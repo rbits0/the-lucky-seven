@@ -16,8 +16,8 @@ function Card({ card }: CardProps) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          className="border m-1 mt-2 bg-body-secondary"
-          style={{ ...provided.draggableProps.style, width: "8em", height: "12em" }}
+          className="border border-black bg-rose-700"
+          style={{ ...provided.draggableProps.style, height: "15em", width: "11em"}}
         >
           <h2>{card.name}</h2>
         </div>

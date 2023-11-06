@@ -12,16 +12,15 @@ interface CellProps {
 
 function Cell({ id, card }: CellProps) {
   return (
-    <Droppable droppableId={id}>
-      {provided => (
+    <Droppable droppableId={id} isCombineEnabled={true} isDropDisabled={true}>
+      {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className="bg-danger-subtle"
-          style={{height: "min-content"}}
+          className={`flex items-center justify-center border border-black ${snapshot.isDraggingOver ? "bg-pink-400" : "bg-white"}`}
+          style={{height: "16em", width: "12em"}}
         >
           <Card card={card}/>
-          {provided.placeholder}
         </div>
       )}
     </Droppable>
