@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Cell from "./Cell";
 import { CardData, CardType } from "./CardData";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import Card from "./Card";
 
 
 function Grid() {
@@ -16,18 +18,25 @@ function Grid() {
   ]);
   
 
+  function onDragEnd(event: DragEndEvent) {
+    // const {over, active} = event;
+  }
+  
+
   return (
-    <div className="mx-1">
-      {
-        list.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex">
-            {row.map((card, columnIndex) => (
-              <Cell key={`${rowIndex},${columnIndex}`} id={`${rowIndex},${columnIndex}`} card={card}/>
-            ))}            
-          </div>
-        ))
-      }
-    </div>
+    <DndContext onDragEnd={onDragEnd}>
+      <div className="mx-1">
+        {
+          list.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex">
+              {row.map((card, columnIndex) => (
+                <Cell key={`${rowIndex},${columnIndex}`} id={`${rowIndex},${columnIndex}`} card={card}/>
+              ))}            
+            </div>
+          ))
+        }
+      </div>
+   </DndContext> 
   );
 }
 
