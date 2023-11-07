@@ -8,7 +8,7 @@ interface CellProps {
   id: string,
   rowIndex: number,
   columnIndex: number,
-  card: CardData,
+  card: CardData | null,
 }
 
 
@@ -26,7 +26,9 @@ function Cell({ id, rowIndex, columnIndex, card }: CellProps) {
       style={{height: "16em", width: "12em"}}
       ref={setNodeRef}
     >
-      <Card card={card} row={rowIndex} column={columnIndex}/>
+      {card ? 
+        <Card card={card} row={rowIndex} column={columnIndex}/>
+      : null}
     </div>
   );
 }
