@@ -28,7 +28,7 @@ function Card({ card }: CardProps) {
   return (
     <div
       ref={setNodeRef}
-      className="text-center flex flex-col justify-center border border-black bg-rose-700"
+      className="text-center flex flex-col justify-center border border-black bg-rose-700 select-none"
       {...listeners}
       {...attributes}
       onDragStart={() => {console.log("A")}}

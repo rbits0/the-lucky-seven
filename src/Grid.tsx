@@ -26,6 +26,12 @@ function Grid() {
     const destIndex: [number, number] = over?.data.current?.index;
     const sourceIndex: [number, number] = active.data.current?.card.index;
     
+    // Check if destIndex == sourceIndex
+    if (destIndex[0] === sourceIndex[0] && destIndex[1] === sourceIndex[1]) {
+      // Dragging back to the same spot means cancel the drag
+      return;
+    }
+    
     // Swap cards
     const newList = [...list];
     console.log(`dest: ${destIndex[0]},${destIndex[1]}  source: ${sourceIndex[0]},${sourceIndex[1]}`)
@@ -83,13 +89,20 @@ function createRandomBoard(): (CardData | null)[][] {
     let column_numbers: number[][] = shuffleArray(cards.columns);
     
     // Shuffle player cards
-    let players: PlayerCard[] = shuffleArray(cards.players);
+    let players = shuffleArray(
+      (cards.players as any[]).map((card, i) => (
+        {...card, id: card.name, type: CardType.Player, down: false}
+      ))
+    ) as PlayerCard[];
     
     // Place player cards
     players.forEach((player, i) => {
       // Find row and column
       const row_index = row_numbers.findIndex(value => value.includes(i));
       const column_index = column_numbers.findIndex(value => value.includes(i));
+      
+      // Update index
+      player.index = [row_index, column_index];
 
       // Place card
       console.log(`${row_index}, ${column_index}`)
