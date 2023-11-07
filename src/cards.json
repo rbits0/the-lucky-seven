@@ -1,8 +1,22 @@
 {
+    "rows": [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+        [7, 8]
+    ],
+    "columns": [
+        [],
+        [1, 6],
+        [2],
+        [3, 7],
+        [4],
+        [5, 8]
+    ],
     "players": [
         {
             "name": "The Leader",
-            "strength": 1,
+            "strength": 1
         },
         {
             "name": "The Athlete",
