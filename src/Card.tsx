@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CardData } from "./CardData";
+import { CardData, CardType, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -36,6 +36,9 @@ function Card({ card }: CardProps) {
     >
       <h2 className="text-2xl font-bold">{card.name}</h2>
       <h2 className="text-xl">{card.strength}</h2>
+      {card.type === CardType.Player ?
+        <h2 className="text-xl">Down: {(card as PlayerCard).down ? "true" : "false"}</h2>
+      : null}
     </div>
   );
 }

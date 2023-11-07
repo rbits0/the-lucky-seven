@@ -99,8 +99,6 @@ function Grid() {
     
     // Swap cards
     const newList = [...list];
-    console.log(`dest: ${destIndex[0]},${destIndex[1]}  source: ${sourceIndex[0]},${sourceIndex[1]}`)
-    console.dir(newList);
     [
       newList[sourceIndex[0]][sourceIndex[1]],
       newList[destIndex[0]][destIndex[1]]
@@ -117,7 +115,6 @@ function Grid() {
 
 
     setList(newList);
-    console.dir(newList);
   }
   
 
@@ -147,7 +144,7 @@ function Grid() {
 
 function createRandomBoard(): [(CardData | null)[][], EnemyCard[]] {
     const cards = require("./cards.json");
-    const list = [...Array(NUM_ROWS)].map(() => Array(NUM_COLUMNS).fill(null));
+    const list: (CardData | null)[][] = [...Array(NUM_ROWS)].map(() => Array(NUM_COLUMNS).fill(null));
     
     // Shuffle row and column numbers
     let row_numbers: number[][] = shuffleArray(cards.rows);
@@ -164,16 +161,34 @@ function createRandomBoard(): [(CardData | null)[][], EnemyCard[]] {
     // Place player cards
     players.forEach((player, i) => {
       // Find row and column
-      const row_index = row_numbers.findIndex(value => value.includes(i));
-      const column_index = column_numbers.findIndex(value => value.includes(i));
+      const rowIndex = row_numbers.findIndex(value => value.includes(i));
+      const columnIndex = column_numbers.findIndex(value => value.includes(i));
       
       // Update index
-      player.index = [row_index, column_index];
+      player.index = [rowIndex, columnIndex];
 
       // Place card
-      console.log(`${row_index}, ${column_index}`)
-      list[row_index][column_index] = player;
+      list[rowIndex][columnIndex] = player;
     });
+    
+
+    // Remove last player card
+    const rowIndex = row_numbers.findIndex(value => value.includes(players.length - 1));
+    const columnIndex = column_numbers.findIndex(value => value.includes(players.length - 1));
+    list[rowIndex][columnIndex] = null;
+    
+    // Down adjacent players
+    const adjacent = [[rowIndex - 1, columnIndex], [rowIndex + 1, columnIndex], [rowIndex, columnIndex - 1], [rowIndex, columnIndex + 1]];
+    for (const index of adjacent) {
+      // Check that index is in bounds
+      if (index[0] < 0 || index[0] >= NUM_ROWS || index[1] < 0 || index[1] >= NUM_COLUMNS) {
+        continue;
+      }
+      
+      if (list[index[0]][index[1]]) {
+        (list[index[0]][index[1]] as PlayerCard).down = true;
+      }
+    }
     
 
     // Parse enemy cards
