@@ -36,8 +36,8 @@ function Card({ card }: CardProps) {
     >
       <h2 className="text-2xl font-bold">{card.name}</h2>
       <h2 className="text-xl">{card.strength}</h2>
-      {card.type === CardType.Player ?
-        <h2 className="text-xl">Down: {(card as PlayerCard).down ? "true" : "false"}</h2>
+      {card.type === CardType.Player && (card as PlayerCard).down ?
+        <h2 className="text-xl">Down</h2>
       : null}
     </div>
   );
