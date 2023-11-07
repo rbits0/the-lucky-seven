@@ -8,12 +8,12 @@ import Card from "./Card";
 function Grid() {
   const [list, setList] = useState<CardData[][]>([
     [
-      { id: "0", name: "Infantry", type: CardType.Enemy, strength: 2, position: 4, index: [0, 0] },
-      { id: "1", name: "Iefantry", type: CardType.Enemy, strength: 2, position: 3, index: [0, 1]},
+      { id: "0", name: "Infantry", type: CardType.Enemy, strength: 2, position: 4, index: [0, 0], hitsDown: false, canOverlap: false, discardAfterRound: false },
+      { id: "1", name: "Iefantry", type: CardType.Enemy, strength: 2, position: 3, index: [0, 1], hitsDown: false, canOverlap: false, discardAfterRound: false },
     ],
     [
-      { id: "2", name: "The Leader", type: CardType.Player, strength: 1, index: [1, 0] },
-      { id: "3", name: "Infantry", type: CardType.Enemy, strength: 2, index: [1, 1] },
+      { id: "2", name: "The Leader", type: CardType.Player, strength: 1, index: [1, 0], down: false },
+      { id: "3", name: "Infantry", type: CardType.Enemy, strength: 2, position: 1, index: [1, 1], hitsDown: false, canOverlap: false, discardAfterRound: false  },
     ]
   ]);
   

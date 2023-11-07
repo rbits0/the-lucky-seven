@@ -4,12 +4,25 @@ export enum CardType {
 }
 
 
-export interface CardData {
+export interface GenericCard {
   id: string,
   name: string,
   type: CardType,
   strength: number,
-  down?: boolean,
-  position?: number,
   index?: [number, number]
 }
+
+
+export interface PlayerCard extends GenericCard {
+  down: boolean,
+}
+
+
+export interface EnemyCard extends GenericCard {
+  position: number,
+  hitsDown: boolean,
+  canOverlap: boolean,
+  discardAfterRound: boolean
+}
+
+export type CardData = PlayerCard | EnemyCard;

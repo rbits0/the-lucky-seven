@@ -28,13 +28,14 @@ function Card({ card }: CardProps) {
   return (
     <div
       ref={setNodeRef}
-      className="border border-black bg-rose-700"
+      className="text-center flex flex-col justify-center border border-black bg-rose-700"
       {...listeners}
       {...attributes}
       onDragStart={() => {console.log("A")}}
       style={{ ...style, height: "15em", width: "11em"}}
     >
-      <h2>{card.name}</h2>
+      <h2 className="text-2xl font-bold">{card.name}</h2>
+      <h2 className="text-xl">{card.strength}</h2>
     </div>
   );
 }

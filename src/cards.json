@@ -1,0 +1,86 @@
+{
+    "players": [
+        {
+            "name": "The Leader",
+            "strength": 1,
+        },
+        {
+            "name": "The Athlete",
+            "strength": 1
+        },
+        {
+            "name": "The Pacifist",
+            "strength": 0
+        },
+        {
+            "name": "The Hammer",
+            "strength": 1
+        },
+        {
+            "name": "The Mouse",
+            "strength": 1
+        },
+        {
+            "name": "The Joker",
+            "strength": 0
+        },
+        {
+            "name": "The Anvil",
+            "strength": 1
+        },
+        {
+            "name": "The Natural",
+            "strength": 1
+        }
+    ],
+    "enemies": [
+        {
+            "name": "Infantry",
+            "strength": 1,
+            "positions": [0, 0, 1, 2, 3, 4, 5, 5],
+            "hitsDown": true,
+            "canOverlap": false,
+            "discardAfterRound": false
+        },
+        {
+            "name": "Infantry",
+            "strength": 2,
+            "positions": [0, 2, 3, 5],
+            "hitsDown": true,
+            "canOverlap": false,
+            "discardAfterRound": false
+        },
+        {
+            "name": "Machine Gun",
+            "strength": 3,
+            "positions": [1, 2, 3, 4],
+            "hitsDown": false,
+            "canOverlap": false,
+            "discardAfterRound": false
+        },
+        {
+            "name": "Flare",
+            "strength": -1,
+            "positions": [1, 2, 3, 4],
+            "hitsDown": true,
+            "canOverlap": true,
+            "discardAfterRound": true
+        },
+        {
+            "name": "Mortar",
+            "strength": -1,
+            "positions": [0, 1, 2, 3, 4, 5],
+            "hitsDown": true,
+            "canOverlap": true,
+            "discardAfterRound": true
+        },
+        {
+            "name": "Tank",
+            "strength": -1,
+            "positions": [-1, -1],
+            "hitsDown": false,
+            "canOverlap": false,
+            "discardAfterRound": true
+        }
+    ]
+}
