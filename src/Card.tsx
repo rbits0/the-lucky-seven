@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { CardData } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -6,21 +6,24 @@ import { CSS } from "@dnd-kit/utilities";
 
 interface CardProps {
   card: CardData,
+  row: number,
+  column: number,
 }
 
 
 function Card({ card }: CardProps) {
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: card.id
+    id: card.id,
+    data: {
+      card: card,
+    }
   })
   
   const style: React.CSSProperties | undefined = transform ? {
     transform: CSS.Translate.toString(transform)
   } : undefined;
 
-  React.useEffect(() => {
-    console.log(style?.transform);
-  }, [style])
 
   return (
     <div
@@ -28,6 +31,7 @@ function Card({ card }: CardProps) {
       className="border border-black bg-rose-700"
       {...listeners}
       {...attributes}
+      onDragStart={() => {console.log("A")}}
       style={{ ...style, height: "15em", width: "11em"}}
     >
       <h2>{card.name}</h2>

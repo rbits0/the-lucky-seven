@@ -11,4 +11,5 @@ export interface CardData {
   strength: number,
   down?: boolean,
   position?: number,
+  index?: [number, number]
 }
