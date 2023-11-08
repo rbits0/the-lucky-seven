@@ -5,8 +5,8 @@ import Card from "./Card";
 
 
 interface GridProps {
-  list: (CardData | null)[][],
-  setList: React.Dispatch<React.SetStateAction<(CardData | null)[][]>>
+  list: (CardData | null)[][][],
+  setList: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>
 }
 
 
@@ -29,17 +29,17 @@ function Grid({ list, setList }: GridProps) {
     // Swap cards
     const newList = [...list];
     [
-      newList[sourceIndex[0]][sourceIndex[1]],
-      newList[destIndex[0]][destIndex[1]]
+      newList[sourceIndex[0]][sourceIndex[1]][0],
+      newList[destIndex[0]][destIndex[1]][0]
     ] = [
-      newList[destIndex[0]][destIndex[1]],
-      newList[sourceIndex[0]][sourceIndex[1]]
+      newList[destIndex[0]][destIndex[1]][0],
+      newList[sourceIndex[0]][sourceIndex[1]][0]
     ];
     
     // Update card indexes
-    newList[destIndex[0]][destIndex[1]]!.index = destIndex;
-    if (newList[sourceIndex[0]][sourceIndex[1]]) {
-      newList[sourceIndex[0]][sourceIndex[1]]!.index = sourceIndex;
+    newList[destIndex[0]][destIndex[1]][0]!.index = destIndex;
+    if (newList[sourceIndex[0]][sourceIndex[1]][0]) {
+      newList[sourceIndex[0]][sourceIndex[1]][0]!.index = sourceIndex;
     }
 
 
@@ -53,13 +53,13 @@ function Grid({ list, setList }: GridProps) {
         {
           list.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
-              {row.map((card, columnIndex) => (
+              {row.map((cards, columnIndex) => (
                 <Cell
                   key={`${rowIndex},${columnIndex}`}
                   id={`${rowIndex},${columnIndex}`}
                   rowIndex={rowIndex}
                   columnIndex={columnIndex}
-                  card={card}
+                  card={cards[0]}
                 />
               ))}            
             </div>

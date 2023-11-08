@@ -107,7 +107,7 @@ function App() {
 
       // Place card
       if (position >= 0) {
-        newList[row][position] = card;
+        newList[row][position][0] = card;
       }
     }
 
@@ -126,9 +126,10 @@ function App() {
 }
 
 
-function createRandomBoard(): [(CardData | null)[][], EnemyCard[]] {
+function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     const cards = require("./cards.json");
-    const list: (CardData | null)[][] = [...Array(NUM_ROWS)].map(() => Array(NUM_COLUMNS).fill(null));
+    const list: (CardData | null)[][][] = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(0)));
+    console.dir(list);
     
     // Shuffle row and column numbers
     let row_numbers: number[][] = shuffleArray(cards.rows);
@@ -152,14 +153,14 @@ function createRandomBoard(): [(CardData | null)[][], EnemyCard[]] {
       player.index = [rowIndex, columnIndex];
 
       // Place card
-      list[rowIndex][columnIndex] = player;
+      list[rowIndex][columnIndex][0] = player;
     });
     
 
     // Remove last player card
     const rowIndex = row_numbers.findIndex(value => value.includes(players.length - 1));
     const columnIndex = column_numbers.findIndex(value => value.includes(players.length - 1));
-    list[rowIndex][columnIndex] = null;
+    list[rowIndex][columnIndex][0] = null;
     
     // Down adjacent players
     const adjacent = [[rowIndex - 1, columnIndex], [rowIndex + 1, columnIndex], [rowIndex, columnIndex - 1], [rowIndex, columnIndex + 1]];
@@ -169,8 +170,8 @@ function createRandomBoard(): [(CardData | null)[][], EnemyCard[]] {
         continue;
       }
       
-      if (list[index[0]][index[1]]) {
-        (list[index[0]][index[1]] as PlayerCard).down = true;
+      if (list[index[0]][index[1]][0]) {
+        (list[index[0]][index[1]][0] as PlayerCard).down = true;
       }
     }
     
