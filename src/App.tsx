@@ -80,7 +80,7 @@ function App() {
         while (!(prioritisedExhausted && unprioritisedExhausted)) {
           // Try prioritised direction first
           let attemptPosition = position + index * prioritisedDirection;
-          if (attemptPosition < 0 || attemptPosition >= NUM_COLUMNS) {
+          if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
             prioritisedExhausted = true;
           } else {
             if (!newList[row][attemptPosition][0]) {
