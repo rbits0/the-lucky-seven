@@ -5,7 +5,7 @@ import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 
 
 const NUM_ROWS = 4
-const NUM_COLUMNS = 6
+const NUM_COLUMNS = 7
 
 
 enum Phase {
@@ -30,16 +30,20 @@ function App() {
         dealEnemies();
         setPhase(Phase.ENCOUNTER);
         break;
-      case Phase.ENCOUNTER:
-        setPhase(Phase.MANEUVER);
-        break;
-      case Phase.MANEUVER:
-        setPhase(Phase.ATTACK);
-        break;
-      case Phase.ATTACK:
-        setPhase(Phase.COUNTER_ATTACK);
-        break;
-      case Phase.COUNTER_ATTACK:
+      // case Phase.ENCOUNTER:
+      //   setPhase(Phase.MANEUVER);
+      //   break;
+      // case Phase.MANEUVER:
+      //   setPhase(Phase.ATTACK);
+      //   break;
+      // case Phase.ATTACK:
+      //   setPhase(Phase.COUNTER_ATTACK);
+      //   break;
+      // case Phase.COUNTER_ATTACK:
+      //   dealEnemies();
+      //   setPhase(Phase.ENCOUNTER);
+      //   break;
+      default:
         dealEnemies();
         setPhase(Phase.ENCOUNTER);
         break;
@@ -58,17 +62,16 @@ function App() {
     for (let row = 0; row < NUM_ROWS; row++) {
       // Deal top card
       const card = newDeck.pop()!;
-      
+
 
       // Work out position of card
       let position = card.position;
-      console.log(`Row ${row}, position ${position}`);
-
+      
       // If it can't overlap, need to find position where it doesn't overlap
       // If it can't find a free space, it won't change position
-      if (!card.canOverlap && newList[row][position]) {
+      if (position >= 0 && !card.canOverlap && newList[row][position][0]) {
         // Determine whether to prioritise left or right
-        const prioritisedDirection = position < NUM_COLUMNS / 2 ? -1 : 1;
+        const prioritisedDirection = position > (NUM_COLUMNS - 1) / 2 ? -1 : 1;
         
         let index = 1;
         let prioritisedExhausted = false;
@@ -80,7 +83,7 @@ function App() {
           if (attemptPosition < 0 || attemptPosition >= NUM_COLUMNS) {
             prioritisedExhausted = true;
           } else {
-            if (!newList[row][attemptPosition]) {
+            if (!newList[row][attemptPosition][0]) {
               // Success
               position = attemptPosition;
               break;
@@ -89,10 +92,10 @@ function App() {
           
           // Try other direction
           attemptPosition = position + index * (prioritisedDirection * -1);
-          if (attemptPosition < 0 || attemptPosition >= NUM_COLUMNS) {
+          if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
             unprioritisedExhausted = true;
           } else {
-            if (!newList[row][attemptPosition]) {
+            if (!newList[row][attemptPosition][0]) {
               // Success
               position = attemptPosition;
               break;
@@ -103,11 +106,17 @@ function App() {
           index += 1;
         }
       }
-      
+
 
       // Place card
+      card.index = [row, position];
       if (position >= 0) {
-        newList[row][position][0] = card;
+        if (card.canOverlap && newList[row][position][0]) {
+          // Put card on top instead of replacing
+          newList[row][position].push(card);
+        } else {
+          newList[row][position][0] = card;
+        }
       }
     }
 
@@ -128,12 +137,14 @@ function App() {
 
 function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     const cards = require("./cards.json");
-    const list: (CardData | null)[][][] = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(0)));
-    console.dir(list);
+    // Create 3D array with null for board
+    const list: (CardData | null)[][][] = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(2).fill(null)));
     
     // Shuffle row and column numbers
     let row_numbers: number[][] = shuffleArray(cards.rows);
     let column_numbers: number[][] = shuffleArray(cards.columns);
+    // let row_numbers: number[][] = cards.rows;
+    // let column_numbers: number[][] = cards.columns;
     
 
     // Shuffle player cards
@@ -142,12 +153,15 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
         {...card, id: card.name, type: CardType.Player, down: false}
       ))
     ) as PlayerCard[];
+    // let players = (cards.players as any[]).map(card => (
+    //   {...card, id: card.name, type: CardType.Player, down: false}
+    // ))as PlayerCard[];
     
     // Place player cards
     players.forEach((player, i) => {
       // Find row and column
-      const rowIndex = row_numbers.findIndex(value => value.includes(i));
-      const columnIndex = column_numbers.findIndex(value => value.includes(i));
+      const rowIndex = row_numbers.findIndex(value => value.includes(i + 1));
+      const columnIndex = column_numbers.findIndex(value => value.includes(i + 1)) + 1;
       
       // Update index
       player.index = [rowIndex, columnIndex];
@@ -158,8 +172,8 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     
 
     // Remove last player card
-    const rowIndex = row_numbers.findIndex(value => value.includes(players.length - 1));
-    const columnIndex = column_numbers.findIndex(value => value.includes(players.length - 1));
+    const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
+    const columnIndex = column_numbers.findIndex(value => value.includes(players.length));
     list[rowIndex][columnIndex][0] = null;
     
     // Down adjacent players
@@ -179,8 +193,8 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     // Parse enemy cards
     let enemies: EnemyCard[] = [];
     for (const [i, enemy] of cards.enemies.entries()) {
-      for (const position of enemy.positions) {
-        const newEnemy = { ...enemy, position: position, id: `enemy${i}`, type: CardType.Enemy};
+      for (const [j, position] of enemy.positions.entries()) {
+        const newEnemy = { ...enemy, position: position, id: `enemy${i},${j}`, type: CardType.Enemy};
         delete newEnemy.positions;
         enemies.push(newEnemy);
       }
