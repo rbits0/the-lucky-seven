@@ -173,7 +173,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
 
     // Remove last player card
     const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
-    const columnIndex = column_numbers.findIndex(value => value.includes(players.length));
+    const columnIndex = column_numbers.findIndex(value => value.includes(players.length)) + 1;
     list[rowIndex][columnIndex][0] = null;
     
     // Down adjacent players
