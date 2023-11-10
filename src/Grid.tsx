@@ -26,6 +26,11 @@ function Grid({ list, setList }: GridProps) {
       return;
     }
     
+    // Check if card to swap with is an enemy
+    if (list[destIndex[0]][destIndex[1]][0]?.type === CardType.Enemy) {
+      return;
+    }
+    
     // Swap cards
     const newList = [...list];
     [

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CardData, CardType, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -12,25 +12,35 @@ interface CardProps {
 
 
 function Card({ card }: CardProps) {
+  const [enabled, setEnabled] = useState(card.type === CardType.Player);
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: card.id,
     data: {
       card: card,
-    }
+    },
+    disabled: !enabled,
   })
   
   const style: React.CSSProperties | undefined = transform ? {
     transform: CSS.Translate.toString(transform)
   } : undefined;
 
+  
+  // Update enabled whenever card changes
+  useEffect(() => {
+    setEnabled(card.type === CardType.Player);
+  }, [card.type]);
+
 
   return (
     <div
       ref={setNodeRef}
-      className="w-full h-full text-center flex flex-col justify-center border border-black bg-rose-700 select-none"
+      className={`w-full h-full text-center flex flex-col justify-center border border-black select-none
+        ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}`}
       {...listeners}
       {...attributes}
+      role={enabled ? "button" : ""}
       onDragStart={() => {console.log("A")}}
       style={style}
     >
