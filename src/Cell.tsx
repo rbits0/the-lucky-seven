@@ -30,7 +30,7 @@ function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
         <Card card={cards[0]} disabled={cards[1] !== null}/>
       : null}
       {cards[1] ? 
-        <Card card={cards[1]} disabled={true} className="absolute mt-20"/> 
+        <Card card={cards[1]} disabled={true} className="absolute mt-16"/> 
       : null}
     </div>
   );

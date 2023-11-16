@@ -37,7 +37,7 @@ function Card({ card, className, disabled }: CardProps) {
     <>
       <div
         ref={setNodeRef}
-        className={`text-center mt-3 mb-3 flex flex-col justify-center border border-black select-none
+        className={`text-center flex flex-col border border-black select-none
           ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : "z-10"
@@ -47,11 +47,10 @@ function Card({ card, className, disabled }: CardProps) {
         {...listeners}
         {...attributes}
         role={enabled ? "button" : ""}
-        onDragStart={() => {console.log("A")}}
         style={{ ...style, height: "calc(100% - 2rem)", width: "calc(100% - 2rem)" }}
       >
-        <h2 className="text-2xl font-bold">{card.name}</h2>
-        <h2 className="text-xl">{card.strength}</h2>
+        <h2 className="text-xl font-bold">{card.name}</h2>
+        <h2 className="text-xl mt-auto">{card.strength}</h2>
         {card.type === CardType.Player && (card as PlayerCard).down ?
           <h2 className="text-xl">Down</h2>
         : null}
