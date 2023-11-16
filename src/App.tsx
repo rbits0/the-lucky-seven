@@ -123,8 +123,6 @@ function App() {
     // Save new deck and list
     setList(newList);
     setDeck(newDeck);
-    
-    console.dir(newList);
   }
   
   
