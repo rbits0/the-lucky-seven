@@ -8,11 +8,11 @@ interface CellProps {
   id: string,
   rowIndex: number,
   columnIndex: number,
-  card: CardData | null,
+  cards: (CardData | null)[],
 }
 
 
-function Cell({ id, rowIndex, columnIndex, card }: CellProps) {
+function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
     data: {
@@ -22,12 +22,15 @@ function Cell({ id, rowIndex, columnIndex, card }: CellProps) {
 
   return (
     <div
-      className={`flex p-2 items-center justify-center border border-black ${isOver ? "bg-pink-400" : "bg-white"}`}
-      style={{height: "16em", width: "12em"}}
+      className={`flex items-center justify-center relative border border-black ${isOver ? "bg-pink-400" : "bg-white"}`}
+      style={{height: "14em", width: "10em"}}
       ref={setNodeRef}
     >
-      {card ? 
-        <Card card={card} row={rowIndex} column={columnIndex}/>
+      {cards[0] ? 
+        <Card card={cards[0]} disabled={cards[1] !== null}/>
+      : null}
+      {cards[1] ? 
+        <Card card={cards[1]} disabled={true} className="absolute mt-20"/> 
       : null}
     </div>
   );

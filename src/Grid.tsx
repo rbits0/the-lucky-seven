@@ -12,6 +12,8 @@ interface GridProps {
 
 function Grid({ list, setList }: GridProps) {
 
+  console.dir(list);
+
   function onDragEnd({over, active}: DragEndEvent) {
     if (!over) {
       return;
@@ -54,7 +56,7 @@ function Grid({ list, setList }: GridProps) {
 
   return (
     <DndContext onDragEnd={onDragEnd}>
-      <div className="mx-1">
+      <div className="border border-black">
         {
           list.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
@@ -64,7 +66,7 @@ function Grid({ list, setList }: GridProps) {
                   id={`${rowIndex},${columnIndex}`}
                   rowIndex={rowIndex}
                   columnIndex={columnIndex}
-                  card={cards[0]}
+                  cards={cards}
                 />
               ))}            
             </div>

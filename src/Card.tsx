@@ -6,15 +6,15 @@ import { CSS } from "@dnd-kit/utilities";
 
 interface CardProps {
   card: CardData,
-  row: number,
-  column: number,
+  className?: string,
+  disabled: boolean,
 }
 
 
-function Card({ card }: CardProps) {
-  const [enabled, setEnabled] = useState(card.type === CardType.Player);
+function Card({ card, className, disabled }: CardProps) {
+  const [enabled, setEnabled] = useState(false);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
     data: {
       card: card,
@@ -29,27 +29,34 @@ function Card({ card }: CardProps) {
   
   // Update enabled whenever card changes
   useEffect(() => {
-    setEnabled(card.type === CardType.Player);
-  }, [card.type]);
+    setEnabled(!disabled && card.type === CardType.Player && !(card as PlayerCard).down);
+  }, [card, disabled]);
 
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`w-full h-full text-center flex flex-col justify-center border border-black select-none
-        ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}`}
-      {...listeners}
-      {...attributes}
-      role={enabled ? "button" : ""}
-      onDragStart={() => {console.log("A")}}
-      style={style}
-    >
-      <h2 className="text-2xl font-bold">{card.name}</h2>
-      <h2 className="text-xl">{card.strength}</h2>
-      {card.type === CardType.Player && (card as PlayerCard).down ?
-        <h2 className="text-xl">Down</h2>
-      : null}
-    </div>
+    <>
+      <div
+        ref={setNodeRef}
+        className={`text-center mt-3 mb-3 flex flex-col justify-center border border-black select-none
+          ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
+          ${// Card should be above everything when it's being dragged
+            isDragging ? "z-30" : "z-10"
+          }
+          ${className}
+        `}
+        {...listeners}
+        {...attributes}
+        role={enabled ? "button" : ""}
+        onDragStart={() => {console.log("A")}}
+        style={{ ...style, height: "calc(100% - 2rem)", width: "calc(100% - 2rem)" }}
+      >
+        <h2 className="text-2xl font-bold">{card.name}</h2>
+        <h2 className="text-xl">{card.strength}</h2>
+        {card.type === CardType.Player && (card as PlayerCard).down ?
+          <h2 className="text-xl">Down</h2>
+        : null}
+      </div>
+    </>
   );
 }
 

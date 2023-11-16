@@ -113,7 +113,7 @@ function App() {
       if (position >= 0) {
         if (card.canOverlap && newList[row][position][0]) {
           // Put card on top instead of replacing
-          newList[row][position].push(card);
+          newList[row][position][1] = card;
         } else {
           newList[row][position][0] = card;
         }
@@ -123,6 +123,8 @@ function App() {
     // Save new deck and list
     setList(newList);
     setDeck(newDeck);
+    
+    console.dir(newList);
   }
   
   
@@ -194,7 +196,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     let enemies: EnemyCard[] = [];
     for (const [i, enemy] of cards.enemies.entries()) {
       for (const [j, position] of enemy.positions.entries()) {
-        const newEnemy = { ...enemy, position: position, id: `enemy${i},${j}`, type: CardType.Enemy};
+        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy};
         delete newEnemy.positions;
         enemies.push(newEnemy);
       }
