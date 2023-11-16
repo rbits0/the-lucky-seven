@@ -33,6 +33,11 @@ function Grid({ list, setList }: GridProps) {
       return;
     }
     
+    // Check if card to swap with has card stacked on top
+    if (list[destIndex[0]][destIndex[1]][1]) {
+      return;
+    }
+    
     // Swap cards
     const newList = [...list];
     [
