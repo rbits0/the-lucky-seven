@@ -61,7 +61,7 @@ function Grid({ list, setList }: GridProps) {
 
   return (
     <DndContext onDragEnd={onDragEnd}>
-      <div className="border border-black">
+      <div>
         {
           list.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">

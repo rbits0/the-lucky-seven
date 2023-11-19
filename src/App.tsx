@@ -150,7 +150,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     // Shuffle player cards
     let players = shuffleArray(
       (cards.players as any[]).map((card, i) => (
-        {...card, id: card.name, type: CardType.Player, down: false}
+        {...card, id: card.name, type: CardType.Player, down: false, rotated: false}
       ))
     ) as PlayerCard[];
     // let players = (cards.players as any[]).map(card => (

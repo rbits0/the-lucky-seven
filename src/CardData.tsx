@@ -15,6 +15,7 @@ export interface GenericCard {
 
 export interface PlayerCard extends GenericCard {
   down: boolean,
+  rotated: boolean,
 }
 
 
