@@ -1,5 +1,3 @@
-- [ ] Check on GenericCard.index
-
 ## Board
 
 - [ ] Disable dragging of cards when not necessary
