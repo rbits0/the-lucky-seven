@@ -1,6 +1,6 @@
 ## Board
 
-- [ ] Disable dragging of cards when not necessary
+- [x] Disable dragging of cards when not necessary
 - [ ] Display card images
 - [ ] Display different image if flipped
 - [ ] Seperate card position from rest of image
@@ -12,7 +12,7 @@
 Setup
 
 Encounter
-- [ ] Flip/rotate players from mortars
+- [ ] Flip/rotate players from mortars before maneuver
 - [ ] Remove mortars before maneuver phase
 
 Maneuver
@@ -40,11 +40,11 @@ Attack
 - [ ] Highlight cards it can attack?
 - [ ] Unrotate cards before counter-attack phase
 - [ ] Revert enemy health before counter-attack phase
+- [ ] Check for failure before counter-attack phase
+- [ ] Check for success before counter-attack phase
 
 Counter-Attack
 - [ ] Remove all players adjacent to enemy cards
 - [ ] Don't remove players adjacent to machine gun if they are up
 - [ ] Remove all up players in tank's row
 - [ ] Remove flares and tanks before encounter phase
-- [ ] Check for failure
-- [ ] Check for success

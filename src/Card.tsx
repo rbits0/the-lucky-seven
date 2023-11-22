@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CardData, CardType, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { Phase, PhaseContext } from "./Contexts";
 
 
 interface CardProps {
@@ -14,6 +15,7 @@ interface CardProps {
 
 function Card({ card, className, disabled, above }: CardProps) {
   const [enabled, setEnabled] = useState(false);
+  const phase = useContext(PhaseContext);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -30,8 +32,8 @@ function Card({ card, className, disabled, above }: CardProps) {
   
   // Update enabled whenever card changes
   useEffect(() => {
-    setEnabled(!disabled && card.type === CardType.Player && !(card as PlayerCard).down);
-  }, [card, disabled]);
+    setEnabled(!disabled && phase === Phase.MANEUVER && card.type === CardType.Player && !(card as PlayerCard).down);
+  }, [card, disabled, phase]);
 
 
   return (

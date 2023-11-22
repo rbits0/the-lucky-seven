@@ -2,19 +2,13 @@ import React, { useEffect, useState } from "react";
 import './App.css';
 import Grid from './Grid';
 import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
+import { Phase, PhaseContext } from "./Contexts";
 
 
 const NUM_ROWS = 4
 const NUM_COLUMNS = 7
 
 
-enum Phase {
-  GAME_START,
-  ENCOUNTER,
-  MANEUVER,
-  ATTACK,
-  COUNTER_ATTACK,
-}
 
 
 function App() {
@@ -30,19 +24,19 @@ function App() {
         dealEnemies();
         setPhase(Phase.ENCOUNTER);
         break;
-      // case Phase.ENCOUNTER:
-      //   setPhase(Phase.MANEUVER);
-      //   break;
-      // case Phase.MANEUVER:
-      //   setPhase(Phase.ATTACK);
-      //   break;
-      // case Phase.ATTACK:
-      //   setPhase(Phase.COUNTER_ATTACK);
-      //   break;
-      // case Phase.COUNTER_ATTACK:
-      //   dealEnemies();
-      //   setPhase(Phase.ENCOUNTER);
-      //   break;
+      case Phase.ENCOUNTER:
+        setPhase(Phase.MANEUVER);
+        break;
+      case Phase.MANEUVER:
+        setPhase(Phase.ATTACK);
+        break;
+      case Phase.ATTACK:
+        setPhase(Phase.COUNTER_ATTACK);
+        break;
+      case Phase.COUNTER_ATTACK:
+        dealEnemies();
+        setPhase(Phase.ENCOUNTER);
+        break;
       default:
         dealEnemies();
         setPhase(Phase.ENCOUNTER);
@@ -127,10 +121,13 @@ function App() {
   
   
   return (
-    <div>
-      <Grid list={list} setList={setList}/>
-      <button onClick={nextPhase}>Next Phase</button>
-    </div>
+    <PhaseContext.Provider value={phase}>
+      <div>
+        <Grid list={list} setList={setList}/>
+        <button onClick={nextPhase}>Next Phase</button>
+        <p>Phase: {phase}</p>
+      </div>
+    </PhaseContext.Provider>
   );
 }
 
