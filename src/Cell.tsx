@@ -22,7 +22,10 @@ function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
 
   return (
     <div
-      className={`flex items-center justify-center relative border border-black ${isOver ? "bg-pink-400" : "bg-white"}`}
+      className={`flex items-center justify-center relative 
+        ${columnIndex > 0 ? "border border-black" : ""}
+        ${isOver ? "bg-pink-400" : "bg-white"}`
+      }
       style={{height: "14em", width: "14em"}}
       ref={setNodeRef}
     >
