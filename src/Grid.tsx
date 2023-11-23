@@ -12,8 +12,6 @@ interface GridProps {
 
 function Grid({ list, setList }: GridProps) {
 
-  console.dir(list);
-
   function onDragEnd({over, active}: DragEndEvent) {
     if (!over) {
       return;

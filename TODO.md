@@ -10,10 +10,11 @@
 ## Phases
 
 Setup
+- [ ] Show which card was discarded?
 
 Encounter
-- [ ] Flip/rotate players from mortars before maneuver
-- [ ] Remove mortars before maneuver phase
+- [x] Flip/rotate players from mortars before maneuver
+- [x] Remove mortars before maneuver phase
 
 Maneuver
 - [ ] Check that card is adjacent or diagonally adjacent before swapping

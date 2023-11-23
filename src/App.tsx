@@ -25,6 +25,7 @@ function App() {
         setPhase(Phase.ENCOUNTER);
         break;
       case Phase.ENCOUNTER:
+        handleMortars();
         setPhase(Phase.MANEUVER);
         break;
       case Phase.MANEUVER:
@@ -117,6 +118,51 @@ function App() {
     // Save new deck and list
     setList(newList);
     setDeck(newDeck);
+  }
+  
+
+  function handleMortars() {
+    const newList = [...list];
+    
+    // For all mortars
+    newList.flat()
+      .filter(cards => cards[0]?.name === "Mortar" || cards[1]?.name === "Mortar")
+      .forEach(cards => {
+        const mortarIndex = cards[0]!.index!;
+        
+        // Flip and rotate mortar
+        if (newList[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.Player) {
+          const card = newList[mortarIndex[0]][mortarIndex[1]][0] as PlayerCard;
+          card.down = true;
+          card.rotated = true;
+        }
+        
+        // Flip all adjacent cards
+        const indexes = [
+          [mortarIndex[0] + 1, mortarIndex[1]],
+          [mortarIndex[0] - 1, mortarIndex[1]],
+          [mortarIndex[0], mortarIndex[1] + 1],
+          [mortarIndex[0], mortarIndex[1] - 1],
+        ];
+        for (const index of indexes) {
+          // Check index is in bounds
+          if (index[0] < 0 || index[1] < 1 || index[0] >= newList.length || index[1] >= newList[0].length) {
+            continue;
+          }
+          
+          if (newList[index[0]][index[1]][0]?.type === CardType.Player) {
+            (newList[index[0]][index[1]][0] as PlayerCard).down = true;
+          }
+          
+        }
+        
+        // Remove mortar
+        if (cards[1]?.name === "Mortar") {
+          cards[1] = null;
+        } else {
+          cards[0] = null;
+        }
+      });
   }
   
   
