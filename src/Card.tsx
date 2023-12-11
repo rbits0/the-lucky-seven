@@ -32,7 +32,13 @@ function Card({ card, className, disabled, above }: CardProps) {
   
   // Update enabled whenever card changes
   useEffect(() => {
-    setEnabled(!disabled && phase === Phase.MANEUVER && card.type === CardType.Player && !(card as PlayerCard).down);
+    setEnabled(
+      !disabled &&
+      phase === Phase.MANEUVER &&
+      card.type === CardType.Player &&
+      !(card as PlayerCard).down &&
+      !(card as PlayerCard).rotated
+    );
   }, [card, disabled, phase]);
 
 

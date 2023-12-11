@@ -95,6 +95,12 @@ function Grid({ list, setList }: GridProps) {
       newList[sourceIndex[0]][sourceIndex[1]][0]!.index = sourceIndex;
     }
 
+    // Rotate card
+    (newList[destIndex[0]][destIndex[1]][0]! as PlayerCard).rotated = true;
+    if (newList[sourceIndex[0]][sourceIndex[1]][0]) {
+      (newList[sourceIndex[0]][sourceIndex[1]][0] as PlayerCard).rotated = true;
+    }
+
 
     setList(newList);
   }
