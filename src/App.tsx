@@ -5,8 +5,8 @@ import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext } from "./Contexts";
 
 
-const NUM_ROWS = 4
-const NUM_COLUMNS = 7
+export const NUM_ROWS = 4
+export const NUM_COLUMNS = 7
 
 
 
@@ -168,7 +168,7 @@ function App() {
   
   return (
     <PhaseContext.Provider value={phase}>
-      <div>
+      <div className="h-screen flex flex-col">
         <Grid list={list} setList={setList}/>
         <button onClick={nextPhase}>Next Phase</button>
         <p>Phase: {phase}</p>

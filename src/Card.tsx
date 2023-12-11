@@ -37,29 +37,27 @@ function Card({ card, className, disabled, above }: CardProps) {
 
 
   return (
-    <>
-      <div
-        ref={setNodeRef}
-        className={`text-center flex flex-col border-black select-none p-1 rounded-lg
-          ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
-          ${// Card should be above everything when it's being dragged
-            isDragging ? "z-30" : above ? "z-20" : "z-10"
-          }
-          ${card.type === CardType.Player && (card as PlayerCard).rotated ? "rotate-90" : ""}
-          ${className}
-        `}
-        {...listeners}
-        {...attributes}
-        role={enabled ? "button" : ""}
-        style={{ ...style, height: "90%", width: "calc(90% * 9 / 14)" }}
-      >
-        <h2 className="text-xl">{card.name}</h2>
-        <h2 className="text-xl mt-auto">{card.strength}</h2>
-        {card.type === CardType.Player && (card as PlayerCard).down ?
-          <h2 className="text-xl">Down</h2>
-        : null}
-      </div>
-    </>
+    <div
+      ref={setNodeRef}
+      className={`text-center flex flex-col border-black select-none p-1 rounded-lg
+        ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
+        ${// Card should be above everything when it's being dragged
+          isDragging ? "z-30" : above ? "z-20" : "z-10"
+        }
+        ${card.type === CardType.Player && (card as PlayerCard).rotated ? "rotate-90" : ""}
+        ${className}
+      `}
+      {...listeners}
+      {...attributes}
+      role={enabled ? "button" : ""}
+      style={{ ...style, aspectRatio: "9/14", height: "90%"}}
+    >
+      <h2 className="text-xl">{card.name}</h2>
+      <h2 className="text-xl mt-auto">{card.strength}</h2>
+      {card.type === CardType.Player && (card as PlayerCard).down ?
+        <h2 className="text-xl">Down</h2>
+      : null}
+    </div>
   );
 }
 

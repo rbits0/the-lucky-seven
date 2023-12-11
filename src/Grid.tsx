@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core";
-import Card from "./Card";
+import { NUM_ROWS, NUM_COLUMNS } from "./App";
 
 
 interface GridProps {
@@ -59,10 +59,12 @@ function Grid({ list, setList }: GridProps) {
 
   return (
     <DndContext onDragEnd={onDragEnd}>
-      <div>
+      <table className={`table-fixed w-[80%]`}
+        style={{aspectRatio: `${NUM_COLUMNS}/${NUM_ROWS}`}}
+      >
         {
           list.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex">
+            <tr key={rowIndex} className="">
               {row.map((cards, columnIndex) => (
                 <Cell
                   key={`${rowIndex},${columnIndex}`}
@@ -72,10 +74,10 @@ function Grid({ list, setList }: GridProps) {
                   cards={cards}
                 />
               ))}            
-            </div>
+            </tr>
           ))
         }
-      </div>
+      </table>
    </DndContext> 
   );
 }
