@@ -17,8 +17,8 @@ Encounter
 - [x] Remove mortars before maneuver phase
 
 Maneuver
-- [ ] Check that card is adjacent or diagonally adjacent before swapping
-- [ ] Check that diagonal movement is not blocked by 2 enemy cards
+- [x] Check that card is adjacent or diagonally adjacent before swapping
+- [x] Check that diagonal movement is not blocked by 2 enemy cards
 - [ ] Rotate card after moving
 - [ ] Check that card is not down (except mouse) or rotated before moving
 - [ ] Add ability for athlete to do 2 moves (rotate 45 degrees?)
