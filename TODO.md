@@ -19,9 +19,9 @@ Encounter
 Maneuver
 - [x] Check that card is adjacent or diagonally adjacent before swapping
 - [x] Check that diagonal movement is not blocked by 2 enemy cards
-- [ ] Rotate card after moving
-- [ ] Check that card is not down or rotated before moving
-- [ ] Add exception for mouse
+- [x] Rotate card after moving
+- [x] Check that card is not down or rotated before moving
+- [x] Add exception for mouse
 - [ ] Add ability for athlete to do 2 moves (rotate 45 degrees?)
     - Note that athlete cannot move AND flip
 - [ ] Click on player card to select it

@@ -36,7 +36,10 @@ function Card({ card, className, disabled, above }: CardProps) {
       !disabled &&
       phase === Phase.MANEUVER &&
       card.type === CardType.Player &&
-      !(card as PlayerCard).down &&
+      (
+        !(card as PlayerCard).down ||
+        card.name === "The Mouse"
+      ) &&
       !(card as PlayerCard).rotated
     );
   }, [card, disabled, phase]);
