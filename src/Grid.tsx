@@ -1,5 +1,5 @@
 import Cell from "./Cell";
-import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
+import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
 
@@ -95,11 +95,9 @@ function Grid({ list, setList }: GridProps) {
       newList[sourceIndex[0]][sourceIndex[1]][0]!.index = sourceIndex;
     }
 
-    // Rotate card
-    (newList[destIndex[0]][destIndex[1]][0]! as PlayerCard).rotated = true;
-    if (newList[sourceIndex[0]][sourceIndex[1]][0]) {
-      (newList[sourceIndex[0]][sourceIndex[1]][0] as PlayerCard).rotated = true;
-    }
+    // Rotate cards
+    rotatePlayer(newList[destIndex[0]][destIndex[1]][0]);
+    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0]);
 
 
     setList(newList);
@@ -127,6 +125,25 @@ function Grid({ list, setList }: GridProps) {
       </div>
    </DndContext> 
   );
+}
+
+
+function rotatePlayer(card: CardData | null) {
+  if (!card || card.type !== CardType.Player) {
+    return;
+  }
+
+  card = card as PlayerCard;
+
+  if (card.name === "The Athlete") {
+    if (!(card as AthleteCard).halfRotated) {
+      (card as AthleteCard).halfRotated = true;
+    } else {
+      card.rotated = true;
+    }
+  } else {
+    card.rotated = true;
+  }
 }
 
 
