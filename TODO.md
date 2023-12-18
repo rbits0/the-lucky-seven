@@ -22,7 +22,7 @@ Maneuver
 - [x] Rotate card after moving
 - [x] Check that card is not down or rotated before moving
 - [x] Add exception for mouse
-- [ ] Add ability for athlete to do 2 moves (rotate 45 degrees?)
+- [x] Add ability for athlete to do 2 moves (rotate 45 degrees?)
     - Note that athlete cannot move AND flip
 - [ ] Click on player card to select it
 - [ ] Flip down/flip up (if up player nearby)
