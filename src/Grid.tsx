@@ -1,6 +1,7 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
 import { Active, DndContext, DragEndEvent, DragMoveEvent, DragStartEvent } from "@dnd-kit/core";
+import { NUM_ROWS, NUM_COLUMNS } from "./App";
 import { useContext, useEffect, useState } from "react";
 import { SetSelectedContext } from "./Contexts";
 
@@ -130,10 +131,15 @@ function Grid({ list, setList }: GridProps) {
 
   return (
     <DndContext onDragStart={onDragStart} onDragMove={onDragMove} onDragEnd={onDragEnd}>
-      <div>
+      <table className={`table-fixed grid-aspect`}
+      >
         {
           list.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex">
+            <tr
+              key={rowIndex}
+              style={{height: `${100 / NUM_ROWS}%`}}
+            >
+            {/* <tr key={rowIndex} className={`h-100%`}> */}
               {row.map((cards, columnIndex) => (
                 <Cell
                   key={`${rowIndex},${columnIndex}`}
@@ -143,10 +149,10 @@ function Grid({ list, setList }: GridProps) {
                   cards={cards}
                 />
               ))}            
-            </div>
+            </tr>
           ))
         }
-      </div>
+      </table>
    </DndContext> 
   );
 }

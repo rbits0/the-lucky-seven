@@ -6,8 +6,8 @@ import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Cont
 import { Active } from "@dnd-kit/core";
 
 
-const NUM_ROWS = 4
-const NUM_COLUMNS = 7
+export const NUM_ROWS = 4
+export const NUM_COLUMNS = 7
 
 
 
