@@ -79,7 +79,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     <>
       <div
         ref={setNodeRef}
-        className={`text-center flex flex-col border-black select-none p-1 rounded-lg
+        className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14]
           ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
@@ -92,7 +92,6 @@ function Card({ card, className, disabled, above }: CardProps) {
         style={{
           ...style,
           height: "90%",
-          width: "calc(90% * 9 / 14)",
           transform: `${style ? style!.transform : ""} rotate(${rotation}deg)`
         }}
         onClick={handleClick}

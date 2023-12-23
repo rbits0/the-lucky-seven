@@ -29,7 +29,7 @@ function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
       // style={{height: "14em", width: "14em"}}
       ref={setNodeRef}
     >
-      <div className="flex justify-center items-center relative">
+      <div className="flex justify-center items-center relative h-full">
         {cards[0] ? 
           <Card card={cards[0]} disabled={cards[1] !== null}/>
         : null}
