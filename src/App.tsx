@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import './App.css';
 import Grid from './Grid';
 import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
-import { Phase, PhaseContext } from "./Contexts";
+import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
+import { Active } from "@dnd-kit/core";
 
 
 const NUM_ROWS = 4
@@ -16,6 +17,7 @@ function App() {
   const [list, setList] = useState(initialBoard);
   const [deck, setDeck] = useState(initialDeck);
   const [phase, setPhase] = useState(Phase.GAME_START);
+  const [selected, setSelected] = useState<string | null>(null);
 
 
   function nextPhase() {
@@ -164,15 +166,19 @@ function App() {
         }
       });
   }
-  
+
   
   return (
     <PhaseContext.Provider value={phase}>
-      <div>
-        <Grid list={list} setList={setList}/>
-        <button onClick={nextPhase}>Next Phase</button>
-        <p>Phase: {phase}</p>
-      </div>
+      <SelectedContext.Provider value={selected}>
+        <SetSelectedContext.Provider value={setSelected}>
+          <div>
+            <Grid list={list} setList={setList}/>
+            <button onClick={nextPhase}>Next Phase</button>
+            <p>Phase: {phase}</p>
+          </div>
+        </SetSelectedContext.Provider>
+      </SelectedContext.Provider>
     </PhaseContext.Provider>
   );
 }

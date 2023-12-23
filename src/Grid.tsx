@@ -1,17 +1,36 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
-import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core";
+import { Active, DndContext, DragEndEvent, DragMoveEvent, DragStartEvent } from "@dnd-kit/core";
+import { useContext, useEffect, useState } from "react";
+import { SetSelectedContext } from "./Contexts";
 
 
 interface GridProps {
   list: (CardData | null)[][][],
-  setList: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>
+  setList: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>,
 }
 
 
 function Grid({ list, setList }: GridProps) {
+  // Checks whether mouse press was a click or a drag
+  const [clickPhase, setClickPhase] = useState(0);
+  const setSelected = useContext(SetSelectedContext);
+
+  function onDragStart(_: DragStartEvent) {
+    setClickPhase(1);
+  }
+
+  function onDragMove(_: DragMoveEvent) {
+    setClickPhase(0);
+  }
 
   function onDragEnd({over, active}: DragEndEvent) {
+    if (clickPhase === 1) {
+      setClickPhase(0);
+      handleClick(active);
+      return;
+    }
+
     if (!over) {
       return;
     }
@@ -102,10 +121,15 @@ function Grid({ list, setList }: GridProps) {
 
     setList(newList);
   }
-  
+
+
+  function handleClick(active: Active) {
+    setSelected!(active.data.current?.card.id);
+  }
+
 
   return (
-    <DndContext onDragEnd={onDragEnd}>
+    <DndContext onDragStart={onDragStart} onDragMove={onDragMove} onDragEnd={onDragEnd}>
       <div>
         {
           list.map((row, rowIndex) => (

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AthleteCard, CardData, CardType, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Phase, PhaseContext } from "./Contexts";
+import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 
 
 interface CardProps {
@@ -16,6 +16,9 @@ interface CardProps {
 function Card({ card, className, disabled, above }: CardProps) {
   const [enabled, setEnabled] = useState(false);
   const phase = useContext(PhaseContext);
+  const selected = useContext(SelectedContext);
+  const setSelected = useContext(SetSelectedContext);
+  const [isSelected, setIsSelected] = useState(false);
   const [rotation, setRotation] = useState("0");
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -57,6 +60,20 @@ function Card({ card, className, disabled, above }: CardProps) {
   }, [card])
 
 
+  // Update isSelected whenever selected changes
+  useEffect(() => {
+    setIsSelected(selected === card.id);
+  }, [selected, card])
+
+
+  function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    console.log("A");
+    
+    if (disabled) {
+      setSelected!(card.id);
+    }
+  }
+
 
   return (
     <>
@@ -78,12 +95,14 @@ function Card({ card, className, disabled, above }: CardProps) {
           width: "calc(90% * 9 / 14)",
           transform: `${style ? style!.transform : ""} rotate(${rotation}deg)`
         }}
+        onClick={handleClick}
       >
         <h2 className="text-xl">{card.name}</h2>
         <h2 className="text-xl mt-auto">{card.strength}</h2>
         {card.type === CardType.Player && (card as PlayerCard).down ?
           <h2 className="text-xl">Down</h2>
         : null}
+        {isSelected ? <p>Selected</p> : null}
       </div>
     </>
   );
