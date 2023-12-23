@@ -24,7 +24,6 @@ function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
   return (
     <td
       className={`border border-black border-collapse bg-clip-border
-        h-[${1 / NUM_ROWS * 100}%]
         ${isOver ? "bg-pink-400" : "bg-white"}
       `}
       // style={{height: "14em", width: "14em"}}

@@ -130,13 +130,16 @@ function Grid({ list, setList }: GridProps) {
 
 
   return (
-    <DndContext onDragEnd={onDragEnd}>
-      <table className={`table-fixed w-[80%]`}
-        style={{aspectRatio: `${NUM_COLUMNS}/${NUM_ROWS}`}}
+    <DndContext onDragStart={onDragStart} onDragMove={onDragMove} onDragEnd={onDragEnd}>
+      <table className={`table-fixed grid-aspect`}
       >
         {
           list.map((row, rowIndex) => (
-            <tr key={rowIndex} className="">
+            <tr
+              key={rowIndex}
+              style={{height: `${100 / NUM_ROWS}%`}}
+            >
+            {/* <tr key={rowIndex} className={`h-100%`}> */}
               {row.map((cards, columnIndex) => (
                 <Cell
                   key={`${rowIndex},${columnIndex}`}
