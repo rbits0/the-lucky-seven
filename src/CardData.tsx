@@ -19,6 +19,11 @@ export interface PlayerCard extends GenericCard {
 }
 
 
+export interface AthleteCard extends PlayerCard {
+  halfRotated: boolean,
+}
+
+
 export interface EnemyCard extends GenericCard {
   position: number,
   hitsDown: boolean,
