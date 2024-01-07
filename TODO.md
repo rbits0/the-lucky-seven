@@ -24,7 +24,7 @@ Maneuver
 - [x] Add exception for mouse
 - [x] Add ability for athlete to do 2 moves (rotate 45 degrees?)
     - Note that athlete cannot move AND flip
-- [ ] Click on player card to select it
+- [x] Click on player card to select it
 - [ ] Flip down/flip up (if up player nearby)
 - [ ] Unrotate all members before attack phase
 
