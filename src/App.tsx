@@ -172,10 +172,17 @@ function App() {
     <PhaseContext.Provider value={phase}>
       <SelectedContext.Provider value={selected}>
         <SetSelectedContext.Provider value={setSelected}>
-          <div>
+          <div className="flex items-start flex-wrap">
             <Grid list={list} setList={setList}/>
-            <button onClick={nextPhase}>Next Phase</button>
-            <p>Phase: {phase}</p>
+            <div className="m-auto p-4 text-xl">
+              <button
+                onClick={nextPhase}
+                className="bg-gray-400 h-min p-2 rounded-md"
+              >
+                Next Phase
+              </button>
+              <p className="mt-4">Phase: {phase}</p>
+            </div>
           </div>
         </SetSelectedContext.Provider>
       </SelectedContext.Provider>

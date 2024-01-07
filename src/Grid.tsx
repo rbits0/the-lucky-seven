@@ -111,8 +111,7 @@ function Grid({ list, setList }: GridProps) {
 
   return (
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
-      <table className={`table-fixed grid-aspect`}
-      >
+      <table className={`table-fixed grid-aspect`}>
         {
           list.map((row, rowIndex) => (
             <tr
