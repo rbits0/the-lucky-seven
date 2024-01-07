@@ -21,6 +21,8 @@ function Card({ card, className, disabled, above }: CardProps) {
   const [isSelected, setIsSelected] = useState(false);
   const [rotation, setRotation] = useState("0");
 
+  const isClickable = card.type === CardType.Player && (phase === Phase.MANEUVER || phase === Phase.ATTACK);
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
     data: {
@@ -69,7 +71,7 @@ function Card({ card, className, disabled, above }: CardProps) {
   function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     console.log("A");
     
-    if (disabled) {
+    if (isClickable) {
       setSelected!(card.id);
     }
   }
@@ -88,7 +90,7 @@ function Card({ card, className, disabled, above }: CardProps) {
         `}
         {...listeners}
         {...attributes}
-        role={enabled ? "button" : ""}
+        role={isClickable ? "button" : ""}
         style={{
           ...style,
           height: "90%",

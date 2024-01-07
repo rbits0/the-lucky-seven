@@ -1,9 +1,7 @@
 import Cell from "./Cell";
-import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
-import { Active, DndContext, DragEndEvent, DragMoveEvent, DragStartEvent } from "@dnd-kit/core";
-import { NUM_ROWS, NUM_COLUMNS } from "./App";
-import { useContext, useEffect, useState } from "react";
-import { SetSelectedContext } from "./Contexts";
+import { AthleteCard, CardData, CardType, PlayerCard } from "./CardData";
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { NUM_ROWS, } from "./App";
 
 
 interface GridProps {
@@ -13,24 +11,11 @@ interface GridProps {
 
 
 function Grid({ list, setList }: GridProps) {
-  // Checks whether mouse press was a click or a drag
-  const [clickPhase, setClickPhase] = useState(0);
-  const setSelected = useContext(SetSelectedContext);
 
-  function onDragStart(_: DragStartEvent) {
-    setClickPhase(1);
-  }
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10}}))
 
-  function onDragMove(_: DragMoveEvent) {
-    setClickPhase(0);
-  }
 
   function onDragEnd({over, active}: DragEndEvent) {
-    if (clickPhase === 1) {
-      setClickPhase(0);
-      handleClick(active);
-      return;
-    }
 
     if (!over) {
       return;
@@ -124,13 +109,8 @@ function Grid({ list, setList }: GridProps) {
   }
 
 
-  function handleClick(active: Active) {
-    setSelected!(active.data.current?.card.id);
-  }
-
-
   return (
-    <DndContext onDragStart={onDragStart} onDragMove={onDragMove} onDragEnd={onDragEnd}>
+    <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <table className={`table-fixed grid-aspect`}
       >
         {
