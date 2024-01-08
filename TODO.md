@@ -26,6 +26,7 @@ Maneuver
     - Note that athlete cannot move AND flip
 - [x] Click on player card to select it
 - [ ] Flip down/flip up (if up player nearby)
+    - Fix board not updating
 - [ ] Unrotate all members before attack phase
 
 Attack

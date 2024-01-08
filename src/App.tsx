@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import Grid from './Grid';
-import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
+import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 
@@ -167,6 +167,59 @@ function App() {
       });
   }
 
+
+  function flipSelected() {
+    // Find selected card
+    for (const row of list) {
+      const selectedCard = row.find((card) => card[0]?.id === selected);
+
+      if (selectedCard) {
+        const selectedPlayerCard = selectedCard[0] as PlayerCard;
+
+        // Card can't flip if it is rotated
+        // Includes athlete's half-rotation
+        if (
+          selectedPlayerCard.rotated || (
+            selectedPlayerCard.name === "The Athlete" &&
+            (selectedPlayerCard as AthleteCard).halfRotated
+          )
+        ) {
+          return;
+        }
+
+        if (selectedPlayerCard.down) {
+          // Flip up
+          // Check if adjacent up card exists
+          const index = selectedPlayerCard.index!;
+          const adjacent = [
+            [index[0] - 1, index[1]],
+            [index[0], index[1] - 1],
+            [index[0] + 1, index[1]],
+            [index[0], index[1] + 1],
+          ]
+          
+          const canFlip = adjacent.some((adjacentIndex) => {
+            const adjacentCard = list[adjacentIndex[0]][adjacentIndex[1]][0];
+            if (adjacentCard && adjacentCard.type === CardType.Player && !(adjacentCard as PlayerCard).down) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+
+          if (canFlip) {
+            selectedPlayerCard.down = false;
+            selectedPlayerCard.rotated = true;
+          }
+        } else {
+          // Flip down
+          selectedPlayerCard.down = true;
+          selectedPlayerCard.rotated = true;
+        }
+      }
+    }
+  }
+
   
   return (
     <PhaseContext.Provider value={phase}>
@@ -174,14 +227,24 @@ function App() {
         <SetSelectedContext.Provider value={setSelected}>
           <div className="flex items-start flex-wrap">
             <Grid list={list} setList={setList}/>
-            <div className="m-auto p-4 text-xl">
+
+            <div className="flex flex-col m-auto p-4 text-xl">
+              <p>Phase: {phase}</p>
+
+              <button
+                onClick={flipSelected}
+                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+              >
+                Flip Selected
+              </button>
+
               <button
                 onClick={nextPhase}
-                className="bg-gray-400 h-min p-2 rounded-md"
+                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
               >
                 Next Phase
               </button>
-              <p className="mt-4">Phase: {phase}</p>
+
             </div>
           </div>
         </SetSelectedContext.Provider>

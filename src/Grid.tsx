@@ -12,7 +12,7 @@ interface GridProps {
 
 function Grid({ list, setList }: GridProps) {
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10}}))
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
 
 
   function onDragEnd({over, active}: DragEndEvent) {

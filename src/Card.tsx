@@ -22,6 +22,7 @@ function Card({ card, className, disabled, above }: CardProps) {
   const [rotation, setRotation] = useState("0");
 
   const isClickable = card.type === CardType.Player && (phase === Phase.MANEUVER || phase === Phase.ATTACK);
+  const rotated = (card as PlayerCard).rotated;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -48,7 +49,7 @@ function Card({ card, className, disabled, above }: CardProps) {
       ) &&
       !(card as PlayerCard).rotated
     );
-  }, [card, disabled, phase]);
+  }, [card, rotated, disabled, phase]);
 
   // Update rotation whenever card changes
   useEffect(() => {
@@ -59,7 +60,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     } else {
       setRotation("0");
     }
-  }, [card])
+  }, [card, (card as PlayerCard).rotated])
 
 
   // Update isSelected whenever selected changes
