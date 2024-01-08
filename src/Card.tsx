@@ -52,7 +52,8 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
             (!(card as PlayerCard).down || card.name === "The Mouse")
         ) || (
           card.type === CardType.Enemy &&
-            selected
+            selected &&
+            (card as EnemyCard).strength >= 0
         )
       )
 

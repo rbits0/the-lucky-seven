@@ -41,7 +41,8 @@ Attack
 - [x] Click on adjacent enemy card to attack with player, rotate player
 - [x] Don't allow selecting down card (except mouse)
 - [x] Remove enemy once health reaches 0
-- [ ] Don't allow attacking flares
+- [x] Don't allow attacking flares
+- [ ] Don't allow selecting joker or pacifist
 - [x] Allow the natural to attack diagonally
 - [ ] Increase anvil/hammer strength when pacifist adjacent
 - [ ] Decrease enemy strength when joker adjacent
