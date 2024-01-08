@@ -45,6 +45,9 @@ function App() {
         setPhase(Phase.ENCOUNTER);
         break;
     }
+    
+    // Unselect card
+    setSelected(null);
   }
 
   

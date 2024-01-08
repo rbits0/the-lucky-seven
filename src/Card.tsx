@@ -17,11 +17,15 @@ function Card({ card, className, disabled, above }: CardProps) {
   const [enabled, setEnabled] = useState(false);
   const phase = useContext(PhaseContext);
   const selected = useContext(SelectedContext);
-  const setSelected = useContext(SetSelectedContext);
+  const setSelected = useContext(SetSelectedContext)!;
   const [isSelected, setIsSelected] = useState(false);
   const [rotation, setRotation] = useState("0");
 
-  const isClickable = card.type === CardType.Player && (phase === Phase.MANEUVER || phase === Phase.ATTACK);
+  const isClickable = (
+    card.type === CardType.Player &&
+    (phase === Phase.MANEUVER || phase === Phase.ATTACK) && 
+    !(card as PlayerCard).rotated
+  );
   const rotated = (card as PlayerCard).rotated;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -73,7 +77,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     console.log("A");
     
     if (isClickable) {
-      setSelected!(card.id);
+      setSelected(card.id);
     }
   }
 

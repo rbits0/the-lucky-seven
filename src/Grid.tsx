@@ -2,6 +2,8 @@ import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { NUM_ROWS, } from "./App";
+import { useContext } from "react";
+import { SelectedContext, SetSelectedContext } from "./Contexts";
 
 
 interface GridProps {
@@ -13,6 +15,8 @@ interface GridProps {
 function Grid({ list, setList }: GridProps) {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
+  const selected = useContext(SelectedContext);
+  const setSelected = useContext(SetSelectedContext)!;
 
 
   function onDragEnd({over, active}: DragEndEvent) {
@@ -101,8 +105,8 @@ function Grid({ list, setList }: GridProps) {
     }
 
     // Rotate cards
-    rotatePlayer(newList[destIndex[0]][destIndex[1]][0]);
-    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0]);
+    rotatePlayer(newList[destIndex[0]][destIndex[1]][0], selected, setSelected);
+    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0], selected, setSelected);
 
 
     setList(newList);
@@ -137,7 +141,11 @@ function Grid({ list, setList }: GridProps) {
 }
 
 
-function rotatePlayer(card: CardData | null) {
+function rotatePlayer(
+  card: CardData | null,
+  selected: string | null,
+  setSelected: React.Dispatch<React.SetStateAction<string | null>>
+) {
   if (!card || card.type !== CardType.Player) {
     return;
   }
@@ -145,14 +153,26 @@ function rotatePlayer(card: CardData | null) {
   card = card as PlayerCard;
 
   if (card.name === "The Athlete") {
+    // Special case for athlete
     if (!(card as AthleteCard).halfRotated) {
       (card as AthleteCard).halfRotated = true;
     } else {
       card.rotated = true;
+      
+      // Unselect card
+      if (card.id === selected) {
+        setSelected(null);
+      }
     }
   } else {
     card.rotated = true;
+    
+    // Unselect card
+    if (card.id === selected) {
+      setSelected(null);
+    }
   }
+  
 }
 
 
