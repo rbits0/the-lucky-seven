@@ -37,20 +37,25 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
 
   const isClickable = (
     (
+
       phase === Phase.MANEUVER && 
       card.type === CardType.Player &&
       !(card as PlayerCard).rotated
+
     ) || (
+
       phase === Phase.ATTACK &&
       (
         (
           card.type === CardType.Player &&
-          !(card as PlayerCard).rotated
+            !(card as PlayerCard).rotated &&
+            (!(card as PlayerCard).down || card.name === "The Mouse")
         ) || (
           card.type === CardType.Enemy &&
-          selected
+            selected
         )
       )
+
     )
   );
 

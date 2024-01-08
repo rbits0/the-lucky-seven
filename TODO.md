@@ -39,7 +39,7 @@ Maneuver
 Attack
 - [x] Click on player card to select it
 - [x] Click on adjacent enemy card to attack with player, rotate player
-- [ ] Check not down before attacking (except mouse)
+- [x] Don't allow selecting down card (except mouse)
 - [x] Remove enemy once health reaches 0
 - [ ] Don't allow attacking flares
 - [x] Allow the natural to attack diagonally
