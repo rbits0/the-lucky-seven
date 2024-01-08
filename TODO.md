@@ -42,7 +42,7 @@ Attack
 - [ ] Check not down before attacking (except mouse)
 - [x] Remove enemy once health reaches 0
 - [ ] Don't allow attacking flares
-- [ ] Allow the natural to attack diagonally
+- [x] Allow the natural to attack diagonally
 - [ ] Increase anvil/hammer strength when pacifist adjacent
 - [ ] Decrease enemy strength when joker adjacent
 - [ ] Seperate numbers from card images in order to display that properly
