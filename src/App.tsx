@@ -32,6 +32,7 @@ function App() {
         break;
       case Phase.MANEUVER:
         unrotateCards();
+        removeFlares();
         setPhase(Phase.ATTACK);
         break;
       case Phase.ATTACK:
@@ -191,6 +192,15 @@ function App() {
       }
     }
 
+    setList(newList);
+  }
+  
+
+  function removeFlares() {
+    const newList = list.map(row => row.map(cards => cards.map(
+      card => card?.name === "Flare" ? null : card
+    )));
+    
     setList(newList);
   }
 

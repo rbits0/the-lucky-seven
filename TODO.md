@@ -35,13 +35,14 @@ Maneuver
 - [x] Can't select card that is rotated
     - Automatically deselect card once rotated and on next phase
 - [x] Unrotate all members before attack phase
+- [x] Remove flares before attack phase
 
 Attack
 - [x] Click on player card to select it
 - [x] Click on adjacent enemy card to attack with player, rotate player
 - [x] Don't allow selecting down card (except mouse)
 - [x] Remove enemy once health reaches 0
-- [x] Don't allow attacking flares
+- [x] Don't allow attacking tanks
 - [ ] Don't allow selecting joker or pacifist
 - [x] Allow the natural to attack diagonally
 - [ ] Increase anvil/hammer strength when pacifist adjacent
