@@ -34,13 +34,13 @@ Maneuver
     - Fix board not updating
 - [x] Can't select card that is rotated
     - Automatically deselect card once rotated and on next phase
-- [x] Unrotate all members before attack phase
+- [ ] Unrotate all members before attack phase
 
 Attack
 - [x] Click on player card to select it
-- [ ] Click on adjacent enemy card to attack with player, rotate player
+- [x] Click on adjacent enemy card to attack with player, rotate player
 - [ ] Check not down before attacking (except mouse)
-- [ ] Remove enemy once health reaches 0
+- [x] Remove enemy once health reaches 0
 - [ ] Don't allow attacking flares
 - [ ] Allow the natural to attack diagonally
 - [ ] Increase anvil/hammer strength when pacifist adjacent

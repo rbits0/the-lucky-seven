@@ -10,10 +10,11 @@ interface CardProps {
   className?: string,
   disabled: boolean,
   above?: boolean,
+  attackCallback: (enemy: EnemyCard) => void,
 }
 
 
-function Card({ card, className, disabled, above }: CardProps) {
+function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   const phase = useContext(PhaseContext);
   const selected = useContext(SelectedContext);
   const setSelected = useContext(SetSelectedContext)!;
@@ -83,8 +84,7 @@ function Card({ card, className, disabled, above }: CardProps) {
       if (card.type === CardType.Player) {
         setSelected(card.id);
       } else {
-        // Attack
-        // TODO:
+        attackCallback(card as EnemyCard);
       }
     }
   }
