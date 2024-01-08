@@ -27,6 +27,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     !(card as PlayerCard).rotated
   );
   const rotated = (card as PlayerCard).rotated;
+  const halfRotated = (card as AthleteCard).halfRotated;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -57,14 +58,14 @@ function Card({ card, className, disabled, above }: CardProps) {
 
   // Update rotation whenever card changes
   useEffect(() => {
-    if (card.type === CardType.Player && (card as PlayerCard).rotated) {
+    if (card.type === CardType.Player && rotated) {
       setRotation("90");
-    } else if (card.name === "The Athlete" && (card as AthleteCard).halfRotated) {
+    } else if (card.name === "The Athlete" && halfRotated) {
       setRotation("45");
     } else {
       setRotation("0");
     }
-  }, [card, rotated])
+  }, [card, rotated, halfRotated])
 
 
   // Update isSelected whenever selected changes
@@ -74,8 +75,6 @@ function Card({ card, className, disabled, above }: CardProps) {
 
 
   function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    console.log("A");
-    
     if (isClickable) {
       setSelected(card.id);
     }

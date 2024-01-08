@@ -34,6 +34,7 @@ function App() {
         setPhase(Phase.ATTACK);
         break;
       case Phase.ATTACK:
+        unrotateCards();
         setPhase(Phase.COUNTER_ATTACK);
         break;
       case Phase.COUNTER_ATTACK:
@@ -46,6 +47,7 @@ function App() {
         break;
     }
     
+
     // Unselect card
     setSelected(null);
   }
@@ -168,6 +170,27 @@ function App() {
           cards[0] = null;
         }
       });
+  }
+  
+
+  function unrotateCards() {
+    const newList = [...list];
+
+    for (const row of newList) {
+      for (const cards of row) {
+        if (cards[0]?.type !== CardType.Player) {
+          continue;
+        }
+        
+        (cards[0] as PlayerCard).rotated = false;
+
+        if (cards[0].name === "The Athlete") {
+          (cards[0] as AthleteCard).halfRotated = false;
+        }
+      }
+    }
+
+    setList(newList);
   }
 
 
