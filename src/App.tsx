@@ -31,6 +31,7 @@ function App() {
         setPhase(Phase.MANEUVER);
         break;
       case Phase.MANEUVER:
+        unrotateCards();
         setPhase(Phase.ATTACK);
         break;
       case Phase.ATTACK:
