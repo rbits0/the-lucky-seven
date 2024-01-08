@@ -227,6 +227,11 @@ function App() {
           ]
           
           const canFlip = adjacent.some((adjacentIndex) => {
+            // Check index is in bounds
+            if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= newList.length || adjacentIndex[1] >= newList[0].length) {
+              return false;
+            }
+
             const adjacentCard = list[adjacentIndex[0]][adjacentIndex[1]][0];
             if (adjacentCard && adjacentCard.type === CardType.Player && !(adjacentCard as PlayerCard).down) {
               return true;

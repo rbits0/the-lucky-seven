@@ -6,6 +6,10 @@
 - [ ] Seperate card position from rest of image
 - [ ] Undo button
 - [ ] Success and failure screens
+- [ ] Add error messages for invalid actions
+    - Flipping without adjacent player
+        - Maybe grey out button instead
+    - Moving diagonally between 2 enemies
 
 ## Phases
 
