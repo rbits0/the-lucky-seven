@@ -43,7 +43,7 @@ Attack
 - [x] Don't allow selecting down card (except mouse)
 - [x] Remove enemy once health reaches 0
 - [x] Don't allow attacking tanks
-- [ ] Don't allow selecting joker or pacifist
+- [x] Don't allow selecting joker or pacifist
 - [x] Allow the natural to attack diagonally
 - [ ] Increase anvil/hammer strength when pacifist adjacent
 - [ ] Decrease enemy strength when joker adjacent
