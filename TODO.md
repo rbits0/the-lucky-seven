@@ -27,7 +27,7 @@ Maneuver
 - [x] Click on player card to select it
 - [x] Flip down/flip up (if up player nearby)
     - Fix board not updating
-- [ ] Can't select card that is rotated
+- [x] Can't select card that is rotated
     - Automatically deselect card once rotated and on next phase
 - [ ] Unrotate all members before attack phase
 
