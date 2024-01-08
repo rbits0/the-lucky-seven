@@ -169,8 +169,10 @@ function App() {
 
 
   function flipSelected() {
+    const newList = [...list];
+
     // Find selected card
-    for (const row of list) {
+    for (const row of newList) {
       const selectedCard = row.find((card) => card[0]?.id === selected);
 
       if (selectedCard) {
@@ -218,6 +220,8 @@ function App() {
         }
       }
     }
+
+    setList(newList);
   }
 
   

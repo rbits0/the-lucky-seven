@@ -60,7 +60,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     } else {
       setRotation("0");
     }
-  }, [card, (card as PlayerCard).rotated])
+  }, [card, rotated])
 
 
   // Update isSelected whenever selected changes

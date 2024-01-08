@@ -25,8 +25,10 @@ Maneuver
 - [x] Add ability for athlete to do 2 moves (rotate 45 degrees?)
     - Note that athlete cannot move AND flip
 - [x] Click on player card to select it
-- [ ] Flip down/flip up (if up player nearby)
+- [x] Flip down/flip up (if up player nearby)
     - Fix board not updating
+- [ ] Can't select card that is rotated
+    - Automatically deselect card once rotated and on next phase
 - [ ] Unrotate all members before attack phase
 
 Attack
