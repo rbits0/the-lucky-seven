@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AthleteCard, CardData, CardType, PlayerCard } from "./CardData";
+import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
@@ -14,20 +14,44 @@ interface CardProps {
 
 
 function Card({ card, className, disabled, above }: CardProps) {
-  const [enabled, setEnabled] = useState(false);
   const phase = useContext(PhaseContext);
   const selected = useContext(SelectedContext);
   const setSelected = useContext(SetSelectedContext)!;
-  const [isSelected, setIsSelected] = useState(false);
   const [rotation, setRotation] = useState("0");
 
-  const isClickable = (
-    card.type === CardType.Player &&
-    (phase === Phase.MANEUVER || phase === Phase.ATTACK) && 
-    !(card as PlayerCard).rotated
-  );
   const rotated = (card as PlayerCard).rotated;
   const halfRotated = (card as AthleteCard).halfRotated;
+  const isSelected = selected === card.id;
+
+  const enabled = (
+    !disabled &&
+    phase === Phase.MANEUVER &&
+    card.type === CardType.Player &&
+    (
+      !(card as PlayerCard).down ||
+      card.name === "The Mouse"
+    ) &&
+    !(card as PlayerCard).rotated
+  )
+
+  const isClickable = (
+    (
+      phase === Phase.MANEUVER && 
+      card.type === CardType.Player &&
+      !(card as PlayerCard).rotated
+    ) || (
+      phase === Phase.ATTACK &&
+      (
+        (
+          card.type === CardType.Player &&
+          !(card as PlayerCard).rotated
+        ) || (
+          card.type === CardType.Enemy &&
+          selected
+        )
+      )
+    )
+  );
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -42,20 +66,6 @@ function Card({ card, className, disabled, above }: CardProps) {
   } : undefined;
 
   
-  // Update enabled whenever card changes
-  useEffect(() => {
-    setEnabled(
-      !disabled &&
-      phase === Phase.MANEUVER &&
-      card.type === CardType.Player &&
-      (
-        !(card as PlayerCard).down ||
-        card.name === "The Mouse"
-      ) &&
-      !(card as PlayerCard).rotated
-    );
-  }, [card, rotated, disabled, phase]);
-
   // Update rotation whenever card changes
   useEffect(() => {
     if (card.type === CardType.Player && rotated) {
@@ -68,21 +78,19 @@ function Card({ card, className, disabled, above }: CardProps) {
   }, [card, rotated, halfRotated])
 
 
-  // Update isSelected whenever selected changes
-  useEffect(() => {
-    setIsSelected(selected === card.id);
-  }, [selected, card])
-
-
   function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (isClickable) {
-      setSelected(card.id);
+      if (card.type === CardType.Player) {
+        setSelected(card.id);
+      } else {
+        // Attack
+        // TODO:
+      }
     }
   }
 
 
   return (
-    <>
       <div
         ref={setNodeRef}
         className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14]
@@ -103,13 +111,16 @@ function Card({ card, className, disabled, above }: CardProps) {
         onClick={handleClick}
       >
         <h2 className="text-xl">{card.name}</h2>
-        <h2 className="text-xl mt-auto">{card.strength}</h2>
+        <h2 className="text-xl mt-auto">{
+          card.type === CardType.Player ?
+            card.strength : 
+            (card as EnemyCard).health
+        }</h2>
         {card.type === CardType.Player && (card as PlayerCard).down ?
           <h2 className="text-xl">Down</h2>
         : null}
         {isSelected ? <p>Selected</p> : null}
       </div>
-    </>
   );
 }
 

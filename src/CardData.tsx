@@ -28,7 +28,8 @@ export interface EnemyCard extends GenericCard {
   position: number,
   hitsDown: boolean,
   canOverlap: boolean,
-  discardAfterRound: boolean
+  discardAfterRound: boolean,
+  health: number,
 }
 
 export type CardData = PlayerCard | EnemyCard;

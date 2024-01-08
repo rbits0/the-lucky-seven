@@ -6,10 +6,11 @@
 - [ ] Seperate card position from rest of image
 - [ ] Undo button
 - [ ] Success and failure screens
-- [ ] Add error messages for invalid actions
+- [ ] Add error messages for invalid actions (or make it more clear that it is invalid)
     - Flipping without adjacent player
         - Maybe grey out button instead
     - Moving diagonally between 2 enemies
+    - Attacking non-adjacent enemy
 
 ## Phases
 
@@ -36,7 +37,7 @@ Maneuver
 - [x] Unrotate all members before attack phase
 
 Attack
-- [ ] Click on player card to select it
+- [x] Click on player card to select it
 - [ ] Click on adjacent enemy card to attack with player, rotate player
 - [ ] Check not down before attacking (except mouse)
 - [ ] Remove enemy once health reaches 0

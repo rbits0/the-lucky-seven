@@ -348,7 +348,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     let enemies: EnemyCard[] = [];
     for (const [i, enemy] of cards.enemies.entries()) {
       for (const [j, position] of enemy.positions.entries()) {
-        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy};
+        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy, health: enemy.strength};
         delete newEnemy.positions;
         enemies.push(newEnemy);
       }
