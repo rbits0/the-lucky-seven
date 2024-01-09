@@ -298,7 +298,11 @@ export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
 }
 
 
-export function findAdjacentEnemies(index: [number, number], list: (CardData | null)[][][]): EnemyCard[] {
+function findAdjacent(
+  index: [number, number],
+  list: (CardData | null)[][][],
+  predicate: (card: CardData | null) => boolean
+): CardData[] {
   const adjacent = [
     [index[0] - 1, index[1]],
     [index[0], index[1] - 1],
@@ -307,12 +311,29 @@ export function findAdjacentEnemies(index: [number, number], list: (CardData | n
   // No out of bounds indexes
   ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
   
-  const adjacentEnemies = adjacent
+  const adjacentCards = adjacent
     .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
-    .filter(card => card?.type === CardType.Enemy)
-    .map(card => card! as EnemyCard);
+    .filter(predicate)
+    .map(card => card!);
   
-  return adjacentEnemies;
+  return adjacentCards;
+}
+
+export function findAdjacentEnemies(index: [number, number], list: (CardData | null)[][][]): EnemyCard[] {
+  return findAdjacent(index, list, card => card?.type === CardType.Enemy)
+    .map(card => card as EnemyCard);
+}
+
+export function findAdjacentPlayers(index: [number, number], list: (CardData | null)[][][], up?: boolean): PlayerCard[] {
+  if (up === undefined) {
+    up = false;
+  }
+
+  return findAdjacent(
+    index,
+    list,
+    card => card?.type === CardType.Player && (!up || !(card! as PlayerCard).down)
+  ).map(card => card as PlayerCard);
 }
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
-import Grid, { findAdjacentEnemies, updateHammerAnvilStrength } from './Grid';
+import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
@@ -38,6 +38,7 @@ function App() {
       case Phase.ATTACK:
         unrotateCards();
         resetEnemyHealth();
+        counterAttack();
         setPhase(Phase.COUNTER_ATTACK);
         break;
       case Phase.COUNTER_ATTACK:
@@ -282,6 +283,33 @@ function App() {
     updateJokerAdjacentHealth(newList);
     
     setList(newList);
+  }
+  
+
+  function counterAttack() {
+    const newList = [...list];
+
+    for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+      let toRemove: PlayerCard[] = [];
+
+      if (enemy[0]!.name === "Infantry") {
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, false));
+      } else if (enemy[0]!.name === "Machine Gun") {
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, true));
+      } else if (enemy[0]!.name === "Tank") {
+        // Find all player cards in that row
+        toRemove = toRemove.concat(
+          newList[enemy[0]!.index![0]]
+            .filter(cards => cards[0]?.type === CardType.Player && !(cards[0]! as PlayerCard).down)
+            .map(cards => cards[0]! as PlayerCard)
+        );
+      }
+      
+      for (const player of toRemove) {
+        // Remove player
+        newList[player.index![0]][player.index![1]][0] = null;
+      }
+    }
   }
 
   

@@ -57,8 +57,8 @@ Attack
 - [ ] Check for success before counter-attack phase
 
 Counter-Attack
-- [ ] Remove all players adjacent to enemy cards
-    - Remember to update anvil/hammer strength
-- [ ] Don't remove players adjacent to machine gun if they are up
-- [ ] Remove all up players in tank's row
-- [ ] Remove flares and tanks before encounter phase
+- [x] Remove all players adjacent to enemy cards
+- [ ] Update anvil/hammer strength
+- [x] Don't remove players adjacent to machine gun if they are down
+- [x] Remove all up players in tank's row
+- [ ] Remove tanks before encounter phase
