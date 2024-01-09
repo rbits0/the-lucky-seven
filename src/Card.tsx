@@ -120,7 +120,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
         <h2 className="text-xl">{card.name}</h2>
         <h2 className="text-xl mt-auto">{
           card.type === CardType.Player ?
-            card.strength : 
+            (card as PlayerCard).effectiveStrength : 
             (card as EnemyCard).health
         }</h2>
         {card.type === CardType.Player && (card as PlayerCard).down ?

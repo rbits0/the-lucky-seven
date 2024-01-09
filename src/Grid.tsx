@@ -143,7 +143,7 @@ function Grid({ list, setList }: GridProps) {
     }
     
     const newList = [...list];
-    const damage = selectedCard.strength;
+    const damage = (selectedCard as PlayerCard).effectiveStrength;
     
     enemy.health -= damage;
 
