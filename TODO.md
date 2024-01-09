@@ -58,7 +58,7 @@ Attack
 
 Counter-Attack
 - [x] Remove all players adjacent to enemy cards
-- [ ] Update anvil/hammer strength
+- [x] Update anvil/hammer strength
 - [x] Don't remove players adjacent to machine gun if they are down
 - [x] Remove all up players in tank's row
 - [ ] Remove tanks before encounter phase

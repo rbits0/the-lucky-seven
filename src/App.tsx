@@ -37,7 +37,11 @@ function App() {
         break;
       case Phase.ATTACK:
         unrotateCards();
-        resetEnemyHealth();
+
+        const newList = [...list];
+        resetEnemyHealth(newList);
+        setList(newList);
+
         counterAttack();
         setPhase(Phase.COUNTER_ATTACK);
         break;
@@ -273,19 +277,6 @@ function App() {
   }
   
 
-  function resetEnemyHealth() {
-    const newList = [...list];
-    
-    for (const enemy of newList.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
-      (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
-    }
-    
-    updateJokerAdjacentHealth(newList);
-    
-    setList(newList);
-  }
-  
-
   function counterAttack() {
     const newList = [...list];
 
@@ -310,6 +301,11 @@ function App() {
         newList[player.index![0]][player.index![1]][0] = null;
       }
     }
+    
+    resetEnemyHealth(newList);
+    updateHammerAnvilStrength(newList);
+    
+    setList(newList);
   }
 
   
@@ -442,6 +438,15 @@ function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
       enemy.health = enemy.strength - 1;
     }
   }
+}
+
+
+function resetEnemyHealth(list: (CardData | null)[][][]) {
+  for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+    (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
+  }
+  
+  updateJokerAdjacentHealth(list);
 }
 
 
