@@ -39,7 +39,6 @@ function App() {
         unrotateCards();
 
         const newList = [...list];
-        resetEnemyHealth(newList);
         setList(newList);
 
         counterAttack();
