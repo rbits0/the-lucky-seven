@@ -61,4 +61,4 @@ Counter-Attack
 - [x] Update anvil/hammer strength
 - [x] Don't remove players adjacent to machine gun if they are down
 - [x] Remove all up players in tank's row
-- [ ] Remove tanks before encounter phase
+- [x] Remove tanks before encounter phase

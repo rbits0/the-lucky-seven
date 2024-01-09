@@ -38,10 +38,8 @@ function App() {
       case Phase.ATTACK:
         unrotateCards();
 
-        const newList = [...list];
-        setList(newList);
-
         counterAttack();
+        removeTanks();
         setPhase(Phase.COUNTER_ATTACK);
         break;
       case Phase.COUNTER_ATTACK:
@@ -304,6 +302,15 @@ function App() {
     resetEnemyHealth(newList);
     updateHammerAnvilStrength(newList);
     
+    setList(newList);
+  }
+  
+
+  function removeTanks() {
+    const newList = [...list];
+    for (const row of newList) {
+      row[0][0] = null;
+    }
     setList(newList);
   }
 
