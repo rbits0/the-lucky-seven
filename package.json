@@ -1,6 +1,6 @@
 {
   "name": "the-lucky-seven",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha",
   "homepage": "https://rbits0.github.io/the-lucky-seven",
   "private": true,
   "dependencies": {
