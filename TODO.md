@@ -11,6 +11,7 @@
         - Maybe grey out button instead
     - Moving diagonally between 2 enemies
     - Attacking non-adjacent enemy
+- [ ] Display number of cards/turns remaining
 
 ## Phases
 
