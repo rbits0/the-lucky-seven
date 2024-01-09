@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
-import Grid from './Grid';
+import Grid, { updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
@@ -353,6 +353,9 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
         (list[index[0]][index[1]][0] as PlayerCard).down = true;
       }
     }
+
+
+    updateHammerAnvilStrength(list);
     
 
     // Parse enemy cards

@@ -107,6 +107,9 @@ function Grid({ list, setList }: GridProps) {
     // Rotate cards
     rotatePlayer(newList[destIndex[0]][destIndex[1]][0], selected, setSelected);
     rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0], selected, setSelected);
+    
+
+    updateHammerAnvilStrength(newList);
 
 
     setList(newList);
@@ -224,6 +227,48 @@ function rotatePlayer(
     }
   }
   
+}
+
+
+function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
+  const adjacent = [
+    [index[0] - 1, index[1]],
+    [index[0], index[1] - 1],
+    [index[0], index[1] + 1],
+    [index[0] + 1, index[1]],
+  // No out of bounds indexes
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  
+
+  
+  const pacifistIsAdjacent = adjacent
+    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .find(card => card?.name === "The Pacifist") !== undefined;
+  
+  console.dir(pacifistIsAdjacent);
+  
+  return pacifistIsAdjacent;;
+}
+
+export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
+  // Check if pacifist adjacent to any hammer/anvil
+  for (const row of list) {
+    // For all hammer/anvils
+    for (const cards of row
+      .filter(
+        cards => cards[0]?.name === "The Hammer" ||
+        cards[0]?.name === "The Anvil"
+      )
+    ) {
+      if (isPacifistAdjacent(cards[0]!.index!, list)) {
+        // Increase strength
+        (cards[0]! as PlayerCard).effectiveStrength = (cards[0]!.strength + 1);
+      } else {
+        // Reset strength
+        (cards[0]! as PlayerCard).effectiveStrength = (cards[0]!.strength);
+      }
+    }
+  }
 }
 
 

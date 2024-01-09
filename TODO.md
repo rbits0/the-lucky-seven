@@ -45,7 +45,8 @@ Attack
 - [x] Don't allow attacking tanks
 - [x] Don't allow selecting joker or pacifist
 - [x] Allow the natural to attack diagonally
-- [ ] Increase anvil/hammer strength when pacifist adjacent
+- [x] Increase anvil/hammer strength when pacifist adjacent
+- [ ] Change colour of strength text when modified
 - [ ] Decrease enemy strength when joker adjacent
 - [ ] Seperate numbers from card images in order to display that properly
     - Maybe have the modified number be a different colour?
@@ -57,6 +58,7 @@ Attack
 
 Counter-Attack
 - [ ] Remove all players adjacent to enemy cards
+    - Remember to update anvil/hammer strength
 - [ ] Don't remove players adjacent to machine gun if they are up
 - [ ] Remove all up players in tank's row
 - [ ] Remove flares and tanks before encounter phase
