@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
-import Grid, { updateHammerAnvilStrength } from './Grid';
+import Grid, { findAdjacentEnemies, updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
@@ -123,6 +123,17 @@ function App() {
         }
       }
     }
+    
+    
+    // Update strengths of enemies adjacent to joker
+    const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+    if (joker) {
+      const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, newList);
+      for (const enemy of adjacentEnemies) {
+        enemy.health = enemy.strength - 1;
+      }
+    }
+
 
     // Save new deck and list
     setList(newList);

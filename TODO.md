@@ -47,7 +47,7 @@ Attack
 - [x] Allow the natural to attack diagonally
 - [x] Increase anvil/hammer strength when pacifist adjacent
 - [ ] Change colour of strength text when modified
-- [ ] Decrease enemy strength when joker adjacent
+- [x] Decrease enemy strength when joker adjacent
 - [ ] Seperate numbers from card images in order to display that properly
     - Maybe have the modified number be a different colour?
 - [ ] Highlight cards it can attack?

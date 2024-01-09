@@ -88,6 +88,16 @@ function Grid({ list, setList }: GridProps) {
       return;
     }
     
+    // If one of the cards is the joker, reset enemy strength
+    for (const index of [sourceIndex, destIndex]) {
+      if (list[index[0]][index[1]][0]?.name === "The Joker") {
+        const adjacentEnemies = findAdjacentEnemies(index, list);
+        for (const enemy of adjacentEnemies) {
+          enemy.health = enemy.strength;
+        }
+      }
+    }
+    
     // Swap cards
     const newList = [...list];
     [
@@ -110,6 +120,17 @@ function Grid({ list, setList }: GridProps) {
     
 
     updateHammerAnvilStrength(newList);
+
+
+    // If one of the cards is the joker, reduce enemy strength
+    for (const index of [sourceIndex, destIndex]) {
+      if (newList[index[0]][index[1]][0]?.name === "The Joker") {
+        const adjacentEnemies = findAdjacentEnemies(index, newList);        
+        for (const enemy of adjacentEnemies) {
+          enemy.health = enemy.strength - 1;
+        }
+      }
+    }
 
 
     setList(newList);
@@ -230,7 +251,12 @@ function rotatePlayer(
 }
 
 
-function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
+function is_Adjacent(
+  index: [number, number],
+  list: (CardData | null)[][][],
+  predicate: (card: CardData | null) => boolean
+): boolean {
+
   const adjacent = [
     [index[0] - 1, index[1]],
     [index[0], index[1] - 1],
@@ -239,15 +265,15 @@ function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][]
   // No out of bounds indexes
   ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
   
-
-  
-  const pacifistIsAdjacent = adjacent
+  const cardIsAdjacent = adjacent
     .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
-    .find(card => card?.name === "The Pacifist") !== undefined;
+    .find(predicate) !== undefined;
   
-  console.dir(pacifistIsAdjacent);
-  
-  return pacifistIsAdjacent;;
+  return cardIsAdjacent;
+}
+
+function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
+  return is_Adjacent(index, list, card => card?.name === "The Pacifist");
 }
 
 export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
@@ -269,6 +295,24 @@ export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
       }
     }
   }
+}
+
+
+export function findAdjacentEnemies(index: [number, number], list: (CardData | null)[][][]): EnemyCard[] {
+  const adjacent = [
+    [index[0] - 1, index[1]],
+    [index[0], index[1] - 1],
+    [index[0], index[1] + 1],
+    [index[0] + 1, index[1]],
+  // No out of bounds indexes
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  
+  const adjacentEnemies = adjacent
+    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .filter(card => card?.type === CardType.Enemy)
+    .map(card => card! as EnemyCard);
+  
+  return adjacentEnemies;
 }
 
 
