@@ -1,6 +1,6 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { NUM_ROWS, } from "./App";
 import { useContext } from "react";
 import { SelectedContext, SetSelectedContext } from "./Contexts";
@@ -14,7 +14,11 @@ interface GridProps {
 
 function Grid({ list, setList }: GridProps) {
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
+  // const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 1 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 1 } })
+  );
   const selected = useContext(SelectedContext);
   const setSelected = useContext(SetSelectedContext)!;
 
