@@ -51,8 +51,8 @@ Attack
 - [ ] Seperate numbers from card images in order to display that properly
     - Maybe have the modified number be a different colour?
 - [ ] Highlight cards it can attack?
-- [ ] Unrotate cards before counter-attack phase
-- [ ] Revert enemy health before counter-attack phase
+- [x] Unrotate cards before counter-attack phase
+- [x] Revert enemy health before counter-attack phase
 - [ ] Check for failure before counter-attack phase
 - [ ] Check for success before counter-attack phase
 

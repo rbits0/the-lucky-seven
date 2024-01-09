@@ -37,6 +37,7 @@ function App() {
         break;
       case Phase.ATTACK:
         unrotateCards();
+        resetEnemyHealth();
         setPhase(Phase.COUNTER_ATTACK);
         break;
       case Phase.COUNTER_ATTACK:
@@ -124,15 +125,8 @@ function App() {
       }
     }
     
-    
-    // Update strengths of enemies adjacent to joker
-    const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
-    if (joker) {
-      const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, newList);
-      for (const enemy of adjacentEnemies) {
-        enemy.health = enemy.strength - 1;
-      }
-    }
+
+    updateJokerAdjacentHealth(newList);
 
 
     // Save new deck and list
@@ -276,6 +270,19 @@ function App() {
 
     setList(newList);
   }
+  
+
+  function resetEnemyHealth() {
+    const newList = [...list];
+    
+    for (const enemy of newList.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+      (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
+    }
+    
+    updateJokerAdjacentHealth(newList);
+    
+    setList(newList);
+  }
 
   
   return (
@@ -395,6 +402,18 @@ function shuffleArray<T>(array: T[]): T[] {
   }
   
   return array;
+}
+
+
+function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
+  // Update strengths of enemies adjacent to joker
+  const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+  if (joker) {
+    const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
+    for (const enemy of adjacentEnemies) {
+      enemy.health = enemy.strength - 1;
+    }
+  }
 }
 
 
