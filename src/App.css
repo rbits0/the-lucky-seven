@@ -12,7 +12,6 @@ html, body, #root {
     height: calc(100vw * var(--height-ratio) / var(--width-ratio));
     max-height: 100vh;
     max-width: calc(100vh * var(--width-ratio) / var(--height-ratio));
-    margin: auto;
     /* position: absolute; */
     top:0;bottom:0; /* vertical center */
     left:0;right:0; /* horizontal center */

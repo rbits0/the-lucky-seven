@@ -16,6 +16,8 @@ export interface GenericCard {
 export interface PlayerCard extends GenericCard {
   down: boolean,
   rotated: boolean,
+  // Strength when attacking enemies (different than strength for hammer and anvil)
+  effectiveStrength: number,
 }
 
 
@@ -28,7 +30,8 @@ export interface EnemyCard extends GenericCard {
   position: number,
   hitsDown: boolean,
   canOverlap: boolean,
-  discardAfterRound: boolean
+  discardAfterRound: boolean,
+  health: number,
 }
 
 export type CardData = PlayerCard | EnemyCard;

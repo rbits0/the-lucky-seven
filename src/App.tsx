@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
-import Grid from './Grid';
-import { CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
+import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStrength } from './Grid';
+import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 
@@ -31,9 +31,15 @@ function App() {
         setPhase(Phase.MANEUVER);
         break;
       case Phase.MANEUVER:
+        unrotateCards();
+        removeFlares();
         setPhase(Phase.ATTACK);
         break;
       case Phase.ATTACK:
+        unrotateCards();
+
+        counterAttack();
+        removeTanks();
         setPhase(Phase.COUNTER_ATTACK);
         break;
       case Phase.COUNTER_ATTACK:
@@ -45,6 +51,10 @@ function App() {
         setPhase(Phase.ENCOUNTER);
         break;
     }
+    
+
+    // Unselect card
+    setSelected(null);
   }
 
   
@@ -116,6 +126,10 @@ function App() {
         }
       }
     }
+    
+
+    updateJokerAdjacentHealth(newList);
+
 
     // Save new deck and list
     setList(newList);
@@ -166,16 +180,166 @@ function App() {
         }
       });
   }
+  
+
+  function unrotateCards() {
+    const newList = [...list];
+
+    for (const row of newList) {
+      for (const cards of row) {
+        if (cards[0]?.type !== CardType.Player) {
+          continue;
+        }
+        
+        (cards[0] as PlayerCard).rotated = false;
+
+        if (cards[0].name === "The Athlete") {
+          (cards[0] as AthleteCard).halfRotated = false;
+        }
+      }
+    }
+
+    setList(newList);
+  }
+  
+
+  function removeFlares() {
+    const newList = list.map(row => row.map(cards => cards.map(
+      card => card?.name === "Flare" ? null : card
+    )));
+    
+    setList(newList);
+  }
+
+
+  function flipSelected() {
+    const newList = [...list];
+
+    // Find selected card
+    for (const row of newList) {
+      const selectedCard = row.find((card) => card[0]?.id === selected);
+
+      if (selectedCard) {
+        const selectedPlayerCard = selectedCard[0] as PlayerCard;
+
+        // Card can't flip if it is rotated
+        // Includes athlete's half-rotation
+        if (
+          selectedPlayerCard.rotated || (
+            selectedPlayerCard.name === "The Athlete" &&
+            (selectedPlayerCard as AthleteCard).halfRotated
+          )
+        ) {
+          return;
+        }
+
+        if (selectedPlayerCard.down) {
+          // Flip up
+          // Check if adjacent up card exists
+          const index = selectedPlayerCard.index!;
+          const adjacent = [
+            [index[0] - 1, index[1]],
+            [index[0], index[1] - 1],
+            [index[0] + 1, index[1]],
+            [index[0], index[1] + 1],
+          ]
+          
+          const canFlip = adjacent.some((adjacentIndex) => {
+            // Check index is in bounds
+            if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= newList.length || adjacentIndex[1] >= newList[0].length) {
+              return false;
+            }
+
+            const adjacentCard = list[adjacentIndex[0]][adjacentIndex[1]][0];
+            if (adjacentCard && adjacentCard.type === CardType.Player && !(adjacentCard as PlayerCard).down) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+
+          if (canFlip) {
+            selectedPlayerCard.down = false;
+            selectedPlayerCard.rotated = true;
+          }
+        } else {
+          // Flip down
+          selectedPlayerCard.down = true;
+          selectedPlayerCard.rotated = true;
+        }
+      }
+    }
+
+    setList(newList);
+  }
+  
+
+  function counterAttack() {
+    const newList = [...list];
+
+    for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+      let toRemove: PlayerCard[] = [];
+
+      if (enemy[0]!.name === "Infantry") {
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, false));
+      } else if (enemy[0]!.name === "Machine Gun") {
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, true));
+      } else if (enemy[0]!.name === "Tank") {
+        // Find all player cards in that row
+        toRemove = toRemove.concat(
+          newList[enemy[0]!.index![0]]
+            .filter(cards => cards[0]?.type === CardType.Player && !(cards[0]! as PlayerCard).down)
+            .map(cards => cards[0]! as PlayerCard)
+        );
+      }
+      
+      for (const player of toRemove) {
+        // Remove player
+        newList[player.index![0]][player.index![1]][0] = null;
+      }
+    }
+    
+    resetEnemyHealth(newList);
+    updateHammerAnvilStrength(newList);
+    
+    setList(newList);
+  }
+  
+
+  function removeTanks() {
+    const newList = [...list];
+    for (const row of newList) {
+      row[0][0] = null;
+    }
+    setList(newList);
+  }
 
   
   return (
     <PhaseContext.Provider value={phase}>
       <SelectedContext.Provider value={selected}>
         <SetSelectedContext.Provider value={setSelected}>
-          <div>
+          <div className="flex items-start flex-wrap">
             <Grid list={list} setList={setList}/>
-            <button onClick={nextPhase}>Next Phase</button>
-            <p>Phase: {phase}</p>
+
+            <div className="flex flex-col m-auto p-4 text-xl">
+              <p>Phase: {phase}</p>
+
+              <button
+                onClick={flipSelected}
+                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+              >
+                Flip Selected
+              </button>
+
+              <button
+                onClick={nextPhase}
+                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+              >
+                Next Phase
+              </button>
+
+            </div>
           </div>
         </SetSelectedContext.Provider>
       </SelectedContext.Provider>
@@ -199,7 +363,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     // Shuffle player cards
     let players = shuffleArray(
       (cards.players as any[]).map((card, i) => (
-        {...card, id: card.name, type: CardType.Player, down: false, rotated: false}
+        {...card, id: card.name, type: CardType.Player, down: false, rotated: false, effectiveStrength: card.strength}
       ))
     ) as PlayerCard[];
     // let players = (cards.players as any[]).map(card => (
@@ -237,13 +401,16 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
         (list[index[0]][index[1]][0] as PlayerCard).down = true;
       }
     }
+
+
+    updateHammerAnvilStrength(list);
     
 
     // Parse enemy cards
     let enemies: EnemyCard[] = [];
     for (const [i, enemy] of cards.enemies.entries()) {
       for (const [j, position] of enemy.positions.entries()) {
-        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy};
+        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy, health: enemy.strength};
         delete newEnemy.positions;
         enemies.push(newEnemy);
       }
@@ -265,6 +432,27 @@ function shuffleArray<T>(array: T[]): T[] {
   }
   
   return array;
+}
+
+
+function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
+  // Update strengths of enemies adjacent to joker
+  const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+  if (joker) {
+    const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
+    for (const enemy of adjacentEnemies) {
+      enemy.health = enemy.strength - 1;
+    }
+  }
+}
+
+
+function resetEnemyHealth(list: (CardData | null)[][][]) {
+  for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+    (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
+  }
+  
+  updateJokerAdjacentHealth(list);
 }
 
 

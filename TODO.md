@@ -6,6 +6,12 @@
 - [ ] Seperate card position from rest of image
 - [ ] Undo button
 - [ ] Success and failure screens
+- [ ] Add error messages for invalid actions (or make it more clear that it is invalid)
+    - Flipping without adjacent player
+        - Maybe grey out button instead
+    - Moving diagonally between 2 enemies
+    - Attacking non-adjacent enemy
+- [ ] Display number of cards/turns remaining
 
 ## Phases
 
@@ -24,29 +30,36 @@ Maneuver
 - [x] Add exception for mouse
 - [x] Add ability for athlete to do 2 moves (rotate 45 degrees?)
     - Note that athlete cannot move AND flip
-- [ ] Click on player card to select it
-- [ ] Flip down/flip up (if up player nearby)
-- [ ] Unrotate all members before attack phase
+- [x] Click on player card to select it
+- [x] Flip down/flip up (if up player nearby)
+    - Fix board not updating
+- [x] Can't select card that is rotated
+    - Automatically deselect card once rotated and on next phase
+- [x] Unrotate all members before attack phase
+- [x] Remove flares before attack phase
 
 Attack
-- [ ] Click on player card to select it
-- [ ] Click on adjacent enemy card to attack with player, rotate player
-- [ ] Check not down before attacking (except mouse)
-- [ ] Remove enemy once health reaches 0
-- [ ] Don't allow attacking flares
-- [ ] Allow the natural to attack diagonally
-- [ ] Increase anvil/hammer strength when pacifist adjacent
-- [ ] Decrease enemy strength when joker adjacent
+- [x] Click on player card to select it
+- [x] Click on adjacent enemy card to attack with player, rotate player
+- [x] Don't allow selecting down card (except mouse)
+- [x] Remove enemy once health reaches 0
+- [x] Don't allow attacking tanks
+- [x] Don't allow selecting joker or pacifist
+- [x] Allow the natural to attack diagonally
+- [x] Increase anvil/hammer strength when pacifist adjacent
+- [ ] Change colour of strength text when modified
+- [x] Decrease enemy strength when joker adjacent
 - [ ] Seperate numbers from card images in order to display that properly
     - Maybe have the modified number be a different colour?
 - [ ] Highlight cards it can attack?
-- [ ] Unrotate cards before counter-attack phase
-- [ ] Revert enemy health before counter-attack phase
+- [x] Unrotate cards before counter-attack phase
+- [x] Revert enemy health before counter-attack phase
 - [ ] Check for failure before counter-attack phase
 - [ ] Check for success before counter-attack phase
 
 Counter-Attack
-- [ ] Remove all players adjacent to enemy cards
-- [ ] Don't remove players adjacent to machine gun if they are up
-- [ ] Remove all up players in tank's row
-- [ ] Remove flares and tanks before encounter phase
+- [x] Remove all players adjacent to enemy cards
+- [x] Update anvil/hammer strength
+- [x] Don't remove players adjacent to machine gun if they are down
+- [x] Remove all up players in tank's row
+- [x] Remove tanks before encounter phase

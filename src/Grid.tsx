@@ -1,9 +1,9 @@
 import Cell from "./Cell";
-import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
-import { Active, DndContext, DragEndEvent, DragMoveEvent, DragStartEvent } from "@dnd-kit/core";
-import { NUM_ROWS, NUM_COLUMNS } from "./App";
-import { useContext, useEffect, useState } from "react";
-import { SetSelectedContext } from "./Contexts";
+import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { NUM_ROWS, } from "./App";
+import { useContext } from "react";
+import { SelectedContext, SetSelectedContext } from "./Contexts";
 
 
 interface GridProps {
@@ -13,24 +13,13 @@ interface GridProps {
 
 
 function Grid({ list, setList }: GridProps) {
-  // Checks whether mouse press was a click or a drag
-  const [clickPhase, setClickPhase] = useState(0);
-  const setSelected = useContext(SetSelectedContext);
 
-  function onDragStart(_: DragStartEvent) {
-    setClickPhase(1);
-  }
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
+  const selected = useContext(SelectedContext);
+  const setSelected = useContext(SetSelectedContext)!;
 
-  function onDragMove(_: DragMoveEvent) {
-    setClickPhase(0);
-  }
 
   function onDragEnd({over, active}: DragEndEvent) {
-    if (clickPhase === 1) {
-      setClickPhase(0);
-      handleClick(active);
-      return;
-    }
 
     if (!over) {
       return;
@@ -99,6 +88,16 @@ function Grid({ list, setList }: GridProps) {
       return;
     }
     
+    // If one of the cards is the joker, reset enemy strength
+    for (const index of [sourceIndex, destIndex]) {
+      if (list[index[0]][index[1]][0]?.name === "The Joker") {
+        const adjacentEnemies = findAdjacentEnemies(index, list);
+        for (const enemy of adjacentEnemies) {
+          enemy.health = enemy.strength;
+        }
+      }
+    }
+    
     // Swap cards
     const newList = [...list];
     [
@@ -116,23 +115,81 @@ function Grid({ list, setList }: GridProps) {
     }
 
     // Rotate cards
-    rotatePlayer(newList[destIndex[0]][destIndex[1]][0]);
-    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0]);
+    rotatePlayer(newList[destIndex[0]][destIndex[1]][0], selected, setSelected);
+    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0], selected, setSelected);
+    
+
+    updateHammerAnvilStrength(newList);
+
+
+    // If one of the cards is the joker, reduce enemy strength
+    for (const index of [sourceIndex, destIndex]) {
+      if (newList[index[0]][index[1]][0]?.name === "The Joker") {
+        const adjacentEnemies = findAdjacentEnemies(index, newList);        
+        for (const enemy of adjacentEnemies) {
+          enemy.health = enemy.strength - 1;
+        }
+      }
+    }
 
 
     setList(newList);
   }
+  
 
+  function attack(enemy: EnemyCard) {
+    const selectedCard = list.flatMap(row => row.find(cards => cards[0]?.id === selected)).filter(x => x)[0];
+    if (!selectedCard) {
+      return;
+    }
+    
 
-  function handleClick(active: Active) {
-    setSelected!(active.data.current?.card.id);
+    // Check that selected is adjacent
+    let adjacentIndexes = [
+      [enemy.index![0] - 1, enemy.index![1]],
+      [enemy.index![0], enemy.index![1] - 1],
+      [enemy.index![0], enemy.index![1] + 1],
+      [enemy.index![0] + 1, enemy.index![1]],
+    ];
+    
+    // Special case for the natural, can attack diagonally
+    if (selectedCard.name === "The Natural") {
+      adjacentIndexes = adjacentIndexes.concat([
+        [enemy.index![0] - 1, enemy.index![1] - 1],
+        [enemy.index![0] - 1, enemy.index![1] + 1],
+        [enemy.index![0] + 1, enemy.index![1] - 1],
+        [enemy.index![0] + 1, enemy.index![1] + 1],
+      ]);
+    }
+
+    if (!adjacentIndexes.find(index => index[0] === selectedCard.index![0] && index[1] === selectedCard.index![1])) {
+      return;
+    }
+    
+    const newList = [...list];
+    const damage = (selectedCard as PlayerCard).effectiveStrength;
+    
+    enemy.health -= damage;
+
+    if (enemy.health <= 0) {
+      // Remove enemy
+      const index = enemy.index!;
+      newList[index[0]][index[1]][0] = null;
+    }
+    
+    // Rotate player
+    (selectedCard as PlayerCard).rotated = true;
+    
+    // Unselect player
+    setSelected(null);
+    
+    setList(newList);
   }
 
 
   return (
-    <DndContext onDragStart={onDragStart} onDragMove={onDragMove} onDragEnd={onDragEnd}>
-      <table className={`table-fixed grid-aspect`}
-      >
+    <DndContext onDragEnd={onDragEnd} sensors={sensors}>
+      <table className={`table-fixed grid-aspect`}>
         {
           list.map((row, rowIndex) => (
             <tr
@@ -147,6 +204,7 @@ function Grid({ list, setList }: GridProps) {
                   rowIndex={rowIndex}
                   columnIndex={columnIndex}
                   cards={cards}
+                  attackCallback={attack}
                 />
               ))}            
             </tr>
@@ -158,7 +216,11 @@ function Grid({ list, setList }: GridProps) {
 }
 
 
-function rotatePlayer(card: CardData | null) {
+function rotatePlayer(
+  card: CardData | null,
+  selected: string | null,
+  setSelected: React.Dispatch<React.SetStateAction<string | null>>
+) {
   if (!card || card.type !== CardType.Player) {
     return;
   }
@@ -166,14 +228,112 @@ function rotatePlayer(card: CardData | null) {
   card = card as PlayerCard;
 
   if (card.name === "The Athlete") {
+    // Special case for athlete
     if (!(card as AthleteCard).halfRotated) {
       (card as AthleteCard).halfRotated = true;
     } else {
       card.rotated = true;
+      
+      // Unselect card
+      if (card.id === selected) {
+        setSelected(null);
+      }
     }
   } else {
     card.rotated = true;
+    
+    // Unselect card
+    if (card.id === selected) {
+      setSelected(null);
+    }
   }
+  
+}
+
+
+function is_Adjacent(
+  index: [number, number],
+  list: (CardData | null)[][][],
+  predicate: (card: CardData | null) => boolean
+): boolean {
+
+  const adjacent = [
+    [index[0] - 1, index[1]],
+    [index[0], index[1] - 1],
+    [index[0], index[1] + 1],
+    [index[0] + 1, index[1]],
+  // No out of bounds indexes
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  
+  const cardIsAdjacent = adjacent
+    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .find(predicate) !== undefined;
+  
+  return cardIsAdjacent;
+}
+
+function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
+  return is_Adjacent(index, list, card => card?.name === "The Pacifist");
+}
+
+export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
+  // Check if pacifist adjacent to any hammer/anvil
+  for (const row of list) {
+    // For all hammer/anvils
+    for (const cards of row
+      .filter(
+        cards => cards[0]?.name === "The Hammer" ||
+        cards[0]?.name === "The Anvil"
+      )
+    ) {
+      if (isPacifistAdjacent(cards[0]!.index!, list)) {
+        // Increase strength
+        (cards[0]! as PlayerCard).effectiveStrength = (cards[0]!.strength + 1);
+      } else {
+        // Reset strength
+        (cards[0]! as PlayerCard).effectiveStrength = (cards[0]!.strength);
+      }
+    }
+  }
+}
+
+
+function findAdjacent(
+  index: [number, number],
+  list: (CardData | null)[][][],
+  predicate: (card: CardData | null) => boolean
+): CardData[] {
+  const adjacent = [
+    [index[0] - 1, index[1]],
+    [index[0], index[1] - 1],
+    [index[0], index[1] + 1],
+    [index[0] + 1, index[1]],
+  // No out of bounds indexes
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  
+  const adjacentCards = adjacent
+    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .filter(predicate)
+    .map(card => card!);
+  
+  return adjacentCards;
+}
+
+export function findAdjacentEnemies(index: [number, number], list: (CardData | null)[][][]): EnemyCard[] {
+  return findAdjacent(index, list, card => card?.type === CardType.Enemy)
+    .map(card => card as EnemyCard);
+}
+
+export function findAdjacentPlayers(index: [number, number], list: (CardData | null)[][][], up?: boolean): PlayerCard[] {
+  if (up === undefined) {
+    up = false;
+  }
+
+  return findAdjacent(
+    index,
+    list,
+    card => card?.type === CardType.Player && (!up || !(card! as PlayerCard).down)
+  ).map(card => card as PlayerCard);
 }
 
 
