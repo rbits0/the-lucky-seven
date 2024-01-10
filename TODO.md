@@ -49,6 +49,7 @@ Attack
 - [x] Increase anvil/hammer strength when pacifist adjacent
 - [ ] Change colour of strength text when modified
 - [x] Decrease enemy strength when joker adjacent
+- [x] Don't decrease when joker is down
 - [ ] Seperate numbers from card images in order to display that properly
     - Maybe have the modified number be a different colour?
 - [ ] Highlight cards it can attack?

@@ -436,8 +436,8 @@ function shuffleArray<T>(array: T[]): T[] {
 
 
 function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
-  // Update strengths of enemies adjacent to joker
-  const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+  // Update strengths of enemies adjacent to joker (up)
+  const joker = list.flat().find(cards => cards[0]?.name === "The Joker" && !(cards[0]! as PlayerCard).down);
   if (joker) {
     const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
     for (const enemy of adjacentEnemies) {

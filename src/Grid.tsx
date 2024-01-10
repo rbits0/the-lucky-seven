@@ -92,9 +92,9 @@ function Grid({ list, setList }: GridProps) {
       return;
     }
     
-    // If one of the cards is the joker, reset enemy strength
+    // If one of the cards is the joker (up), reset enemy strength
     for (const index of [sourceIndex, destIndex]) {
-      if (list[index[0]][index[1]][0]?.name === "The Joker") {
+      if (list[index[0]][index[1]][0]?.name === "The Joker" && !(list[index[0]][index[1]][0]! as PlayerCard).down) {
         const adjacentEnemies = findAdjacentEnemies(index, list);
         for (const enemy of adjacentEnemies) {
           enemy.health = enemy.strength;
@@ -126,9 +126,9 @@ function Grid({ list, setList }: GridProps) {
     updateHammerAnvilStrength(newList);
 
 
-    // If one of the cards is the joker, reduce enemy strength
+    // If one of the cards is the joker (up), reduce enemy strength
     for (const index of [sourceIndex, destIndex]) {
-      if (newList[index[0]][index[1]][0]?.name === "The Joker") {
+      if (newList[index[0]][index[1]][0]?.name === "The Joker" && !(newList[index[0]][index[1]][0]! as PlayerCard).down) {
         const adjacentEnemies = findAdjacentEnemies(index, newList);        
         for (const enemy of adjacentEnemies) {
           enemy.health = enemy.strength - 1;
