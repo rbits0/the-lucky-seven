@@ -146,7 +146,7 @@ function App() {
       .forEach(cards => {
         const mortarIndex = cards[0]!.index!;
         
-        // Flip and rotate mortar
+        // Flip and rotate card under mortar
         if (newList[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.Player) {
           const card = newList[mortarIndex[0]][mortarIndex[1]][0] as PlayerCard;
           card.down = true;
@@ -179,6 +179,11 @@ function App() {
           cards[0] = null;
         }
       });
+    
+    // Update joker adjacent since joker might be down
+    updateJokerAdjacentHealth(newList);
+    
+    setList(newList);
   }
   
 
@@ -267,8 +272,15 @@ function App() {
           selectedPlayerCard.down = true;
           selectedPlayerCard.rotated = true;
         }
+        
+        
+        // If joker, update enemy health
+        if (selectedPlayerCard.name === "The Joker") {
+          updateJokerAdjacentHealth(newList);
+        }
       }
     }
+    
 
     setList(newList);
   }
@@ -437,11 +449,24 @@ function shuffleArray<T>(array: T[]): T[] {
 
 function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
   // Update strengths of enemies adjacent to joker (up)
-  const joker = list.flat().find(cards => cards[0]?.name === "The Joker" && !(cards[0]! as PlayerCard).down);
-  if (joker) {
-    const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
+  const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+  if (!joker) {
+    return;
+  }
+  
+  const isDown = (joker[0]! as PlayerCard).down;
+
+  const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
+  
+  if (!isDown) {
+    // If up
     for (const enemy of adjacentEnemies) {
       enemy.health = enemy.strength - 1;
+    }
+  } else {
+    // If down
+    for (const enemy of adjacentEnemies) {
+      enemy.health = enemy.strength;
     }
   }
 }
