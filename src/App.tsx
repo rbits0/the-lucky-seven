@@ -180,8 +180,9 @@ function App() {
         }
       });
     
-    // Update joker adjacent since joker might be down
+    // Update joker and pacifist adjacent since they might be down
     updateJokerAdjacentHealth(newList);
+    updateHammerAnvilStrength(newList);
     
     setList(newList);
   }
@@ -277,6 +278,11 @@ function App() {
         // If joker, update enemy health
         if (selectedPlayerCard.name === "The Joker") {
           updateJokerAdjacentHealth(newList);
+        }
+        
+        // If pacifist, update hammer/anvil strength
+        if (selectedPlayerCard.name === "The Pacifist") {
+          updateHammerAnvilStrength(newList);
         }
       }
     }

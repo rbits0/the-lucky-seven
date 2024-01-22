@@ -276,8 +276,9 @@ function is_Adjacent(
   return cardIsAdjacent;
 }
 
+// Is pacifist adjacent AND UP
 function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
-  return is_Adjacent(index, list, card => card?.name === "The Pacifist");
+  return is_Adjacent(index, list, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
 }
 
 export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
