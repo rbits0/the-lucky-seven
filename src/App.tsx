@@ -8,7 +8,14 @@ import { Active } from "@dnd-kit/core";
 
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
+const NUM_UNDOS = 3;
 
+
+export interface GameState {
+  phase: Phase,
+  board: (CardData | null)[][][],
+  deck: EnemyCard[],
+}
 
 
 
@@ -18,6 +25,43 @@ function App() {
   const [deck, setDeck] = useState(initialDeck);
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
+  let history: GameState[] = [];
+  
+
+  function addStateToHistory() {
+    if (history.length >= NUM_UNDOS) {
+      history.shift();
+    }
+
+    // const listCopy = list.map(row => row.map(cards => cards.map(card => structuredClone(card))));
+    const state: GameState = {
+      phase: phase,
+      board: structuredClone(list),
+      deck: [...deck],
+    };
+
+    history.push(state);
+  }
+  
+
+  function undo() {
+    if (history.length === 0) {
+      return;
+    }
+
+    let state = history.pop()!;
+    
+    setPhase(state.phase);
+    setList(state.board);
+
+    // Reset deck enemy health and index
+    for (const card of state.deck) {
+      card.health = card.strength;
+      card.index = undefined;
+    }
+    
+    setDeck(state.deck);
+  }
 
 
   function nextPhase() {
