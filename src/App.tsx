@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import './App.css';
 import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
-import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
+import { Phase, PhaseContext, SaveStateContext, SelectedContext, SetSelectedContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 
 
@@ -381,28 +381,32 @@ function App() {
     <PhaseContext.Provider value={phase}>
       <SelectedContext.Provider value={selected}>
         <SetSelectedContext.Provider value={setSelected}>
-          <div className="flex items-start flex-wrap">
-            <Grid list={list} setList={setList}/>
+          <SaveStateContext.Provider value={addStateToHistory}>
 
-            <div className="flex flex-col m-auto p-4 text-xl">
-              <p>Phase: {phase}</p>
+            <div className="flex items-start flex-wrap">
+              <Grid list={list} setList={setList}/>
 
-              <button
-                onClick={flipSelected}
-                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
-              >
-                Flip Selected
-              </button>
+              <div className="flex flex-col m-auto p-4 text-xl">
+                <p>Phase: {phase}</p>
 
-              <button
-                onClick={nextPhase}
-                className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
-              >
-                Next Phase
-              </button>
+                <button
+                  onClick={flipSelected}
+                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                >
+                  Flip Selected
+                </button>
 
+                <button
+                  onClick={nextPhase}
+                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                >
+                  Next Phase
+                </button>
+
+              </div>
             </div>
-          </div>
+
+          </SaveStateContext.Provider>
         </SetSelectedContext.Provider>
       </SelectedContext.Provider>
     </PhaseContext.Provider>
