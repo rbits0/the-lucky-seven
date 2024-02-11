@@ -9,6 +9,7 @@ import { Active } from "@dnd-kit/core";
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
 const NUM_UNDOS = 3;
+const BUTTON_STYLE = "mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
 
 
 export interface GameState {
@@ -398,21 +399,22 @@ function App() {
 
                 <button
                   onClick={flipSelected}
-                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                  className={BUTTON_STYLE}
                 >
                   Flip Selected
                 </button>
 
                 <button
                   onClick={nextPhase}
-                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                  className={BUTTON_STYLE}
                 >
                   Next Phase
                 </button>
                 
                 <button
                   onClick={undo}
-                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                  className={BUTTON_STYLE}
+                  disabled={history.current.length === 0}
                 >
                   Undo
                 </button>
