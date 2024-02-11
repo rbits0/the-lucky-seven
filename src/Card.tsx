@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Phase, PhaseContext, SelectedContext, SetSelectedContext } from "./Contexts";
+import { Phase, SharedContexts } from "./Contexts";
 
 
 interface CardProps {
@@ -15,9 +15,7 @@ interface CardProps {
 
 
 function Card({ card, className, disabled, above, attackCallback }: CardProps) {
-  const phase = useContext(PhaseContext);
-  const selected = useContext(SelectedContext);
-  const setSelected = useContext(SetSelectedContext)!;
+  const { phase, selected, setSelected } = useContext(SharedContexts)!;
   const [rotation, setRotation] = useState("0");
 
   const rotated = (card as PlayerCard).rotated;

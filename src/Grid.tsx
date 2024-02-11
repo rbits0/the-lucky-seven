@@ -3,7 +3,7 @@ import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardDa
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { NUM_ROWS, } from "./App";
 import { useContext } from "react";
-import { SaveStateContext, SelectedContext, SetSelectedContext } from "./Contexts";
+import { SharedContexts } from "./Contexts";
 
 
 interface GridProps {
@@ -19,9 +19,8 @@ function Grid({ list, setList }: GridProps) {
     useSensor(MouseSensor, { activationConstraint: { distance: 1 } }),
     useSensor(TouchSensor, { activationConstraint: { distance: 1 } })
   );
-  const selected = useContext(SelectedContext);
-  const setSelected = useContext(SetSelectedContext)!;
-  const addStateToHistory = useContext(SaveStateContext)!;
+  
+  const { selected, setSelected, addStateToHistory } = useContext(SharedContexts)!;
 
 
   function onDragEnd({over, active}: DragEndEvent) {

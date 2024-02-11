@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext } from "react";
 
 export enum Phase {
   GAME_START,
@@ -8,9 +8,13 @@ export enum Phase {
   COUNTER_ATTACK,
 }
 
-export const PhaseContext = React.createContext(Phase.GAME_START);
 
-export const SelectedContext = React.createContext<string | null>(null);
-export const SetSelectedContext = React.createContext<React.Dispatch<React.SetStateAction<string | null>> | undefined>(undefined);
+export interface Contexts {
+  phase: Phase,
+  selected: string | null,
+  setSelected: React.Dispatch<React.SetStateAction<string | null>>,
+  addStateToHistory: () => void,
+}
 
-export const SaveStateContext = React.createContext<(() => void) | undefined>(undefined);
+
+export const SharedContexts = createContext<Contexts | undefined>(undefined);

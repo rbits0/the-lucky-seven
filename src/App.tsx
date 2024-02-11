@@ -2,7 +2,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import './App.css';
 import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
-import { Phase, PhaseContext, SaveStateContext, SelectedContext, SetSelectedContext } from "./Contexts";
+import { Contexts, Phase, SharedContexts } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 
 
@@ -27,6 +27,13 @@ function App() {
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
   let history: MutableRefObject<GameState[]> = useRef([]);
+  
+  const sharedContexts: Contexts = {
+    phase,
+    selected,
+    setSelected,
+    addStateToHistory,
+  }
   
 
   function addStateToHistory() {
@@ -386,46 +393,40 @@ function App() {
 
   
   return (
-    <PhaseContext.Provider value={phase}>
-      <SelectedContext.Provider value={selected}>
-        <SetSelectedContext.Provider value={setSelected}>
-          <SaveStateContext.Provider value={addStateToHistory}>
+    <SharedContexts.Provider value={sharedContexts}>
 
-            <div className="flex items-start flex-wrap">
-              <Grid list={list} setList={setList}/>
+      <div className="flex items-start flex-wrap">
+        <Grid list={list} setList={setList}/>
 
-              <div className="flex flex-col m-auto p-4 text-xl">
-                <p>Phase: {phase}</p>
+        <div className="flex flex-col m-auto p-4 text-xl">
+          <p>Phase: {phase}</p>
 
-                <button
-                  onClick={flipSelected}
-                  className={BUTTON_STYLE}
-                >
-                  Flip Selected
-                </button>
+          <button
+            onClick={flipSelected}
+            className={BUTTON_STYLE}
+          >
+            Flip Selected
+          </button>
 
-                <button
-                  onClick={nextPhase}
-                  className={BUTTON_STYLE}
-                >
-                  Next Phase
-                </button>
-                
-                <button
-                  onClick={undo}
-                  className={BUTTON_STYLE}
-                  disabled={history.current.length === 0}
-                >
-                  Undo
-                </button>
+          <button
+            onClick={nextPhase}
+            className={BUTTON_STYLE}
+          >
+            Next Phase
+          </button>
+          
+          <button
+            onClick={undo}
+            className={BUTTON_STYLE}
+            disabled={history.current.length === 0}
+          >
+            Undo
+          </button>
 
-              </div>
-            </div>
+        </div>
+      </div>
 
-          </SaveStateContext.Provider>
-        </SetSelectedContext.Provider>
-      </SelectedContext.Provider>
-    </PhaseContext.Provider>
+    </SharedContexts.Provider>
   );
 }
 
