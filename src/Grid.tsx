@@ -3,7 +3,7 @@ import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardDa
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { NUM_ROWS, } from "./App";
 import { useContext } from "react";
-import { SelectedContext, SetSelectedContext } from "./Contexts";
+import { SaveStateContext, SelectedContext, SetSelectedContext } from "./Contexts";
 
 
 interface GridProps {
@@ -21,6 +21,7 @@ function Grid({ list, setList }: GridProps) {
   );
   const selected = useContext(SelectedContext);
   const setSelected = useContext(SetSelectedContext)!;
+  const addStateToHistory = useContext(SaveStateContext)!;
 
 
   function onDragEnd({over, active}: DragEndEvent) {
@@ -91,6 +92,13 @@ function Grid({ list, setList }: GridProps) {
     if (list[destIndex[0]][destIndex[1]][1]) {
       return;
     }
+    
+
+    // ALL CHECKS COMPLETED
+    // Move is successful
+    
+
+    addStateToHistory();
     
     // If one of the cards is the joker (up), reset enemy strength
     for (const index of [sourceIndex, destIndex]) {
@@ -169,6 +177,10 @@ function Grid({ list, setList }: GridProps) {
     if (!adjacentIndexes.find(index => index[0] === selectedCard.index![0] && index[1] === selectedCard.index![1])) {
       return;
     }
+    
+    
+    // CHECKS COMPLETED, attack is successful
+    addStateToHistory();
     
     const newList = [...list];
     const damage = (selectedCard as PlayerCard).effectiveStrength;

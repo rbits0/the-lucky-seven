@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import './App.css';
 import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStrength } from './Grid';
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
@@ -25,12 +25,12 @@ function App() {
   const [deck, setDeck] = useState(initialDeck);
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
-  let history: GameState[] = [];
+  let history: MutableRefObject<GameState[]> = useRef([]);
   
 
   function addStateToHistory() {
-    if (history.length >= NUM_UNDOS) {
-      history.shift();
+    if (history.current.length >= NUM_UNDOS) {
+      history.current.shift();
     }
 
     // const listCopy = list.map(row => row.map(cards => cards.map(card => structuredClone(card))));
@@ -40,17 +40,18 @@ function App() {
       deck: [...deck],
     };
 
-    history.push(state);
+    history.current.push(state);
   }
   
 
   function undo() {
-    if (history.length === 0) {
+    if (history.current.length === 0) {
       return;
     }
 
-    let state = history.pop()!;
+    let state = history.current.pop()!;
     
+    setSelected(null);
     setPhase(state.phase);
     setList(state.board);
 
@@ -65,6 +66,8 @@ function App() {
 
 
   function nextPhase() {
+    addStateToHistory();
+
     switch (phase) {
       case Phase.GAME_START:
         dealEnemies();
@@ -309,10 +312,14 @@ function App() {
           });
 
           if (canFlip) {
+            addStateToHistory();
+            
             selectedPlayerCard.down = false;
             selectedPlayerCard.rotated = true;
           }
         } else {
+          addStateToHistory();
+
           // Flip down
           selectedPlayerCard.down = true;
           selectedPlayerCard.rotated = true;
@@ -401,6 +408,13 @@ function App() {
                   className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
                 >
                   Next Phase
+                </button>
+                
+                <button
+                  onClick={undo}
+                  className="mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+                >
+                  Undo
                 </button>
 
               </div>
