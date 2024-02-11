@@ -7,12 +7,12 @@ import { SharedContexts } from "./Contexts";
 
 
 interface GridProps {
-  list: (CardData | null)[][][],
-  setList: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>,
+  board: (CardData | null)[][][],
+  setBoard: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>,
 }
 
 
-function Grid({ list, setList }: GridProps) {
+function Grid({ board, setBoard }: GridProps) {
 
   // const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
   const sensors = useSensors(
@@ -56,8 +56,8 @@ function Grid({ list, setList }: GridProps) {
     // If diagonally adjacent, check that movement is not blocked by diagonal enemies
     let blocked = [[-1, -1], [-1, 1], [1, -1], [1, 1]].filter((value) => {
       if (destIndex[0] === sourceIndex[0] + value[0] && destIndex[1] === sourceIndex[1] + value[1]) {
-        const card0 = list[sourceIndex[0]][sourceIndex[1] + value[1]];
-        const card1 = list[sourceIndex[0] + value[0]][sourceIndex[1]];
+        const card0 = board[sourceIndex[0]][sourceIndex[1] + value[1]];
+        const card1 = board[sourceIndex[0] + value[0]][sourceIndex[1]];
 
         if (!card0 || !card1) {
           // Not blocked
@@ -83,12 +83,12 @@ function Grid({ list, setList }: GridProps) {
 
     
     // Check if card to swap with is an enemy
-    if (list[destIndex[0]][destIndex[1]][0]?.type === CardType.Enemy) {
+    if (board[destIndex[0]][destIndex[1]][0]?.type === CardType.Enemy) {
       return;
     }
     
     // Check if card to swap with has card stacked on top
-    if (list[destIndex[0]][destIndex[1]][1]) {
+    if (board[destIndex[0]][destIndex[1]][1]) {
       return;
     }
     
@@ -101,8 +101,8 @@ function Grid({ list, setList }: GridProps) {
     
     // If one of the cards is the joker (up), reset enemy strength
     for (const index of [sourceIndex, destIndex]) {
-      if (list[index[0]][index[1]][0]?.name === "The Joker" && !(list[index[0]][index[1]][0]! as PlayerCard).down) {
-        const adjacentEnemies = findAdjacentEnemies(index, list);
+      if (board[index[0]][index[1]][0]?.name === "The Joker" && !(board[index[0]][index[1]][0]! as PlayerCard).down) {
+        const adjacentEnemies = findAdjacentEnemies(index, board);
         for (const enemy of adjacentEnemies) {
           enemy.health = enemy.strength;
         }
@@ -110,33 +110,33 @@ function Grid({ list, setList }: GridProps) {
     }
     
     // Swap cards
-    const newList = [...list];
+    const newBoard = [...board];
     [
-      newList[sourceIndex[0]][sourceIndex[1]][0],
-      newList[destIndex[0]][destIndex[1]][0]
+      newBoard[sourceIndex[0]][sourceIndex[1]][0],
+      newBoard[destIndex[0]][destIndex[1]][0]
     ] = [
-      newList[destIndex[0]][destIndex[1]][0],
-      newList[sourceIndex[0]][sourceIndex[1]][0]
+      newBoard[destIndex[0]][destIndex[1]][0],
+      newBoard[sourceIndex[0]][sourceIndex[1]][0]
     ];
     
     // Update card indexes
-    newList[destIndex[0]][destIndex[1]][0]!.index = destIndex;
-    if (newList[sourceIndex[0]][sourceIndex[1]][0]) {
-      newList[sourceIndex[0]][sourceIndex[1]][0]!.index = sourceIndex;
+    newBoard[destIndex[0]][destIndex[1]][0]!.index = destIndex;
+    if (newBoard[sourceIndex[0]][sourceIndex[1]][0]) {
+      newBoard[sourceIndex[0]][sourceIndex[1]][0]!.index = sourceIndex;
     }
 
     // Rotate cards
-    rotatePlayer(newList[destIndex[0]][destIndex[1]][0], selected, setSelected);
-    rotatePlayer(newList[sourceIndex[0]][sourceIndex[1]][0], selected, setSelected);
+    rotatePlayer(newBoard[destIndex[0]][destIndex[1]][0], selected, setSelected);
+    rotatePlayer(newBoard[sourceIndex[0]][sourceIndex[1]][0], selected, setSelected);
     
 
-    updateHammerAnvilStrength(newList);
+    updateHammerAnvilStrength(newBoard);
 
 
     // If one of the cards is the joker (up), reduce enemy strength
     for (const index of [sourceIndex, destIndex]) {
-      if (newList[index[0]][index[1]][0]?.name === "The Joker" && !(newList[index[0]][index[1]][0]! as PlayerCard).down) {
-        const adjacentEnemies = findAdjacentEnemies(index, newList);        
+      if (newBoard[index[0]][index[1]][0]?.name === "The Joker" && !(newBoard[index[0]][index[1]][0]! as PlayerCard).down) {
+        const adjacentEnemies = findAdjacentEnemies(index, newBoard);        
         for (const enemy of adjacentEnemies) {
           enemy.health = enemy.strength - 1;
         }
@@ -144,12 +144,12 @@ function Grid({ list, setList }: GridProps) {
     }
 
 
-    setList(newList);
+    setBoard(newBoard);
   }
   
 
   function attack(enemy: EnemyCard) {
-    const selectedCard = list.flatMap(row => row.find(cards => cards[0]?.id === selected)).filter(x => x)[0];
+    const selectedCard = board.flatMap(row => row.find(cards => cards[0]?.id === selected)).filter(x => x)[0];
     if (!selectedCard) {
       return;
     }
@@ -181,7 +181,7 @@ function Grid({ list, setList }: GridProps) {
     // CHECKS COMPLETED, attack is successful
     addStateToHistory();
     
-    const newList = [...list];
+    const newBoard = [...board];
     const damage = (selectedCard as PlayerCard).effectiveStrength;
     
     enemy.health -= damage;
@@ -189,7 +189,7 @@ function Grid({ list, setList }: GridProps) {
     if (enemy.health <= 0) {
       // Remove enemy
       const index = enemy.index!;
-      newList[index[0]][index[1]][0] = null;
+      newBoard[index[0]][index[1]][0] = null;
     }
     
     // Rotate player
@@ -198,7 +198,7 @@ function Grid({ list, setList }: GridProps) {
     // Unselect player
     setSelected(null);
     
-    setList(newList);
+    setBoard(newBoard);
   }
 
 
@@ -206,7 +206,7 @@ function Grid({ list, setList }: GridProps) {
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <table className={`table-fixed grid-aspect`}>
         {
-          list.map((row, rowIndex) => (
+          board.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               style={{height: `${100 / NUM_ROWS}%`}}
@@ -268,7 +268,7 @@ function rotatePlayer(
 
 function is_Adjacent(
   index: [number, number],
-  list: (CardData | null)[][][],
+  board: (CardData | null)[][][],
   predicate: (card: CardData | null) => boolean
 ): boolean {
 
@@ -278,23 +278,23 @@ function is_Adjacent(
     [index[0], index[1] + 1],
     [index[0] + 1, index[1]],
   // No out of bounds indexes
-  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < board.length && adjIndex[1] < board[0].length);
   
   const cardIsAdjacent = adjacent
-    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .map(adjIndex => board[adjIndex[0]][adjIndex[1]][0])
     .find(predicate) !== undefined;
   
   return cardIsAdjacent;
 }
 
 // Is pacifist adjacent AND UP
-function isPacifistAdjacent(index: [number, number], list: (CardData | null)[][][]): boolean {
-  return is_Adjacent(index, list, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
+function isPacifistAdjacent(index: [number, number], board: (CardData | null)[][][]): boolean {
+  return is_Adjacent(index, board, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
 }
 
-export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
+export function updateHammerAnvilStrength(board: (CardData | null)[][][]) {
   // Check if pacifist adjacent to any hammer/anvil
-  for (const row of list) {
+  for (const row of board) {
     // For all hammer/anvils
     for (const cards of row
       .filter(
@@ -302,7 +302,7 @@ export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
         cards[0]?.name === "The Anvil"
       )
     ) {
-      if (isPacifistAdjacent(cards[0]!.index!, list)) {
+      if (isPacifistAdjacent(cards[0]!.index!, board)) {
         // Increase strength
         (cards[0]! as PlayerCard).effectiveStrength = (cards[0]!.strength + 1);
       } else {
@@ -316,7 +316,7 @@ export function updateHammerAnvilStrength(list: (CardData | null)[][][]) {
 
 function findAdjacent(
   index: [number, number],
-  list: (CardData | null)[][][],
+  board: (CardData | null)[][][],
   predicate: (card: CardData | null) => boolean
 ): CardData[] {
   const adjacent = [
@@ -325,29 +325,29 @@ function findAdjacent(
     [index[0], index[1] + 1],
     [index[0] + 1, index[1]],
   // No out of bounds indexes
-  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < list.length && adjIndex[1] < list[0].length);
+  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < board.length && adjIndex[1] < board[0].length);
   
   const adjacentCards = adjacent
-    .map(adjIndex => list[adjIndex[0]][adjIndex[1]][0])
+    .map(adjIndex => board[adjIndex[0]][adjIndex[1]][0])
     .filter(predicate)
     .map(card => card!);
   
   return adjacentCards;
 }
 
-export function findAdjacentEnemies(index: [number, number], list: (CardData | null)[][][]): EnemyCard[] {
-  return findAdjacent(index, list, card => card?.type === CardType.Enemy)
+export function findAdjacentEnemies(index: [number, number], board: (CardData | null)[][][]): EnemyCard[] {
+  return findAdjacent(index, board, card => card?.type === CardType.Enemy)
     .map(card => card as EnemyCard);
 }
 
-export function findAdjacentPlayers(index: [number, number], list: (CardData | null)[][][], up?: boolean): PlayerCard[] {
+export function findAdjacentPlayers(index: [number, number], board: (CardData | null)[][][], up?: boolean): PlayerCard[] {
   if (up === undefined) {
     up = false;
   }
 
   return findAdjacent(
     index,
-    list,
+    board,
     card => card?.type === CardType.Player && (!up || !(card! as PlayerCard).down)
   ).map(card => card as PlayerCard);
 }

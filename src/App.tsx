@@ -22,7 +22,7 @@ export interface GameState {
 
 function App() {
   const [initialBoard, initialDeck] = createRandomBoard();
-  const [list, setList] = useState(initialBoard);
+  const [board, setBoard] = useState(initialBoard);
   const [deck, setDeck] = useState(initialDeck);
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
@@ -41,10 +41,9 @@ function App() {
       history.current.shift();
     }
 
-    // const listCopy = list.map(row => row.map(cards => cards.map(card => structuredClone(card))));
     const state: GameState = {
       phase: phase,
-      board: structuredClone(list),
+      board: structuredClone(board),
       deck: [...deck],
     };
 
@@ -61,7 +60,7 @@ function App() {
     
     setSelected(null);
     setPhase(state.phase);
-    setList(state.board);
+    setBoard(state.board);
 
     // Reset deck enemy health and index
     for (const card of state.deck) {
@@ -119,7 +118,7 @@ function App() {
     }
 
     const newDeck = [...deck];
-    const newList = list.map(row => [...row]);
+    const newBoard = board.map(row => [...row]);
 
     for (let row = 0; row < NUM_ROWS; row++) {
       // Deal top card
@@ -131,7 +130,7 @@ function App() {
       
       // If it can't overlap, need to find position where it doesn't overlap
       // If it can't find a free space, it won't change position
-      if (position >= 0 && !card.canOverlap && newList[row][position][0]) {
+      if (position >= 0 && !card.canOverlap && newBoard[row][position][0]) {
         // Determine whether to prioritise left or right
         const prioritisedDirection = position > (NUM_COLUMNS - 1) / 2 ? -1 : 1;
         
@@ -145,7 +144,7 @@ function App() {
           if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
             prioritisedExhausted = true;
           } else {
-            if (!newList[row][attemptPosition][0]) {
+            if (!newBoard[row][attemptPosition][0]) {
               // Success
               position = attemptPosition;
               break;
@@ -157,7 +156,7 @@ function App() {
           if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
             unprioritisedExhausted = true;
           } else {
-            if (!newList[row][attemptPosition][0]) {
+            if (!newBoard[row][attemptPosition][0]) {
               // Success
               position = attemptPosition;
               break;
@@ -173,37 +172,37 @@ function App() {
       // Place card
       card.index = [row, position];
       if (position >= 0) {
-        if (card.canOverlap && newList[row][position][0]) {
+        if (card.canOverlap && newBoard[row][position][0]) {
           // Put card on top instead of replacing
-          newList[row][position][1] = card;
+          newBoard[row][position][1] = card;
         } else {
-          newList[row][position][0] = card;
+          newBoard[row][position][0] = card;
         }
       }
     }
     
 
-    updateJokerAdjacentHealth(newList);
+    updateJokerAdjacentHealth(newBoard);
 
 
-    // Save new deck and list
-    setList(newList);
+    // Save new deck and board
+    setBoard(newBoard);
     setDeck(newDeck);
   }
   
 
   function handleMortars() {
-    const newList = [...list];
+    const newBoard = [...board];
     
     // For all mortars
-    newList.flat()
+    newBoard.flat()
       .filter(cards => cards[0]?.name === "Mortar" || cards[1]?.name === "Mortar")
       .forEach(cards => {
         const mortarIndex = cards[0]!.index!;
         
         // Flip and rotate card under mortar
-        if (newList[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.Player) {
-          const card = newList[mortarIndex[0]][mortarIndex[1]][0] as PlayerCard;
+        if (newBoard[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.Player) {
+          const card = newBoard[mortarIndex[0]][mortarIndex[1]][0] as PlayerCard;
           card.down = true;
           card.rotated = true;
         }
@@ -217,12 +216,12 @@ function App() {
         ];
         for (const index of indexes) {
           // Check index is in bounds
-          if (index[0] < 0 || index[1] < 1 || index[0] >= newList.length || index[1] >= newList[0].length) {
+          if (index[0] < 0 || index[1] < 1 || index[0] >= newBoard.length || index[1] >= newBoard[0].length) {
             continue;
           }
           
-          if (newList[index[0]][index[1]][0]?.type === CardType.Player) {
-            (newList[index[0]][index[1]][0] as PlayerCard).down = true;
+          if (newBoard[index[0]][index[1]][0]?.type === CardType.Player) {
+            (newBoard[index[0]][index[1]][0] as PlayerCard).down = true;
           }
           
         }
@@ -236,17 +235,17 @@ function App() {
       });
     
     // Update joker and pacifist adjacent since they might be down
-    updateJokerAdjacentHealth(newList);
-    updateHammerAnvilStrength(newList);
+    updateJokerAdjacentHealth(newBoard);
+    updateHammerAnvilStrength(newBoard);
     
-    setList(newList);
+    setBoard(newBoard);
   }
   
 
   function unrotateCards() {
-    const newList = [...list];
+    const newBoard = [...board];
 
-    for (const row of newList) {
+    for (const row of newBoard) {
       for (const cards of row) {
         if (cards[0]?.type !== CardType.Player) {
           continue;
@@ -260,24 +259,24 @@ function App() {
       }
     }
 
-    setList(newList);
+    setBoard(newBoard);
   }
   
 
   function removeFlares() {
-    const newList = list.map(row => row.map(cards => cards.map(
+    const newBoard = board.map(row => row.map(cards => cards.map(
       card => card?.name === "Flare" ? null : card
     )));
     
-    setList(newList);
+    setBoard(newBoard);
   }
 
 
   function flipSelected() {
-    const newList = [...list];
+    const newBoard = [...board];
 
     // Find selected card
-    for (const row of newList) {
+    for (const row of newBoard) {
       const selectedCard = row.find((card) => card[0]?.id === selected);
 
       if (selectedCard) {
@@ -307,11 +306,11 @@ function App() {
           
           const canFlip = adjacent.some((adjacentIndex) => {
             // Check index is in bounds
-            if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= newList.length || adjacentIndex[1] >= newList[0].length) {
+            if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= newBoard.length || adjacentIndex[1] >= newBoard[0].length) {
               return false;
             }
 
-            const adjacentCard = list[adjacentIndex[0]][adjacentIndex[1]][0];
+            const adjacentCard = board[adjacentIndex[0]][adjacentIndex[1]][0];
             if (adjacentCard && adjacentCard.type === CardType.Player && !(adjacentCard as PlayerCard).down) {
               return true;
             } else {
@@ -336,35 +335,35 @@ function App() {
         
         // If joker, update enemy health
         if (selectedPlayerCard.name === "The Joker") {
-          updateJokerAdjacentHealth(newList);
+          updateJokerAdjacentHealth(newBoard);
         }
         
         // If pacifist, update hammer/anvil strength
         if (selectedPlayerCard.name === "The Pacifist") {
-          updateHammerAnvilStrength(newList);
+          updateHammerAnvilStrength(newBoard);
         }
       }
     }
     
 
-    setList(newList);
+    setBoard(newBoard);
   }
   
 
   function counterAttack() {
-    const newList = [...list];
+    const newBoard = [...board];
 
-    for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+    for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
       let toRemove: PlayerCard[] = [];
 
       if (enemy[0]!.name === "Infantry") {
-        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, false));
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newBoard, false));
       } else if (enemy[0]!.name === "Machine Gun") {
-        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newList, true));
+        toRemove = toRemove.concat(findAdjacentPlayers(enemy[0]!.index!, newBoard, true));
       } else if (enemy[0]!.name === "Tank") {
         // Find all player cards in that row
         toRemove = toRemove.concat(
-          newList[enemy[0]!.index![0]]
+          newBoard[enemy[0]!.index![0]]
             .filter(cards => cards[0]?.type === CardType.Player && !(cards[0]! as PlayerCard).down)
             .map(cards => cards[0]! as PlayerCard)
         );
@@ -372,23 +371,23 @@ function App() {
       
       for (const player of toRemove) {
         // Remove player
-        newList[player.index![0]][player.index![1]][0] = null;
+        newBoard[player.index![0]][player.index![1]][0] = null;
       }
     }
     
-    resetEnemyHealth(newList);
-    updateHammerAnvilStrength(newList);
+    resetEnemyHealth(newBoard);
+    updateHammerAnvilStrength(newBoard);
     
-    setList(newList);
+    setBoard(newBoard);
   }
   
 
   function removeTanks() {
-    const newList = [...list];
-    for (const row of newList) {
+    const newBoard = [...board];
+    for (const row of newBoard) {
       row[0][0] = null;
     }
-    setList(newList);
+    setBoard(newBoard);
   }
 
   
@@ -396,7 +395,7 @@ function App() {
     <SharedContexts.Provider value={sharedContexts}>
 
       <div className="flex items-start flex-wrap">
-        <Grid list={list} setList={setList}/>
+        <Grid board={board} setBoard={setBoard}/>
 
         <div className="flex flex-col m-auto p-4 text-xl">
           <p>Phase: {phase}</p>
@@ -434,7 +433,7 @@ function App() {
 function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     const cards = require("./cards.json");
     // Create 3D array with null for board
-    const list: (CardData | null)[][][] = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(2).fill(null)));
+    const board: (CardData | null)[][][] = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(2).fill(null)));
     
     // Shuffle row and column numbers
     let row_numbers: number[][] = shuffleArray(cards.rows);
@@ -463,14 +462,14 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
       player.index = [rowIndex, columnIndex];
 
       // Place card
-      list[rowIndex][columnIndex][0] = player;
+      board[rowIndex][columnIndex][0] = player;
     });
     
 
     // Remove last player card
     const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
     const columnIndex = column_numbers.findIndex(value => value.includes(players.length)) + 1;
-    list[rowIndex][columnIndex][0] = null;
+    board[rowIndex][columnIndex][0] = null;
     
     // Down adjacent players
     const adjacent = [[rowIndex - 1, columnIndex], [rowIndex + 1, columnIndex], [rowIndex, columnIndex - 1], [rowIndex, columnIndex + 1]];
@@ -480,13 +479,13 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
         continue;
       }
       
-      if (list[index[0]][index[1]][0]) {
-        (list[index[0]][index[1]][0] as PlayerCard).down = true;
+      if (board[index[0]][index[1]][0]) {
+        (board[index[0]][index[1]][0] as PlayerCard).down = true;
       }
     }
 
 
-    updateHammerAnvilStrength(list);
+    updateHammerAnvilStrength(board);
     
 
     // Parse enemy cards
@@ -503,7 +502,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     shuffleArray(enemies);
 
     
-    return [list, enemies];
+    return [board, enemies];
 }
 
 
@@ -518,16 +517,16 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 
-function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
+function updateJokerAdjacentHealth(board: (CardData | null)[][][]) {
   // Update strengths of enemies adjacent to joker (up)
-  const joker = list.flat().find(cards => cards[0]?.name === "The Joker");
+  const joker = board.flat().find(cards => cards[0]?.name === "The Joker");
   if (!joker) {
     return;
   }
   
   const isDown = (joker[0]! as PlayerCard).down;
 
-  const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, list);
+  const adjacentEnemies = findAdjacentEnemies(joker[0]!.index!, board);
   
   if (!isDown) {
     // If up
@@ -543,12 +542,12 @@ function updateJokerAdjacentHealth(list: (CardData | null)[][][]) {
 }
 
 
-function resetEnemyHealth(list: (CardData | null)[][][]) {
-  for (const enemy of list.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+function resetEnemyHealth(board: (CardData | null)[][][]) {
+  for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
     (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
   }
   
-  updateJokerAdjacentHealth(list);
+  updateJokerAdjacentHealth(board);
 }
 
 
