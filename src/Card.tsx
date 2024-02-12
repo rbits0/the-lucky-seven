@@ -98,7 +98,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   return (
       <div
         ref={setNodeRef}
-        className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14]
+        className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14] absolute
           ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
