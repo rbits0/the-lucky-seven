@@ -16,6 +16,14 @@ export interface GameState {
   phase: Phase,
   board: (CardData | null)[][][],
   deck: EnemyCard[],
+  winState: WinState,
+}
+
+enum WinState {
+  NONE,
+  LAST_TURN,
+  WIN,
+  LOSS,
 }
 
 
@@ -26,6 +34,7 @@ function App() {
   const [deck, setDeck] = useState(initialDeck);
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
+  const [winState, setWinState] = useState(WinState.NONE);
   let history: MutableRefObject<GameState[]> = useRef([]);
   
   const sharedContexts: Contexts = {
@@ -45,6 +54,7 @@ function App() {
       phase: phase,
       board: structuredClone(board),
       deck: [...deck],
+      winState: winState,
     };
 
     history.current.push(state);
@@ -61,6 +71,7 @@ function App() {
     setSelected(null);
     setPhase(state.phase);
     setBoard(state.board);
+    setWinState(state.winState);
 
     // Reset deck enemy health and index
     for (const card of state.deck) {
@@ -114,7 +125,17 @@ function App() {
   
   function dealEnemies() {
     if (deck.length < NUM_ROWS) {
-      return
+      if (winState === WinState.LAST_TURN) {
+        // Check if win or loss
+        const isWin = board.flat(2).some(card => card?.type === CardType.Enemy);
+        if (isWin) {
+          setWinState(WinState.WIN);
+        } else {
+          setWinState(WinState.LOSS);
+        }
+      } else {
+        setWinState(WinState.LAST_TURN);
+      }
     }
 
     const newDeck = [...deck];
