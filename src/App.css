@@ -16,3 +16,12 @@ html, body, #root {
     top:0;bottom:0; /* vertical center */
     left:0;right:0; /* horizontal center */
 }
+
+.fixed-center {
+  /* From StackOverflow: https://stackoverflow.com/a/25919090/13956165 */
+
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

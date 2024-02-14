@@ -45,6 +45,17 @@ function App() {
   }
   
 
+  function resetGame() {
+    const [initialBoard, initialDeck] = createRandomBoard();
+    setBoard(initialBoard);
+    setDeck(initialDeck);
+    setPhase(Phase.GAME_START);
+    setSelected(null);
+    setWinState(WinState.NONE);
+    history.current = [];
+  }
+  
+
   function addStateToHistory() {
     if (history.current.length >= NUM_UNDOS) {
       history.current.shift();
@@ -414,6 +425,29 @@ function App() {
   
   return (
     <SharedContexts.Provider value={sharedContexts}>
+      
+      {winState === WinState.WIN ? 
+        <div className="fixed z-20 w-full h-full">
+          <div className="fixed bg-gray-900 w-full h-full opacity-50"></div>
+          <div className="fixed-center rounded-2xl z-10 bg-green-700 opacity-100 p-5">
+            <h1 className="text-slate-200 font-bold text-6xl text-center">YOU WIN</h1>
+            <div className="flex">
+              <button
+                onClick={resetGame}
+                className={`${BUTTON_STYLE} text-xl ml-auto`}
+              >
+                New Game
+              </button>
+              <button
+                onClick={() => {setWinState(WinState.LAST_TURN)}}
+                className={`${BUTTON_STYLE} text-xl ml-5 mr-auto`}
+              >
+                View Board
+              </button>
+            </div>
+          </div>
+        </div>
+      : null}
 
       <div className="flex items-start flex-wrap">
         <Grid board={board} setBoard={setBoard}/>
