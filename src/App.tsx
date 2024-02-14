@@ -139,11 +139,11 @@ function App() {
       if (winState === WinState.LAST_TURN) {
         // Check if win or loss
         const isWin = !board.flat(2).some(card => card?.type === CardType.ENEMY);
-        console.dir(isWin);
         if (isWin) {
           setWinState(WinState.WIN);
         } else {
           setWinState(WinState.LOSS);
+          console.log("|  ||\n\n|| |_");
         }
       } else {
         setWinState(WinState.LAST_TURN);
@@ -442,7 +442,36 @@ function App() {
                 New Game
               </button>
               <button
-                onClick={() => {setWinState(WinState.LAST_TURN)}}
+                onClick={() => {
+                  setWinState(WinState.LAST_TURN);
+                  setPhase(Phase.COUNTER_ATTACK);
+                }}
+                className={`${BUTTON_STYLE} text-xl ml-5 mr-auto`}
+              >
+                View Board
+              </button>
+            </div>
+          </div>
+        </div>
+      : null}
+      
+      {winState === WinState.LOSS ?
+        <div className="fixed z-20 w-full h-full">
+          <div className="fixed bg-gray-900 w-full h-full opacity-50"></div>
+          <div className="fixed-center rounded-2xl z-10 bg-red-700 opacity-100 p-5">
+            <h1 className="text-slate-200 font-bold text-6xl text-center">YOU LOSE</h1>
+            <div className="flex">
+              <button
+                onClick={resetGame}
+                className={`${BUTTON_STYLE} text-xl ml-auto`}
+              >
+                New Game
+              </button>
+              <button
+                onClick={() => {
+                  setWinState(WinState.LAST_TURN);
+                  setPhase(Phase.COUNTER_ATTACK);
+                }}
                 className={`${BUTTON_STYLE} text-xl ml-5 mr-auto`}
               >
                 View Board

@@ -5,7 +5,7 @@
 - [ ] Display different image if flipped
 - [ ] Seperate card position from rest of image
 - [x] Undo button
-- [ ] Success and failure screens
+- [x] Success and failure screens
 - [ ] Add error messages for invalid actions (or make it more clear that it is invalid)
     - Flipping without adjacent player
         - Maybe grey out button instead
