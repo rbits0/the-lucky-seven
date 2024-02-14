@@ -138,7 +138,8 @@ function App() {
     if (deck.length < NUM_ROWS) {
       if (winState === WinState.LAST_TURN) {
         // Check if win or loss
-        const isWin = board.flat(2).some(card => card?.type === CardType.ENEMY);
+        const isWin = !board.flat(2).some(card => card?.type === CardType.ENEMY);
+        console.dir(isWin);
         if (isWin) {
           setWinState(WinState.WIN);
         } else {
@@ -147,6 +148,8 @@ function App() {
       } else {
         setWinState(WinState.LAST_TURN);
       }
+      
+      return;
     }
 
     const newDeck = [...deck];
