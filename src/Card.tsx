@@ -25,7 +25,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   const enabled = (
     !disabled &&
     phase === Phase.MANEUVER &&
-    card.type === CardType.Player &&
+    card.type === CardType.PLAYER &&
     (
       !(card as PlayerCard).down ||
       card.name === "The Mouse"
@@ -37,7 +37,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
     (
 
       phase === Phase.MANEUVER && 
-      card.type === CardType.Player &&
+      card.type === CardType.PLAYER &&
       !(card as PlayerCard).rotated
 
     ) || (
@@ -45,12 +45,12 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
       phase === Phase.ATTACK &&
       (
         (
-          card.type === CardType.Player &&
+          card.type === CardType.PLAYER &&
             !(card as PlayerCard).rotated &&
             (!(card as PlayerCard).down || card.name === "The Mouse") &&
             card.strength > 0
         ) || (
-          card.type === CardType.Enemy &&
+          card.type === CardType.ENEMY &&
             selected &&
             (card as EnemyCard).strength >= 0
         )
@@ -74,7 +74,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   
   // Update rotation whenever card changes
   useEffect(() => {
-    if (card.type === CardType.Player && rotated) {
+    if (card.type === CardType.PLAYER && rotated) {
       setRotation("90");
     } else if (card.name === "The Athlete" && halfRotated) {
       setRotation("45");
@@ -86,7 +86,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
 
   function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (isClickable) {
-      if (card.type === CardType.Player) {
+      if (card.type === CardType.PLAYER) {
         setSelected(card.id);
       } else {
         attackCallback(card as EnemyCard);
@@ -99,7 +99,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
       <div
         ref={setNodeRef}
         className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14] absolute
-          ${card.type === CardType.Enemy ? "bg-rose-700" : "bg-green-700"}
+          ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
           }
@@ -117,11 +117,11 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
       >
         <h2 className="text-xl">{card.name}</h2>
         <h2 className="text-xl mt-auto">{
-          card.type === CardType.Player ?
+          card.type === CardType.PLAYER ?
             (card as PlayerCard).effectiveStrength : 
             (card as EnemyCard).health
         }</h2>
-        {card.type === CardType.Player && (card as PlayerCard).down ?
+        {card.type === CardType.PLAYER && (card as PlayerCard).down ?
           <h2 className="text-xl">Down</h2>
         : null}
         {isSelected ? <p>Selected</p> : null}

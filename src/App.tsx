@@ -127,7 +127,7 @@ function App() {
     if (deck.length < NUM_ROWS) {
       if (winState === WinState.LAST_TURN) {
         // Check if win or loss
-        const isWin = board.flat(2).some(card => card?.type === CardType.Enemy);
+        const isWin = board.flat(2).some(card => card?.type === CardType.ENEMY);
         if (isWin) {
           setWinState(WinState.WIN);
         } else {
@@ -222,7 +222,7 @@ function App() {
         const mortarIndex = cards[0]!.index!;
         
         // Flip and rotate card under mortar
-        if (newBoard[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.Player) {
+        if (newBoard[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.PLAYER) {
           const card = newBoard[mortarIndex[0]][mortarIndex[1]][0] as PlayerCard;
           card.down = true;
           card.rotated = true;
@@ -241,7 +241,7 @@ function App() {
             continue;
           }
           
-          if (newBoard[index[0]][index[1]][0]?.type === CardType.Player) {
+          if (newBoard[index[0]][index[1]][0]?.type === CardType.PLAYER) {
             (newBoard[index[0]][index[1]][0] as PlayerCard).down = true;
           }
           
@@ -268,7 +268,7 @@ function App() {
 
     for (const row of newBoard) {
       for (const cards of row) {
-        if (cards[0]?.type !== CardType.Player) {
+        if (cards[0]?.type !== CardType.PLAYER) {
           continue;
         }
         
@@ -332,7 +332,7 @@ function App() {
             }
 
             const adjacentCard = board[adjacentIndex[0]][adjacentIndex[1]][0];
-            if (adjacentCard && adjacentCard.type === CardType.Player && !(adjacentCard as PlayerCard).down) {
+            if (adjacentCard && adjacentCard.type === CardType.PLAYER && !(adjacentCard as PlayerCard).down) {
               return true;
             } else {
               return false;
@@ -374,7 +374,7 @@ function App() {
   function counterAttack() {
     const newBoard = [...board];
 
-    for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+    for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
       let toRemove: PlayerCard[] = [];
 
       if (enemy[0]!.name === "Infantry") {
@@ -385,7 +385,7 @@ function App() {
         // Find all player cards in that row
         toRemove = toRemove.concat(
           newBoard[enemy[0]!.index![0]]
-            .filter(cards => cards[0]?.type === CardType.Player && !(cards[0]! as PlayerCard).down)
+            .filter(cards => cards[0]?.type === CardType.PLAYER && !(cards[0]! as PlayerCard).down)
             .map(cards => cards[0]! as PlayerCard)
         );
       }
@@ -466,7 +466,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     // Shuffle player cards
     let players = shuffleArray(
       (cards.players as any[]).map((card, i) => (
-        {...card, id: card.name, type: CardType.Player, down: false, rotated: false, effectiveStrength: card.strength}
+        {...card, id: card.name, type: CardType.PLAYER, down: false, rotated: false, effectiveStrength: card.strength}
       ))
     ) as PlayerCard[];
     // let players = (cards.players as any[]).map(card => (
@@ -513,7 +513,7 @@ function createRandomBoard(): [(CardData | null)[][][], EnemyCard[]] {
     let enemies: EnemyCard[] = [];
     for (const [i, enemy] of cards.enemies.entries()) {
       for (const [j, position] of enemy.positions.entries()) {
-        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.Enemy, health: enemy.strength};
+        const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.ENEMY, health: enemy.strength};
         delete newEnemy.positions;
         enemies.push(newEnemy);
       }
@@ -564,7 +564,7 @@ function updateJokerAdjacentHealth(board: (CardData | null)[][][]) {
 
 
 function resetEnemyHealth(board: (CardData | null)[][][]) {
-  for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.Enemy)) {
+  for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
     (enemy[0]! as EnemyCard).health = enemy[0]!.strength;
   }
   

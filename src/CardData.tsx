@@ -1,6 +1,6 @@
 export enum CardType {
-  Player,
-  Enemy,
+  PLAYER,
+  ENEMY,
 }
 
 

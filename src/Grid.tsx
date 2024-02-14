@@ -65,8 +65,8 @@ function Grid({ board, setBoard }: GridProps) {
         }
 
         if (
-          (card0[0]?.type === CardType.Enemy || card0[1]?.type === CardType.Enemy) &&
-          (card1[0]?.type === CardType.Enemy || card1[1]?.type === CardType.Enemy)
+          (card0[0]?.type === CardType.ENEMY || card0[1]?.type === CardType.ENEMY) &&
+          (card1[0]?.type === CardType.ENEMY || card1[1]?.type === CardType.ENEMY)
         ) {
           // Blocked
           return true;
@@ -83,7 +83,7 @@ function Grid({ board, setBoard }: GridProps) {
 
     
     // Check if card to swap with is an enemy
-    if (board[destIndex[0]][destIndex[1]][0]?.type === CardType.Enemy) {
+    if (board[destIndex[0]][destIndex[1]][0]?.type === CardType.ENEMY) {
       return;
     }
     
@@ -236,7 +236,7 @@ function rotatePlayer(
   selected: string | null,
   setSelected: React.Dispatch<React.SetStateAction<string | null>>
 ) {
-  if (!card || card.type !== CardType.Player) {
+  if (!card || card.type !== CardType.PLAYER) {
     return;
   }
 
@@ -336,7 +336,7 @@ function findAdjacent(
 }
 
 export function findAdjacentEnemies(index: [number, number], board: (CardData | null)[][][]): EnemyCard[] {
-  return findAdjacent(index, board, card => card?.type === CardType.Enemy)
+  return findAdjacent(index, board, card => card?.type === CardType.ENEMY)
     .map(card => card as EnemyCard);
 }
 
@@ -348,7 +348,7 @@ export function findAdjacentPlayers(index: [number, number], board: (CardData | 
   return findAdjacent(
     index,
     board,
-    card => card?.type === CardType.Player && (!up || !(card! as PlayerCard).down)
+    card => card?.type === CardType.PLAYER && (!up || !(card! as PlayerCard).down)
   ).map(card => card as PlayerCard);
 }
 
