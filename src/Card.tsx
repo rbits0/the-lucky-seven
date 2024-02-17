@@ -103,7 +103,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
           }
-          ${isSelected ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
+          ${isSelected && !isDragging ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
           ${className}
         `}
         {...listeners}
