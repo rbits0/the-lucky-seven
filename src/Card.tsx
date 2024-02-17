@@ -137,7 +137,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   return (
       <div
         ref={setNodeRef}
-        className={`text-center flex flex-col select-none p-1 rounded-lg aspect-[9/14] absolute
+        className={`text-center flex flex-col select-none p-1 rounded-lg aspect-[185/258] absolute
           ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
@@ -166,7 +166,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
           <h2 className="text-xl">Down</h2>
         : null} */}
         {imagePaths.map(imagePath => (
-          <img key={imagePath} src={`/cards/${imagePath}.png`} alt={card.name}/>
+          <img key={imagePath} src={`${process.env.PUBLIC_URL}/cards/${imagePath}.png`} alt={card.name}/>
         ))}
       </div>
   );
