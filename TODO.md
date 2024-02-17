@@ -1,9 +1,9 @@
 ## Board
 
 - [x] Disable dragging of cards when not necessary
-- [ ] Display card images
+- [x] Display card images
 - [ ] Display different image if flipped
-- [ ] Seperate card position from rest of image
+- [x] Seperate card position from rest of image
 - [x] Undo button
 - [x] Success and failure screens
 - [ ] Add error messages for invalid actions (or make it more clear that it is invalid)
@@ -12,6 +12,7 @@
     - Moving diagonally between 2 enemies
     - Attacking non-adjacent enemy
 - [ ] Display number of cards/turns remaining
+- [ ] Add Infantry 0 image
 
 ## Phases
 
