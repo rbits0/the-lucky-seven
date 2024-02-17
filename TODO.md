@@ -2,7 +2,7 @@
 
 - [x] Disable dragging of cards when not necessary
 - [x] Display card images
-- [ ] Display different image if flipped
+- [x] Display different image if flipped
 - [x] Seperate card position from rest of image
 - [x] Undo button
 - [x] Success and failure screens
@@ -13,6 +13,7 @@
     - Attacking non-adjacent enemy
 - [ ] Display number of cards/turns remaining
 - [ ] Add Infantry 0 image
+- [ ] Grey out health on modified enemy cards
 
 ## Phases
 

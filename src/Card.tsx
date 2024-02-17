@@ -19,8 +19,13 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   const [rotation, setRotation] = useState("0");
   const [imagePaths, setImagePaths] = useState<string[]>([]);
 
+  // Variables to check in useEffects
   const rotated = (card as PlayerCard).rotated;
   const halfRotated = (card as AthleteCard).halfRotated;
+  const down = (card as PlayerCard).down;
+  const effectiveStrength = (card as PlayerCard).effectiveStrength;
+  const health = (card as EnemyCard).health;
+
   const isSelected = selected === card.id;
 
   const enabled = (
@@ -120,7 +125,7 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
     }
     
     setImagePaths(newImagePaths);
-  }, [card])
+  }, [card, down, effectiveStrength, health])
 
 
   function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
