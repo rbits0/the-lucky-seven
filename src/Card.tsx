@@ -98,11 +98,12 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   return (
       <div
         ref={setNodeRef}
-        className={`text-center flex flex-col border-black select-none p-1 rounded-lg aspect-[9/14] absolute
+        className={`text-center flex flex-col select-none p-1 rounded-lg aspect-[9/14] absolute
           ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
           }
+          ${isSelected ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
           ${className}
         `}
         {...listeners}
@@ -124,7 +125,6 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
         {card.type === CardType.PLAYER && (card as PlayerCard).down ?
           <h2 className="text-xl">Down</h2>
         : null}
-        {isSelected ? <p>Selected</p> : null}
       </div>
   );
 }
