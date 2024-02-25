@@ -142,12 +142,10 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
   return (
       <div
         ref={setNodeRef}
-        className={`text-center flex flex-col select-none rounded-lg aspect-[185/258] absolute
-          ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
+        className={`aspect-[185/258] absolute
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
           }
-          ${isSelected && !isDragging ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
           ${className}
         `}
         {...listeners}
@@ -160,19 +158,16 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
         }}
         onClick={handleClick}
       >
-        {/* <h2 className="text-xl">{card.name}</h2>
-        <p>{imagePaths}</p>
-        <h2 className="text-xl mt-auto">{
-          card.type === CardType.PLAYER ?
-            (card as PlayerCard).effectiveStrength : 
-            (card as EnemyCard).health
-        }</h2>
-        {card.type === CardType.PLAYER && (card as PlayerCard).down ?
-          <h2 className="text-xl">Down</h2>
-        : null} */}
-        {imagePaths.map(imagePath => (
-          <img key={imagePath} src={`${process.env.PUBLIC_URL}/cards/${imagePath}.png`} alt={card.name}/>
-        ))}
+        <div className={`w-full h-full absolute rounded-lg
+          ${isSelected && !isDragging ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
+        `}></div>
+        <div className={`w-full h-full text-center flex flex-col select-none rounded-lg card
+          ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
+        `}>
+          {imagePaths.map(imagePath => (
+            <img key={imagePath} src={`${process.env.PUBLIC_URL}/cards/${imagePath}.png`} alt={card.name}/>
+          ))}
+        </div>
       </div>
   );
 }
