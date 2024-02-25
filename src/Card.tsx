@@ -97,6 +97,8 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
     if (card.type === CardType.ENEMY) {
       // Enemy
       
+      
+
       //Image
       if (card.name === "Infantry") {
         newImagePaths.push(`Enemy/Image/Infantry ${card.strength}`);
@@ -106,7 +108,10 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
       
       // Health
       if (card.strength > 0) {
-        newImagePaths.push(`Enemy/Strength/${card.name} ${(card as EnemyCard).health}`);
+        // If health is different from strength, need to indicate that via change in colour
+        const modified = card.strength === (card as EnemyCard).health ? "" : " Modified"
+        
+        newImagePaths.push(`Enemy/Strength/${card.name} ${(card as EnemyCard).health}${modified}`);
       } else {
         newImagePaths.push(`Enemy/Strength/${card.name}`);
       }
