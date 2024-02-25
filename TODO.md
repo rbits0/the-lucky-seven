@@ -12,8 +12,8 @@
     - Moving diagonally between 2 enemies
     - Attacking non-adjacent enemy
 - [ ] Display number of cards/turns remaining
-- [ ] Add Infantry 0 image
-- [ ] Grey out health on modified enemy cards
+- [x] Add Infantry 0 image
+- [x] Grey out health on modified enemy cards
 
 ## Phases
 
