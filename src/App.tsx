@@ -638,4 +638,20 @@ function resetEnemyHealth(board: (CardData | null)[][][]) {
 }
 
 
+function phaseToString(phase: Phase): string {
+  switch (phase) {
+    case Phase.GAME_START:
+      return "Game Start";
+    case Phase.ENCOUNTER:
+      return "Encounter";
+    case Phase.MANEUVER:
+      return "Maneuver";
+    case Phase.ATTACK:
+      return "Attack";
+    case Phase.COUNTER_ATTACK:
+      return "Counter-Attack"
+  }
+}
+
+
 export default App;

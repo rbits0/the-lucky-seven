@@ -14,6 +14,7 @@
 - [ ] Display number of cards/turns remaining
 - [x] Add Infantry 0 image
 - [x] Grey out health on modified enemy cards
+- [ ] Make win/loss overlay generic (don't have duplicate code)
 
 ## Phases
 
