@@ -9,7 +9,7 @@ import { Active } from "@dnd-kit/core";
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
 const NUM_UNDOS = 3;
-const BUTTON_STYLE = "mt-4 h-min p-2 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
+const BUTTON_STYLE = "mt-4 h-min p-2 w-40 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
 
 
 export interface GameState {
@@ -481,11 +481,11 @@ function App() {
         </div>
       : null}
 
-      <div className="flex items-start flex-wrap">
+      <div className="flex flex-wrap h-full justify-center items-center">
         <Grid board={board} setBoard={setBoard}/>
 
-        <div className="flex flex-col m-auto p-4 text-xl">
-          <p>Phase: {phase}</p>
+        <div className="flex flex-col h-full flex-grow justify-center items-center p-4 text-xl">
+          <p>Phase: {phaseToString(phase)}</p>
 
           <button
             onClick={flipSelected}
