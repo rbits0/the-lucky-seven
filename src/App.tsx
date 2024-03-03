@@ -4,12 +4,13 @@ import Grid, { findAdjacentEnemies, findAdjacentPlayers, updateHammerAnvilStreng
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { Contexts, Phase, SharedContexts } from "./Contexts";
 import { Active } from "@dnd-kit/core";
+import GameEndPopup from "./GameEndPopup";
 
 
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
 const NUM_UNDOS = 3;
-const BUTTON_STYLE = "mt-4 h-min p-2 w-40 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
+export const BUTTON_STYLE = "mt-4 h-min p-2 w-40 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
 
 
 export interface GameState {
@@ -19,7 +20,7 @@ export interface GameState {
   winState: WinState,
 }
 
-enum WinState {
+export enum WinState {
   NONE,
   LAST_TURN,
   WIN,
@@ -430,57 +431,11 @@ function App() {
     <SharedContexts.Provider value={sharedContexts}>
       
       {winState === WinState.WIN ? 
-        <div className="fixed z-20 w-full h-full">
-          <div className="fixed bg-gray-900 w-full h-full opacity-50"></div>
-          <div className="fixed-center rounded-2xl z-10 bg-green-700 opacity-100 p-5">
-            <h1 className="text-slate-200 font-bold text-6xl text-center">YOU WIN</h1>
-            <div className="flex">
-              <button
-                onClick={resetGame}
-                className={`${BUTTON_STYLE} text-xl ml-auto`}
-              >
-                New Game
-              </button>
-              <button
-                onClick={() => {
-                  setWinState(WinState.LAST_TURN);
-                  setPhase(Phase.COUNTER_ATTACK);
-                }}
-                className={`${BUTTON_STYLE} text-xl ml-5 mr-auto`}
-              >
-                View Board
-              </button>
-            </div>
-          </div>
-        </div>
+        <GameEndPopup resetGame={resetGame} setWinState={setWinState} setPhase={setPhase} win={true}/>
+      : winState === WinState.LOSS ?
+        <GameEndPopup resetGame={resetGame} setWinState={setWinState} setPhase={setPhase} win={false}/>
       : null}
       
-      {winState === WinState.LOSS ?
-        <div className="fixed z-20 w-full h-full">
-          <div className="fixed bg-gray-900 w-full h-full opacity-50"></div>
-          <div className="fixed-center rounded-2xl z-10 bg-red-700 opacity-100 p-5">
-            <h1 className="text-slate-200 font-bold text-6xl text-center">YOU LOSE</h1>
-            <div className="flex">
-              <button
-                onClick={resetGame}
-                className={`${BUTTON_STYLE} text-xl ml-auto`}
-              >
-                New Game
-              </button>
-              <button
-                onClick={() => {
-                  setWinState(WinState.LAST_TURN);
-                  setPhase(Phase.COUNTER_ATTACK);
-                }}
-                className={`${BUTTON_STYLE} text-xl ml-5 mr-auto`}
-              >
-                View Board
-              </button>
-            </div>
-          </div>
-        </div>
-      : null}
-
       <div className="flex flex-wrap h-full justify-center items-center">
         <Grid board={board} setBoard={setBoard}/>
 
