@@ -41,6 +41,7 @@ Maneuver
     - Automatically deselect card once rotated and on next phase
 - [x] Unrotate all members before attack phase
 - [x] Remove flares before attack phase
+- [ ] Don't swap with rotated card
 
 Attack
 - [x] Click on player card to select it

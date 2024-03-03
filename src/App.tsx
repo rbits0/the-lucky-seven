@@ -36,6 +36,7 @@ function App() {
   const [phase, setPhase] = useState(Phase.GAME_START);
   const [selected, setSelected] = useState<string | null>(null);
   const [winState, setWinState] = useState(WinState.NONE);
+  const [canFlip, setCanFlip] = useState(false);
   let history: MutableRefObject<GameState[]> = useRef([]);
   
   const sharedContexts: Contexts = {
@@ -306,81 +307,84 @@ function App() {
     
     setBoard(newBoard);
   }
+  
+
+  // Check if selected card can be flipped
+  useEffect(() => {
+    let canFlip = false;
+
+    // Find selected card
+    const selectedCard = board.flat().find((card) => card[0]?.id === selected);
+
+    if (selectedCard) {
+      const selectedPlayerCard = selectedCard[0] as PlayerCard;
+
+      // Card can't flip if it is rotated
+      // Includes athlete's half-rotation
+      if (
+        selectedPlayerCard.rotated || (
+          selectedPlayerCard.name === "The Athlete" &&
+          (selectedPlayerCard as AthleteCard).halfRotated
+        )
+      ) {
+        return;
+      }
+
+      if (selectedPlayerCard.down) {
+        // Check if adjacent up card exists
+        const index = selectedPlayerCard.index!;
+        const adjacent = [
+          [index[0] - 1, index[1]],
+          [index[0], index[1] - 1],
+          [index[0] + 1, index[1]],
+          [index[0], index[1] + 1],
+        ]
+        
+        canFlip = adjacent.some((adjacentIndex) => {
+          // Check index is in bounds
+          if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= board.length || adjacentIndex[1] >= board[0].length) {
+            return false;
+          }
+
+          const adjacentCard = board[adjacentIndex[0]][adjacentIndex[1]][0];
+          if (adjacentCard && adjacentCard.type === CardType.PLAYER && !(adjacentCard as PlayerCard).down) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+
+      } else {
+        canFlip = true;
+      }
+    }
+    
+    setCanFlip(canFlip);
+  }, [selected, board]);
 
 
   function flipSelected() {
     const newBoard = [...board];
 
-    // Find selected card
-    for (const row of newBoard) {
-      const selectedCard = row.find((card) => card[0]?.id === selected);
+    if (canFlip) {
+      // Find selected card
+      const selectedCard = board.flat().find((card) => card[0]?.id === selected)![0] as PlayerCard;
 
-      if (selectedCard) {
-        const selectedPlayerCard = selectedCard[0] as PlayerCard;
+      addStateToHistory();
+      
+      selectedCard.down = !selectedCard.down;
+      selectedCard.rotated = true;
 
-        // Card can't flip if it is rotated
-        // Includes athlete's half-rotation
-        if (
-          selectedPlayerCard.rotated || (
-            selectedPlayerCard.name === "The Athlete" &&
-            (selectedPlayerCard as AthleteCard).halfRotated
-          )
-        ) {
-          return;
-        }
-
-        if (selectedPlayerCard.down) {
-          // Flip up
-          // Check if adjacent up card exists
-          const index = selectedPlayerCard.index!;
-          const adjacent = [
-            [index[0] - 1, index[1]],
-            [index[0], index[1] - 1],
-            [index[0] + 1, index[1]],
-            [index[0], index[1] + 1],
-          ]
-          
-          const canFlip = adjacent.some((adjacentIndex) => {
-            // Check index is in bounds
-            if (adjacentIndex[0] < 0 || adjacentIndex[1] < 1 || adjacentIndex[0] >= newBoard.length || adjacentIndex[1] >= newBoard[0].length) {
-              return false;
-            }
-
-            const adjacentCard = board[adjacentIndex[0]][adjacentIndex[1]][0];
-            if (adjacentCard && adjacentCard.type === CardType.PLAYER && !(adjacentCard as PlayerCard).down) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-
-          if (canFlip) {
-            addStateToHistory();
-            
-            selectedPlayerCard.down = false;
-            selectedPlayerCard.rotated = true;
-          }
-        } else {
-          addStateToHistory();
-
-          // Flip down
-          selectedPlayerCard.down = true;
-          selectedPlayerCard.rotated = true;
-        }
-        
-        
-        // If joker, update enemy health
-        if (selectedPlayerCard.name === "The Joker") {
-          updateJokerAdjacentHealth(newBoard);
-        }
-        
-        // If pacifist, update hammer/anvil strength
-        if (selectedPlayerCard.name === "The Pacifist") {
-          updateHammerAnvilStrength(newBoard);
-        }
+      // If joker, update enemy health
+      if (selectedCard.name === "The Joker") {
+        updateJokerAdjacentHealth(newBoard);
+      }
+      
+      // If pacifist, update hammer/anvil strength
+      if (selectedCard.name === "The Pacifist") {
+        updateHammerAnvilStrength(newBoard);
       }
     }
-    
 
     setBoard(newBoard);
   }
@@ -445,6 +449,7 @@ function App() {
           <button
             onClick={flipSelected}
             className={BUTTON_STYLE}
+            disabled={!canFlip}
           >
             Flip Selected
           </button>
