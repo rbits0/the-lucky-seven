@@ -15,6 +15,7 @@
 - [x] Add Infantry 0 image
 - [x] Grey out health on modified enemy cards
 - [x] Make win/loss overlay generic (don't have duplicate code)
+- [ ] Fix layout on vertical screens
 
 ## Phases
 
@@ -50,7 +51,7 @@ Attack
 - [x] Don't allow selecting joker or pacifist
 - [x] Allow the natural to attack diagonally
 - [x] Increase anvil/hammer strength when pacifist adjacent
-- [ ] Change colour of strength text when modified
+- [x] Change colour of strength text when modified
 - [x] Decrease enemy strength when joker adjacent
 - [x] Don't decrease when joker is down
 - [x] Don't increase strength when pacifist is down
@@ -59,8 +60,8 @@ Attack
 - [ ] Highlight cards it can attack?
 - [x] Unrotate cards before counter-attack phase
 - [x] Revert enemy health before counter-attack phase
-- [ ] Check for failure before counter-attack phase
-- [ ] Check for success before counter-attack phase
+- [x] Check for failure before counter-attack phase
+- [x] Check for success before counter-attack phase
 
 Counter-Attack
 - [x] Remove all players adjacent to enemy cards
