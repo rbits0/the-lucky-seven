@@ -50,7 +50,23 @@ function Grid({ board, setBoard }: GridProps) {
       [sourceIndex[0] + 1, sourceIndex[1] + 1],
     ];
     if (adjacent.filter((source) => source[0] === destIndex[0] && source[1] === destIndex[1]).length === 0) {
-      return
+      return;
+    }
+
+    // Check that both cards are up and not rotated
+    const cards = [
+      board[sourceIndex[0]][sourceIndex[1]][0],
+      board[destIndex[0]][destIndex[1]][0],
+    ]
+    for (const card of cards) {
+      if (
+        card?.type === CardType.PLAYER && (
+          (card as PlayerCard).down === true ||
+          (card as PlayerCard).rotated === true
+        )
+      ) {
+        return;
+      }
     }
     
     // If diagonally adjacent, check that movement is not blocked by diagonal enemies

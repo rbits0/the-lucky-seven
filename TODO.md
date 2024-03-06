@@ -41,7 +41,7 @@ Maneuver
     - Automatically deselect card once rotated and on next phase
 - [x] Unrotate all members before attack phase
 - [x] Remove flares before attack phase
-- [ ] Don't swap with rotated card
+- [x] Don't swap with rotated card
 - [x] Fix leader flipping
 - [ ] Fix out-of-bounds check
 
