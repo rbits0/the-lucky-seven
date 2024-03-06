@@ -25,7 +25,7 @@ function Cell({ id, rowIndex, columnIndex, cards, attackCallback }: CellProps) {
   return (
     <td
       className={`border border-black border-collapse bg-clip-border
-        ${isOver ? "bg-pink-400" : "bg-white"}
+        ${isOver ? "bg-slate-200" : "bg-white"}
       `}
       // style={{height: "14em", width: "14em"}}
       ref={setNodeRef}
