@@ -321,16 +321,17 @@ function App() {
 
       // Card can't flip if it is rotated
       // Includes athlete's half-rotation
-      if (
-        selectedPlayerCard.rotated || (
-          selectedPlayerCard.name === "The Athlete" &&
-          (selectedPlayerCard as AthleteCard).halfRotated
+      if (selectedPlayerCard.rotated || (
+          selectedPlayerCard.name === "The Athlete" && (selectedPlayerCard as AthleteCard).halfRotated
         )
       ) {
         return;
       }
-
-      if (selectedPlayerCard.down) {
+      
+      // Leader can always flip
+      if (selectedPlayerCard.name === "The Leader") {
+        canFlip = true;
+      } else if (selectedPlayerCard.down) {
         // Check if adjacent up card exists
         const index = selectedPlayerCard.index!;
         const adjacent = [
@@ -346,6 +347,7 @@ function App() {
             return false;
           }
 
+          // Check that there is an adjacent card
           const adjacentCard = board[adjacentIndex[0]][adjacentIndex[1]][0];
           if (adjacentCard && adjacentCard.type === CardType.PLAYER && !(adjacentCard as PlayerCard).down) {
             return true;

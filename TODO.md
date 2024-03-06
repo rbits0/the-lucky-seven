@@ -42,7 +42,8 @@ Maneuver
 - [x] Unrotate all members before attack phase
 - [x] Remove flares before attack phase
 - [ ] Don't swap with rotated card
-- [ ] Fix leader flipping
+- [x] Fix leader flipping
+- [ ] Fix out-of-bounds check
 
 Attack
 - [x] Click on player card to select it
