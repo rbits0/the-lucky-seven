@@ -38,6 +38,11 @@ function Grid({ board, setBoard }: GridProps) {
       return;
     }
     
+    // Check that destIndex is in bounds
+    if (destIndex[1] < 1) {
+      return;
+    }
+    
     // Check if card is adjacent or diagonally adjacent
     const adjacent = [
       [sourceIndex[0] - 1, sourceIndex[1] - 1],
