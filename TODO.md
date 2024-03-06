@@ -44,7 +44,7 @@ Maneuver
 - [x] Don't swap with rotated card
 - [x] Fix leader flipping
 - [x] Fix out-of-bounds check
-- [ ] Don't highlight cells of first column, since player can't move to it
+- [x] Don't highlight cells of first column, since player can't move to it
 
 Attack
 - [x] Click on player card to select it
