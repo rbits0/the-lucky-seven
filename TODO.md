@@ -45,6 +45,8 @@ Maneuver
 - [x] Fix leader flipping
 - [x] Fix out-of-bounds check
 - [x] Don't highlight cells of first column, since player can't move to it
+- [ ] The mouse can flip after moving
+- [ ] Fix mouse movement
 
 Attack
 - [x] Click on player card to select it

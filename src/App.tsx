@@ -311,8 +311,14 @@ function App() {
 
   // Check if selected card can be flipped
   useEffect(() => {
-    let canFlip = false;
+    if (phase !== Phase.MANEUVER) {
+      setCanFlip(false);
+      return;
+    }
 
+
+    let canFlip = false;
+    
     // Find selected card
     const selectedCard = board.flat().find((card) => card[0]?.id === selected);
 
