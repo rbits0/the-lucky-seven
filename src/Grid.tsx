@@ -58,7 +58,7 @@ function Grid({ board, setBoard }: GridProps) {
       return;
     }
 
-    // Check that both cards are up and not rotated
+    // Check that both cards are up (except for the mouse) and not rotated
     const cards = [
       board[sourceIndex[0]][sourceIndex[1]][0],
       board[destIndex[0]][destIndex[1]][0],
@@ -66,8 +66,10 @@ function Grid({ board, setBoard }: GridProps) {
     for (const card of cards) {
       if (
         card?.type === CardType.PLAYER && (
-          (card as PlayerCard).down === true ||
-          (card as PlayerCard).rotated === true
+          (
+            (card as PlayerCard).down &&
+            card.name !== "The Mouse"
+          ) || (card as PlayerCard).rotated
         )
       ) {
         return;
