@@ -458,10 +458,10 @@ function App() {
         <GameEndPopup resetGame={resetGame} setWinState={setWinState} setPhase={setPhase} win={false}/>
       : null}
       
-      <div className="flex flex-wrap h-full justify-center items-center">
+      <div className="flex flex-wrap h-full justify-start items-center">
         <Grid board={board} setBoard={setBoard}/>
 
-        <div className="flex flex-col h-full flex-grow justify-center items-center p-4 text-xl">
+        <div className="flex flex-col h-min self-start flex-grow justify-center items-center p-4 text-xl">
           <div className="w-44">
             <p className="text-balance text-center">Phase: {phaseToString(phase)}</p>
 

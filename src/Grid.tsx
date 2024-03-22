@@ -227,7 +227,7 @@ function Grid({ board, setBoard }: GridProps) {
 
   return (
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
-      <table className={`table-fixed grid-aspect`}>
+      <table className={`self-start flex-shrink table-fixed grid-aspect`}>
         {
           board.map((row, rowIndex) => (
             <tr
