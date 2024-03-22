@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/the-lucky-seven/static/css/main.743617b5.css",
-    "main.js": "/the-lucky-seven/static/js/main.2588f5e2.js",
+    "main.js": "/the-lucky-seven/static/js/main.65af5723.js",
     "static/js/787.8b385a7a.chunk.js": "/the-lucky-seven/static/js/787.8b385a7a.chunk.js",
     "index.html": "/the-lucky-seven/index.html",
     "main.743617b5.css.map": "/the-lucky-seven/static/css/main.743617b5.css.map",
-    "main.2588f5e2.js.map": "/the-lucky-seven/static/js/main.2588f5e2.js.map",
+    "main.65af5723.js.map": "/the-lucky-seven/static/js/main.65af5723.js.map",
     "787.8b385a7a.chunk.js.map": "/the-lucky-seven/static/js/787.8b385a7a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.743617b5.css",
-    "static/js/main.2588f5e2.js"
+    "static/js/main.65af5723.js"
   ]
 }
