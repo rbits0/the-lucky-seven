@@ -462,30 +462,34 @@ function App() {
         <Grid board={board} setBoard={setBoard}/>
 
         <div className="flex flex-col h-full flex-grow justify-center items-center p-4 text-xl">
-          <p>Phase: {phaseToString(phase)}</p>
+          <div className="w-44">
+            <p className="text-balance text-center">Phase: {phaseToString(phase)}</p>
 
-          <button
-            onClick={flipSelected}
-            className={BUTTON_STYLE}
-            disabled={!canFlip}
-          >
-            Flip Selected
-          </button>
+            <div className="mx-auto w-min">
+              <button
+                onClick={flipSelected}
+                className={BUTTON_STYLE}
+                disabled={!canFlip}
+              >
+                Flip Selected
+              </button>
 
-          <button
-            onClick={nextPhase}
-            className={BUTTON_STYLE}
-          >
-            Next Phase
-          </button>
-          
-          <button
-            onClick={undo}
-            className={BUTTON_STYLE}
-            disabled={history.current.length === 0}
-          >
-            Undo
-          </button>
+              <button
+                onClick={nextPhase}
+                className={BUTTON_STYLE}
+              >
+                Next Phase
+              </button>
+              
+              <button
+                onClick={undo}
+                className={BUTTON_STYLE}
+                disabled={history.current.length === 0}
+              >
+                Undo
+              </button>
+            </div>
+          </div>
 
         </div>
       </div>
