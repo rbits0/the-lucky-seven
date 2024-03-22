@@ -44,7 +44,14 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
 
       phase === Phase.MANEUVER && 
       card.type === CardType.PLAYER &&
-      !(card as PlayerCard).rotated
+      (
+        // The mouse can flip *DOWN* even if rotated
+        !(card as PlayerCard).rotated ||
+        (
+          card.name === "The Mouse" &&
+          !(card as PlayerCard).down
+        )
+      )
 
     ) || (
 

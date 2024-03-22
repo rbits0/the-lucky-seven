@@ -327,10 +327,17 @@ function App() {
 
       // Card can't flip if it is rotated
       // Includes athlete's half-rotation
-      if (selectedPlayerCard.rotated || (
-          selectedPlayerCard.name === "The Athlete" && (selectedPlayerCard as AthleteCard).halfRotated
+      // Mouse is an exception, it can flip *DOWN* when rotated
+      if ((selectedPlayerCard.rotated || (
+          selectedPlayerCard.name === "The Athlete" &&
+          (selectedPlayerCard as AthleteCard).halfRotated
+        )) && !(
+          // If card is mouse and up, it can flip
+          selectedPlayerCard.name === "The Mouse" &&
+          !selectedPlayerCard.down
         )
       ) {
+        setCanFlip(false);
         return;
       }
       
@@ -368,7 +375,7 @@ function App() {
     }
     
     setCanFlip(canFlip);
-  }, [selected, board]);
+  }, [selected, board, phase]);
 
 
   function flipSelected() {
@@ -392,6 +399,9 @@ function App() {
       if (selectedCard.name === "The Pacifist") {
         updateHammerAnvilStrength(newBoard);
       }
+      
+      // Deselect card
+      setSelected(null);
     }
 
     setBoard(newBoard);
