@@ -16,6 +16,7 @@
 - [x] Grey out health on modified enemy cards
 - [x] Make win/loss overlay generic (don't have duplicate code)
 - [ ] Fix layout on vertical screens
+- [ ] Pre-load images
 
 ## Phases
 
