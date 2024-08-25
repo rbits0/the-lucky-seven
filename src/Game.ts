@@ -28,6 +28,9 @@ enum WinState {
 
 export enum GameActionType {
   RESET,
+  UNDO,
+  NEXT_PHASE,
+  FLIP_SELECTED,
   MOVE,
 }
 
@@ -43,12 +46,27 @@ export interface MoveAction extends GameAction {
 
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
+  const newState = {...state};
+
   switch (action.type) {
     case GameActionType.RESET:
       return createGame();
+    case GameActionType.UNDO:
+      if (state.history === null) {
+        throw new TypeError("Tried to undo, but history is null");
+      }
+
+      return undo(state.history);
+    case GameActionType.NEXT_PHASE:
+      nextPhase(newState);
+      return newState;
+    case GameActionType.FLIP_SELECTED:
+      flipSelected(state);
+      return newState;
+    case GameActionType.MOVE:
+      // TODO:
+      return newState;
   }
-  
-  return state;
 }
 
 
@@ -159,6 +177,7 @@ function addStateToHistory(state: GameState) {
   state.history = newHistory;
 }
 
+// Pure function
 function undo(history: GameState[]): GameState {
   if (history.length === 0) {
     throw new Error("Tried to undo with empty history");
@@ -417,39 +436,6 @@ function removeFlares(board: Board): Board {
 }
 
 
-function flipSelected(state: GameState) {
-  if (!state.canFlip) {
-    return;
-  }
-
-  addStateToHistory(state);
-
-  const newBoard = [...state.board];
-
-  // Find selected card
-  const selectedCard = newBoard.flat().find((card) => card[0]?.id === state.selected)![0] as PlayerCard;
-  const newCard = placeCard(newBoard, selectedCard, selectedCard.index!, 0);
-
-  newCard.down = !selectedCard.down;
-  newCard.rotated = true;
-
-  // If joker, update enemy health
-  if (selectedCard.name === "The Joker") {
-    updateJokerAdjacentHealth(newBoard);
-  }
-  
-  // If pacifist, update hammer/anvil strength
-  if (selectedCard.name === "The Pacifist") {
-    updateHammerAnvilStrength(newBoard);
-  }
-  
-  // Deselect card
-  state.selected = null;
-
-  state.board = newBoard
-}
-
-
 function counterAttack(board: Board) {
   for (const enemy of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
     let toRemove: PlayerCard[] = [];
@@ -485,6 +471,41 @@ function removeTanks(board: Board) {
     placeCard(board, null, [row, 0], 0);
   }
 }
+
+
+function flipSelected(state: GameState) {
+  if (!state.canFlip) {
+    return;
+  }
+
+  addStateToHistory(state);
+
+  const newBoard = [...state.board];
+
+  // Find selected card
+  const selectedCard = newBoard.flat().find((card) => card[0]?.id === state.selected)![0] as PlayerCard;
+  const newCard = placeCard(newBoard, selectedCard, selectedCard.index!, 0);
+
+  newCard.down = !selectedCard.down;
+  newCard.rotated = true;
+
+  // If joker, update enemy health
+  if (selectedCard.name === "The Joker") {
+    updateJokerAdjacentHealth(newBoard);
+  }
+  
+  // If pacifist, update hammer/anvil strength
+  if (selectedCard.name === "The Pacifist") {
+    updateHammerAnvilStrength(newBoard);
+  }
+  
+  // Deselect card
+  state.selected = null;
+
+  state.board = newBoard
+}
+
+
 
   
 
@@ -546,7 +567,7 @@ function updateJokerAdjacentHealth(board: Board) {
 
 
 function resetEnemyHealth(board: Board) {
-  for (const [enemy, _] of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
+  for (const [enemy] of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
     const newCard = placeCard(board, enemy!, enemy!.index!, 0) as EnemyCard;
     newCard.health = newCard.strength;
   }
