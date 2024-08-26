@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { GameActionType, MoveAction, NUM_ROWS } from "./Game";
+import { AttackAction, GameActionType, MoveAction, NUM_ROWS } from "./Game";
 import { useContext } from "react";
 import { GameContext } from "./Contexts";
 
@@ -36,7 +36,7 @@ function Grid() {
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <table className={`self-start flex-shrink table-fixed grid-aspect`}>
         {
-          board.map((row, rowIndex) => (
+          gameState.board.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               style={{height: `${100 / NUM_ROWS}%`}}
@@ -49,7 +49,10 @@ function Grid() {
                   rowIndex={rowIndex}
                   columnIndex={columnIndex}
                   cards={cards}
-                  attackCallback={attack}
+                  attackCallback={(enemy: EnemyCard) => gameDispatch({
+                    type: GameActionType.ATTACK,
+                    enemy: enemy,
+                  } as AttackAction)}
                 />
               ))}            
             </tr>
