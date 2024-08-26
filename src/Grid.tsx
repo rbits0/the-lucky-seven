@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { NUM_ROWS } from "./Game";
+import { GameActionType, MoveAction, NUM_ROWS } from "./Game";
 import { useContext } from "react";
 import { GameContext } from "./Contexts";
 
@@ -17,7 +17,6 @@ function Grid() {
   
 
   function onDragEnd({over, active}: DragEndEvent) {
-
     if (!over) {
       return;
     }
@@ -25,7 +24,11 @@ function Grid() {
     const destIndex: [number, number] = over?.data.current?.index;
     const sourceIndex: [number, number] = active.data.current?.card.index;
     
-    
+    gameDispatch({
+      type: GameActionType.MOVE,
+      from: sourceIndex,
+      to: destIndex
+    } as MoveAction)
   }
   
 

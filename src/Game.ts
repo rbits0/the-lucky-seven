@@ -40,6 +40,7 @@ export interface GameAction {
 }
 
 export interface MoveAction extends GameAction {
+  type: GameActionType.MOVE,
   from: [number, number],
   to: [number, number],
 }
@@ -67,7 +68,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case GameActionType.MOVE:
       // TODO:
       const moveAction = action as MoveAction;
-      moveAction(state, moveAction.from, moveAction.to);
+      doMoveAction(state, moveAction.from, moveAction.to);
       break;
   }
   
@@ -513,7 +514,7 @@ function flipSelected(state: GameState) {
 }
 
 
-function moveAction(state: GameState, from: [number, number], to: [number, number]) {
+function doMoveAction(state: GameState, from: [number, number], to: [number, number]) {
   if (canMove(state.board, from, to)) {
     addStateToHistory(state);
   
