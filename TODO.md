@@ -1,3 +1,7 @@
+## Code
+- [ ] Make immutable arguments more explicit
+
+
 ## Board
 
 - [x] Disable dragging of cards when not necessary

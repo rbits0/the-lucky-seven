@@ -1,6 +1,7 @@
 import { Phase } from "./Contexts";
 import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
 import Card from "./Card";
+import { transpileModule } from "typescript";
 
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
@@ -19,7 +20,7 @@ export interface GameState {
   history: GameState[] | null,
 }
 
-enum WinState {
+export enum WinState {
   NONE,
   LAST_TURN,
   WIN,
@@ -59,14 +60,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return undo(state.history);
     case GameActionType.NEXT_PHASE:
       nextPhase(newState);
-      return newState;
+      break;
     case GameActionType.FLIP_SELECTED:
       flipSelected(state);
-      return newState;
+      break;
     case GameActionType.MOVE:
       // TODO:
-      return newState;
+      break;
   }
+  
+  newState.canFlip = canFlip(state);
+  
+  return newState;
 }
 
 
@@ -506,12 +511,59 @@ function flipSelected(state: GameState) {
 }
 
 
+function canFlip(state: GameState): boolean {
+  if (state.phase !== Phase.MANEUVER) {
+    return false;
+  }
+
+
+  // Find selected card
+  const selectedCard = state.board.flat().find(
+    (card) => card[0]?.id === state.selected
+  );
+  
+  if (selectedCard === undefined) {
+    return false;
+  }
+
+  const selectedPlayerCard = selectedCard[0] as PlayerCard;
+
+  // Card can't flip if it is rotated
+  // Includes athlete's half-rotation
+  // Mouse is an exception, it can flip *DOWN* when rotated
+  if ((selectedPlayerCard.rotated || (
+      selectedPlayerCard.name === "The Athlete" &&
+      (selectedPlayerCard as AthleteCard).halfRotated
+    )) && !(
+      // If card is mouse and up, it can flip
+      selectedPlayerCard.name === "The Mouse" &&
+      !selectedPlayerCard.down
+    )
+  ) {
+    return false;
+  }
+  
+  // Leader can always flip
+  if (selectedPlayerCard.name === "The Leader") {
+    return true;
+  } else if (selectedPlayerCard.down) {
+    // Check if adjacent up card exists
+    
+    return hasAdjacent(selectedPlayerCard.index!, state.board, (card) => (
+      (card !== null) &&
+      (card.type === CardType.PLAYER) && 
+      (!(card as PlayerCard).down)
+    ));
+  } else {
+    return false;
+  }
+}
 
   
 
 // Is pacifist adjacent AND UP
 function isPacifistAdjacent(index: [number, number], board: Board): boolean {
-  return is_Adjacent(index, board, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
+  return hasAdjacent(index, board, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
 }
 
 
@@ -644,7 +696,7 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 
-function isAdjacent(
+function hasAdjacent(
   index: [number, number],
   board: Board,
   predicate: (card: CardData | null) => boolean
@@ -665,5 +717,6 @@ function isAdjacent(
   return cardIsAdjacent;
 }
 // TODO: Remove
-const is_Adjacent = isAdjacent;
+const isAdjacent = hasAdjacent;
+const is_Adjacent = hasAdjacent;
 
