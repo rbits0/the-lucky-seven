@@ -1,7 +1,6 @@
 import Cell from "./Cell";
-import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { AttackAction, GameActionType, MoveAction, NUM_ROWS } from "./Game";
+import { GameActionType, MoveAction, NUM_ROWS } from "./Game";
 import { useContext } from "react";
 import { GameContext } from "./Contexts";
 
@@ -49,10 +48,6 @@ function Grid() {
                   rowIndex={rowIndex}
                   columnIndex={columnIndex}
                   cards={cards}
-                  attackCallback={(enemy: EnemyCard) => gameDispatch({
-                    type: GameActionType.ATTACK,
-                    enemy: enemy,
-                  } as AttackAction)}
                 />
               ))}            
             </tr>

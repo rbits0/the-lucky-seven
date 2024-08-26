@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Phase, SharedContexts } from "./Contexts";
+import { GameContext, Phase, SharedContexts } from "./Contexts";
+import { AttackAction, GameActionType } from "./Game";
 
 
 interface CardProps {
@@ -10,11 +11,12 @@ interface CardProps {
   className?: string,
   disabled: boolean,
   above?: boolean,
-  attackCallback: (enemy: EnemyCard) => void,
 }
 
 
-function Card({ card, className, disabled, above, attackCallback }: CardProps) {
+function Card({ card, className, disabled, above }: CardProps) {
+  const [ , gameDispatch] = useContext(GameContext)!;
+  
   const { phase, selected, setSelected } = useContext(SharedContexts)!;
   const [rotation, setRotation] = useState("0");
   const [imagePaths, setImagePaths] = useState<string[]>([]);
@@ -145,10 +147,19 @@ function Card({ card, className, disabled, above, attackCallback }: CardProps) {
       if (card.type === CardType.PLAYER) {
         setSelected(card.id);
       } else {
-        attackCallback(card as EnemyCard);
+        attack(card as EnemyCard);
       }
     }
   }
+  
+
+  function attack(enemy: EnemyCard) {
+    gameDispatch({
+      type: GameActionType.ATTACK,
+      enemy: enemy,
+    } as AttackAction);
+  }
+
 
 
   return (
