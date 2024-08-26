@@ -33,6 +33,7 @@ export enum GameActionType {
   NEXT_PHASE,
   FLIP_SELECTED,
   MOVE,
+  ATTACK,
 }
 
 export interface GameAction {
@@ -43,6 +44,11 @@ export interface MoveAction extends GameAction {
   type: GameActionType.MOVE,
   from: [number, number],
   to: [number, number],
+}
+
+export interface AttackAction extends GameAction {
+  type: GameActionType.ATTACK,
+  enemy: EnemyCard,
 }
 
 
@@ -63,12 +69,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       nextPhase(newState);
       break;
     case GameActionType.FLIP_SELECTED:
-      flipSelected(state);
+      flipSelected(newState);
       break;
     case GameActionType.MOVE:
       // TODO:
       const moveAction = action as MoveAction;
-      doMoveAction(state, moveAction.from, moveAction.to);
+      doMoveAction(newState, moveAction.from, moveAction.to);
+      break;
+    case GameActionType.ATTACK:
+      const attackAction = action as AttackAction;
+      doAttackAction(newState, attackAction.enemy);
       break;
   }
   
@@ -666,6 +676,78 @@ function moveCard(
   }
   
   return shouldUnselect
+}
+
+
+function doAttackAction(state: GameState, enemy: EnemyCard) {
+  const selectedCard = state.board.flatMap(row => row.find(
+    cards => cards[0]?.id === state.selected
+  )).find(
+    x => x !== null && x !== undefined
+  ) as PlayerCard | undefined;
+
+  if (!selectedCard) {
+    return;
+  }
+  
+  if (!canAttack(selectedCard, enemy.index!)) {
+    return;
+  }
+
+  addStateToHistory(state);
+
+  attack(state, selectedCard, enemy);
+}
+
+
+function canAttack(selectedCard: PlayerCard, enemyIndex: [number, number]): boolean {
+  // TODO: Check that selected card is up
+
+  // Check that selected is adjacent
+  // TODO: Use hasAdjacent. Need to add diagonal version
+  let adjacentIndexes = [
+    [enemyIndex![0] - 1, enemyIndex![1]],
+    [enemyIndex![0], enemyIndex![1] - 1],
+    [enemyIndex![0], enemyIndex![1] + 1],
+    [enemyIndex![0] + 1, enemyIndex![1]],
+  ];
+  
+  // Special case for the natural, can attack diagonally
+  if (selectedCard.name === "The Natural") {
+    adjacentIndexes = adjacentIndexes.concat([
+      [enemyIndex![0] - 1, enemyIndex![1] - 1],
+      [enemyIndex![0] - 1, enemyIndex![1] + 1],
+      [enemyIndex![0] + 1, enemyIndex![1] - 1],
+      [enemyIndex![0] + 1, enemyIndex![1] + 1],
+    ]);
+  }
+
+  return (adjacentIndexes.find(
+    index => index[0] === selectedCard.index![0] && index[1] === selectedCard.index![1]
+  ) !== null);
+}
+
+
+function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
+  const newBoard = [...state.board];
+
+  const damage = selectedCard.effectiveStrength;
+  
+  const newEnemy = placeCard(newBoard, enemy, enemy.index!, 0);
+  newEnemy.health -= damage;
+
+  if (newEnemy.health <= 0) {
+    // Remove enemy
+    const index = newEnemy.index!;
+    placeCard(newBoard, null, index, 0);
+  }
+  
+  // Rotate selected card
+  const newSelected = placeCard(state.board, selectedCard, selectedCard.index!, 0);
+  newSelected.rotated = true;
+  
+  state.selected = null;
+  state.board = newBoard
 }
 
 

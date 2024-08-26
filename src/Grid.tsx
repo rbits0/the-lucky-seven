@@ -32,60 +32,6 @@ function Grid() {
   }
   
 
-  function attack(enemy: EnemyCard) {
-    const selectedCard = board.flatMap(row => row.find(cards => cards[0]?.id === selected)).filter(x => x)[0];
-    if (!selectedCard) {
-      return;
-    }
-    
-
-    // Check that selected is adjacent
-    let adjacentIndexes = [
-      [enemy.index![0] - 1, enemy.index![1]],
-      [enemy.index![0], enemy.index![1] - 1],
-      [enemy.index![0], enemy.index![1] + 1],
-      [enemy.index![0] + 1, enemy.index![1]],
-    ];
-    
-    // Special case for the natural, can attack diagonally
-    if (selectedCard.name === "The Natural") {
-      adjacentIndexes = adjacentIndexes.concat([
-        [enemy.index![0] - 1, enemy.index![1] - 1],
-        [enemy.index![0] - 1, enemy.index![1] + 1],
-        [enemy.index![0] + 1, enemy.index![1] - 1],
-        [enemy.index![0] + 1, enemy.index![1] + 1],
-      ]);
-    }
-
-    if (!adjacentIndexes.find(index => index[0] === selectedCard.index![0] && index[1] === selectedCard.index![1])) {
-      return;
-    }
-    
-    
-    // CHECKS COMPLETED, attack is successful
-    addStateToHistory();
-    
-    const newBoard = [...board];
-    const damage = (selectedCard as PlayerCard).effectiveStrength;
-    
-    enemy.health -= damage;
-
-    if (enemy.health <= 0) {
-      // Remove enemy
-      const index = enemy.index!;
-      newBoard[index[0]][index[1]][0] = null;
-    }
-    
-    // Rotate player
-    (selectedCard as PlayerCard).rotated = true;
-    
-    // Unselect player
-    setSelected(null);
-    
-    setBoard(newBoard);
-  }
-
-
   return (
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <table className={`self-start flex-shrink table-fixed grid-aspect`}>
