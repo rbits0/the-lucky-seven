@@ -66,6 +66,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       break;
     case GameActionType.MOVE:
       // TODO:
+      const moveAction = action as MoveAction;
+      moveAction(state, moveAction.from, moveAction.to);
       break;
   }
   
@@ -511,6 +513,161 @@ function flipSelected(state: GameState) {
 }
 
 
+function moveAction(state: GameState, from: [number, number], to: [number, number]) {
+  if (canMove(state.board, from, to)) {
+    addStateToHistory(state);
+  
+    const newBoard = [...state.board];
+    const shouldUnselect = moveCard(newBoard, from, to, state.selected);
+    if (shouldUnselect) {
+      state.selected = null;
+    }
+    state.board = newBoard;
+  }
+}
+
+function canMove(board: Board, from: [number, number], to: [number, number]): boolean {
+  // Check if destIndex == sourceIndex
+  if (to[0] === from[0] && to[1] === from[1]) {
+    // Dragging back to the same spot means cancel the drag
+    return false;
+  }
+  
+  // Check that destIndex is in bounds
+  if (to[1] < 1) {
+    return false;
+  }
+  
+  // Check if card is adjacent or diagonally adjacent
+  const adjacent = [
+    [from[0] - 1, from[1] - 1],
+    [from[0] - 1, from[1]],
+    [from[0] - 1, from[1] + 1],
+    [from[0], from[1] - 1],
+    [from[0], from[1] + 1],
+    [from[0] + 1, from[1] - 1],
+    [from[0] + 1, from[1]],
+    [from[0] + 1, from[1] + 1],
+  ];
+  if (adjacent.filter((source) => source[0] === to[0] && source[1] === to[1]).length === 0) {
+    return false;
+  }
+
+  // Check that both cards are up (except for the mouse) and not rotated
+  const cards = [
+    board[from[0]][from[1]][0],
+    board[to[0]][to[1]][0],
+  ]
+  for (const card of cards) {
+    if (
+      card?.type === CardType.PLAYER && (
+        (
+          (card as PlayerCard).down &&
+          card.name !== "The Mouse"
+        ) || (card as PlayerCard).rotated
+      )
+    ) {
+      return false;
+    }
+  }
+  
+  // If diagonally adjacent, check that movement is not blocked by diagonal enemies
+  // TODO: Replace with findAdjacent
+  let blocked = [[-1, -1], [-1, 1], [1, -1], [1, 1]].filter((value) => {
+    if (to[0] === from[0] + value[0] && to[1] === from[1] + value[1]) {
+      const card0 = board[from[0]][from[1] + value[1]];
+      const card1 = board[from[0] + value[0]][from[1]];
+
+      if (!card0 || !card1) {
+        // Not blocked
+        return false;
+      }
+
+      if (
+        (card0[0]?.type === CardType.ENEMY || card0[1]?.type === CardType.ENEMY) &&
+        (card1[0]?.type === CardType.ENEMY || card1[1]?.type === CardType.ENEMY)
+      ) {
+        // Blocked
+        return true;
+      }
+    }
+
+    // Not blocked
+    return false;
+  }).length > 0;
+
+  if (blocked) {
+    return false;
+  }
+
+  
+  // Check if card to swap with is an enemy
+  if (board[to[0]][to[1]][0]?.type === CardType.ENEMY) {
+    return false;
+  }
+  
+  // Check if card to swap with has card stacked on top
+  if (board[to[0]][to[1]][1]) {
+    return false;
+  }
+  
+  // ALL CHECKS PASSED
+  return true;
+}
+  
+
+// Returns true if should unselect card
+function moveCard(
+  board: Board,
+  from: [number, number],
+  to: [number, number],
+  selected: string | null,
+) {
+  // If one of the cards is the joker (up), reset enemy strength
+  for (const index of [from, to]) {
+    if (board[index[0]][index[1]][0]?.name === "The Joker" && !(board[index[0]][index[1]][0]! as PlayerCard).down) {
+      const adjacentEnemies = findAdjacentEnemies(index, board);
+      for (const enemy of adjacentEnemies) {
+        enemy.health = enemy.strength;
+      }
+    }
+  }
+  
+  // Swap cards
+  const card1 = board[from[0]][from[1]][0];
+  const card2 = board[to[0]][to[1]][0];
+  const newCard1 = placeCard(board, card1, to, 0);
+  const newCard2 = placeCard(board, card2, from, 0);
+
+  // Rotate cards
+  rotatePlayer(newCard1);
+  rotatePlayer(newCard2);
+  
+  updateHammerAnvilStrength(board);
+
+  let shouldUnselect = false;
+
+  for (const card of [newCard1, newCard2]) {
+    // If one of the cards is the joker (up), reduce enemy strength
+    if (card?.name === "The Joker" && !(card as PlayerCard).down) {
+      const adjacentEnemies = findAdjacentEnemies(card.index!, board);        
+      for (const enemy of adjacentEnemies) {
+        const newEnemy = placeCard(board, enemy, enemy.index!, 0)
+        newEnemy.health = newEnemy.strength - 1;
+      }
+    }
+    
+    
+    // If one of the cards was selected but is now down, should unselect
+    if (card && card.id === selected && (card as PlayerCard).down) {
+      shouldUnselect = true;
+    }
+  }
+  
+  return shouldUnselect
+}
+
+
 function canFlip(state: GameState): boolean {
   if (state.phase !== Phase.MANEUVER) {
     return false;
@@ -558,6 +715,31 @@ function canFlip(state: GameState): boolean {
     return false;
   }
 }
+
+
+function rotatePlayer(card: CardData | null) {
+  if (!card || card.type !== CardType.PLAYER) {
+    return;
+  }
+
+  card = card as PlayerCard;
+
+  if (card.name === "The Athlete") {
+    // Special case for athlete
+    if (!(card as AthleteCard).halfRotated) {
+      (card as AthleteCard).halfRotated = true;
+      return;
+    } else {
+      card.rotated = true;
+      return;
+    }
+  } else {
+    card.rotated = true;
+    return;
+  }
+}
+
+
 
   
 
