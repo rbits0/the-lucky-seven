@@ -1,4 +1,5 @@
 import React, { createContext } from "react";
+import { GameAction, GameState } from "./Game";
 
 export enum Phase {
   GAME_START,
@@ -17,4 +18,9 @@ export interface Contexts {
 }
 
 
-export const SharedContexts = createContext<Contexts | undefined>(undefined);
+// export const SharedContexts = createContext<Contexts | undefined>(undefined);
+
+
+export const GameContext = createContext<
+  [GameState, React.Dispatch<GameAction>] | undefined
+>(undefined);

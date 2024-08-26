@@ -1,16 +1,13 @@
 import React from "react";
-import { BUTTON_STYLE, WinState } from "./App";
+import { BUTTON_STYLE } from "./App";
 import { Phase } from "./Contexts";
 
 interface GameEndPopupProps {
-  resetGame: () => void,
-  setWinState: (value: React.SetStateAction<WinState>) => void,
-  setPhase: React.Dispatch<React.SetStateAction<Phase>>,
   win: boolean,
 }
 
 
-function GameEndPopup({resetGame, setWinState, setPhase, win}: GameEndPopupProps) {
+function GameEndPopup({win}: GameEndPopupProps) {
     return (
       <div className="fixed z-20 w-full h-full">
         <div className="fixed bg-gray-900 w-full h-full opacity-50"></div>

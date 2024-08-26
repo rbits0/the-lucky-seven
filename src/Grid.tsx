@@ -1,18 +1,13 @@
 import Cell from "./Cell";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { DndContext, DragEndEvent, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { NUM_ROWS, } from "./App";
+import { NUM_ROWS } from "./Game";
 import { useContext } from "react";
-import { SharedContexts } from "./Contexts";
+import { GameContext, SharedContexts } from "./Contexts";
 
 
-interface GridProps {
-  board: (CardData | null)[][][],
-  setBoard: React.Dispatch<React.SetStateAction<(CardData | null)[][][]>>,
-}
-
-
-function Grid({ board, setBoard }: GridProps) {
+function Grid() {
+  const [gameState, gameDispatch] = useContext(GameContext)!;
 
   // const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1}}))
   const sensors = useSensors(
