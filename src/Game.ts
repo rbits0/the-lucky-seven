@@ -1,7 +1,5 @@
 import { Phase } from "./Contexts";
-import { AthleteCard, CardData, CardType, EnemyCard, GenericCard, PlayerCard } from "./CardData";
-import Card from "./Card";
-import { transpileModule } from "typescript";
+import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 
 export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
@@ -524,7 +522,7 @@ function flipSelected(state: GameState) {
 
 
 function doMoveAction(state: GameState, from: [number, number], to: [number, number]) {
-  if (canMove(state.board, from, to)) {
+  if (canMoveTo(state.board, from, to)) {
     addStateToHistory(state);
   
     const newBoard = [...state.board];
@@ -536,7 +534,7 @@ function doMoveAction(state: GameState, from: [number, number], to: [number, num
   }
 }
 
-function canMove(board: Board, from: [number, number], to: [number, number]): boolean {
+function canMoveTo(board: Board, from: [number, number], to: [number, number]): boolean {
   // Check if destIndex == sourceIndex
   if (to[0] === from[0] && to[1] === from[1]) {
     // Dragging back to the same spot means cancel the drag
@@ -689,7 +687,7 @@ function doAttackAction(state: GameState, enemy: EnemyCard) {
     return;
   }
   
-  if (!canAttack(selectedCard, enemy.index!)) {
+  if (!canAttackEnemy(selectedCard, enemy)) {
     return;
   }
 
@@ -699,31 +697,46 @@ function doAttackAction(state: GameState, enemy: EnemyCard) {
 }
 
 
-function canAttack(selectedCard: PlayerCard, enemyIndex: [number, number]): boolean {
-  // TODO: Check that selected card is up
-
+export function canAttackEnemy(card: PlayerCard, enemy: EnemyCard): boolean {
+  if (!canPlayerAttack(card)) {
+    return false;
+  }
+  
+  if (enemy.strength === -1) {
+    return false;
+  }
+  
   // Check that selected is adjacent
   // TODO: Use hasAdjacent. Need to add diagonal version
   let adjacentIndexes = [
-    [enemyIndex![0] - 1, enemyIndex![1]],
-    [enemyIndex![0], enemyIndex![1] - 1],
-    [enemyIndex![0], enemyIndex![1] + 1],
-    [enemyIndex![0] + 1, enemyIndex![1]],
+    [enemy.index![0] - 1, enemy.index![1]],
+    [enemy.index![0], enemy.index![1] - 1],
+    [enemy.index![0], enemy.index![1] + 1],
+    [enemy.index![0] + 1, enemy.index![1]],
   ];
   
   // Special case for the natural, can attack diagonally
-  if (selectedCard.name === "The Natural") {
+  if (card.name === "The Natural") {
     adjacentIndexes = adjacentIndexes.concat([
-      [enemyIndex![0] - 1, enemyIndex![1] - 1],
-      [enemyIndex![0] - 1, enemyIndex![1] + 1],
-      [enemyIndex![0] + 1, enemyIndex![1] - 1],
-      [enemyIndex![0] + 1, enemyIndex![1] + 1],
+      [enemy.index![0] - 1, enemy.index![1] - 1],
+      [enemy.index![0] - 1, enemy.index![1] + 1],
+      [enemy.index![0] + 1, enemy.index![1] - 1],
+      [enemy.index![0] + 1, enemy.index![1] + 1],
     ]);
   }
 
   return (adjacentIndexes.find(
-    index => index[0] === selectedCard.index![0] && index[1] === selectedCard.index![1]
+    index => index[0] === card.index![0] && index[1] === card.index![1]
   ) !== null);
+}
+
+
+export function canPlayerAttack(card: PlayerCard): boolean {
+  return (
+    !(card as PlayerCard).rotated &&
+    (!(card as PlayerCard).down || card.name === "The Mouse") &&
+    card.strength > 0
+  );
 }
 
 
@@ -760,11 +773,6 @@ function doSelectAction(state: GameState, card: CardData | null) {
 
 
 function canFlip(state: GameState): boolean {
-  if (state.phase !== Phase.MANEUVER) {
-    return false;
-  }
-
-
   // Find selected card
   const selectedCard = state.board.flat().find(
     (card) => card[0]?.id === state.selected
@@ -775,35 +783,45 @@ function canFlip(state: GameState): boolean {
   }
 
   const selectedPlayerCard = selectedCard[0] as PlayerCard;
+  return canCardFlip(state, selectedPlayerCard);
+}
 
+
+export function canCardFlip(state: GameState, card: PlayerCard): boolean {
+  if (state.phase !== Phase.MANEUVER) {
+    return false;
+  }
+
+  // Mouse can always flip DOWN
+  if (card.name === "The Mouse" && !card.down) {
+    return true;
+  }
+  
   // Card can't flip if it is rotated
   // Includes athlete's half-rotation
-  // Mouse is an exception, it can flip *DOWN* when rotated
-  if ((selectedPlayerCard.rotated || (
-      selectedPlayerCard.name === "The Athlete" &&
-      (selectedPlayerCard as AthleteCard).halfRotated
-    )) && !(
-      // If card is mouse and up, it can flip
-      selectedPlayerCard.name === "The Mouse" &&
-      !selectedPlayerCard.down
+  if (
+    card.rotated || 
+    (
+      card.name === "The Athlete" &&
+      (card as AthleteCard).halfRotated
     )
   ) {
     return false;
   }
   
-  // Leader can always flip
-  if (selectedPlayerCard.name === "The Leader") {
+
+  // Leader can always flip, even if down
+  if (!card.down || card.name === "The Leader") {
     return true;
-  } else if (selectedPlayerCard.down) {
+  } else {
+    // Card is down
+
     // Check if adjacent up card exists
-    
-    return hasAdjacent(selectedPlayerCard.index!, state.board, (card) => (
+    return hasAdjacent(card.index!, state.board, (card) => (
       (card !== null) &&
       (card.type === CardType.PLAYER) && 
       (!(card as PlayerCard).down)
     ));
-  } else {
-    return false;
   }
 }
 
@@ -955,6 +973,19 @@ function placeCard<T extends CardData | null>(board: Board, card: T, index: [num
   board[index[0]][index[1]] = newCards;
   
   return newCard;
+}
+
+
+export function isMoveable(state: GameState, card: CardData): boolean {
+  return (
+    state.phase === Phase.MANEUVER &&
+    card.type === CardType.PLAYER &&
+    (
+      !(card as PlayerCard).down ||
+      card.name === "The Mouse"
+    ) &&
+    !(card as PlayerCard).rotated
+  )
 }
 
 

@@ -3,7 +3,7 @@ import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardDa
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { GameContext, Phase } from "./Contexts";
-import { GameActionType, SelectAction } from "./Game";
+import { canCardFlip, canPlayerAttack, GameActionType, GameState, isMoveable, SelectAction } from "./Game";
 
 
 interface CardProps {
@@ -24,59 +24,15 @@ function Card({ card, className, disabled, above }: CardProps) {
   );
   const imagePaths = useMemo(() => getImagePaths(card), [card]);
   const isSelected = (gameState.selected === card.id);
-
-  // TODO: Move to seperate function
-  const isMoveable = (
-    !disabled &&
-    gameState.phase === Phase.MANEUVER &&
-    card.type === CardType.PLAYER &&
-    (
-      !(card as PlayerCard).down ||
-      card.name === "The Mouse"
-    ) &&
-    !(card as PlayerCard).rotated
-  )
-
-  // TODO: Move to seperate functions
-  const isClickable = (
-    (
-
-      gameState.phase === Phase.MANEUVER && 
-      card.type === CardType.PLAYER &&
-      (
-        // The mouse can flip *DOWN* even if rotated
-        !(card as PlayerCard).rotated ||
-        (
-          card.name === "The Mouse" &&
-          !(card as PlayerCard).down
-        )
-      )
-
-    ) || (
-
-      gameState.phase === Phase.ATTACK &&
-      (
-        (
-          card.type === CardType.PLAYER &&
-            !(card as PlayerCard).rotated &&
-            (!(card as PlayerCard).down || card.name === "The Mouse") &&
-            card.strength > 0
-        ) || (
-          card.type === CardType.ENEMY &&
-            gameState.selected &&
-            (card as EnemyCard).strength >= 0
-        )
-      )
-
-    )
-  );
+  const cardIsMoveable = (!disabled && isMoveable(gameState, card));
+  const cardIsClickable = isClickable(gameState, card);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
     data: {
       card: card,
     },
-    disabled: !isMoveable,
+    disabled: !cardIsMoveable,
   })
   
   const style: React.CSSProperties | undefined = transform ? {
@@ -85,7 +41,7 @@ function Card({ card, className, disabled, above }: CardProps) {
 
 
   function handleClick() {
-    if (isClickable) {
+    if (cardIsClickable) {
       gameDispatch({
         type: GameActionType.SELECT,
         card: card,
@@ -105,7 +61,7 @@ function Card({ card, className, disabled, above }: CardProps) {
         `}
         {...listeners}
         {...attributes}
-        role={isClickable ? "button" : ""}
+        role={cardIsClickable ? "button" : ""}
         style={{
           ...style,
           height: "90%",
@@ -166,6 +122,22 @@ function getImagePaths(card: CardData): string[] {
   }
   
   return newImagePaths;
+}
+
+
+function isClickable(state: GameState, card: CardData): boolean {
+  if (card.type === CardType.PLAYER) {
+    const playerCard = card as PlayerCard;
+    return (
+      (canCardFlip(state, playerCard)) ||
+      (
+        (state.phase === Phase.ATTACK) && 
+        (canPlayerAttack(playerCard))
+      )
+    );
+  } else {
+    return (state.phase === Phase.ATTACK);
+  }
 }
 
 export default Card;
