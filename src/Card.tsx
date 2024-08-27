@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useMemo } from "react";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -17,18 +17,12 @@ interface CardProps {
 function Card({ card, className, disabled, above }: CardProps) {
   const [gameState, gameDispatch] = useContext(GameContext)!;
   
-  // TODO: Doesn't need useEffect
-  const [rotation, setRotation] = useState("0");
-  // TODO: Use useMemo instead
-  const [imagePaths, setImagePaths] = useState<string[]>([]);
-
-  // Variables to check in useEffects
-  const rotated = (card as PlayerCard).rotated;
-  const halfRotated = (card as AthleteCard).halfRotated;
-  const down = (card as PlayerCard).down;
-  const effectiveStrength = (card as PlayerCard).effectiveStrength;
-  const health = (card as EnemyCard).health;
-
+  const rotation = (
+    (card.type === CardType.PLAYER && (card as PlayerCard).rotated) ? "90" :
+    (card.name === "The Athlete" && (card as AthleteCard).halfRotated) ? "45" :
+    "0"
+  );
+  const imagePaths = useMemo(() => getImagePaths(card), [card]);
   const isSelected = (gameState.selected === card.id);
 
   // TODO: Move to seperate function
@@ -89,61 +83,6 @@ function Card({ card, className, disabled, above }: CardProps) {
     transform: CSS.Translate.toString(transform)
   } : undefined;
 
-  
-  // Update rotation whenever card changes
-  useEffect(() => {
-    if (card.type === CardType.PLAYER && rotated) {
-      setRotation("90");
-    } else if (card.name === "The Athlete" && halfRotated) {
-      setRotation("45");
-    } else {
-      setRotation("0");
-    }
-  }, [card, rotated, halfRotated])
-  
-
-  // Update image paths whenever card changes
-  useEffect(() => {
-    const newImagePaths = [];
-    
-    if (card.type === CardType.ENEMY) {
-      // Enemy
-      
-      
-
-      //Image
-      if (card.name === "Infantry") {
-        newImagePaths.push(`Enemy/Image/Infantry ${card.strength}`);
-      } else {
-        newImagePaths.push(`Enemy/Image/${card.name}`);
-      }
-      
-      // Health
-      if (card.strength > 0) {
-        // If health is different from strength, need to indicate that via change in colour
-        const modified = card.strength === (card as EnemyCard).health ? "" : " Modified"
-        
-        newImagePaths.push(`Enemy/Strength/${card.name} ${(card as EnemyCard).health}${modified}`);
-      } else {
-        newImagePaths.push(`Enemy/Strength/${card.name}`);
-      }
-      
-      // Position
-      newImagePaths.push(`Enemy/Position/${(card as EnemyCard).position}`);
-    } else {
-      // Player
-
-      if ((card as PlayerCard).down) {
-        newImagePaths.push(`Player/Down/${card.name}`);
-      } else {
-        newImagePaths.push(`Player/Up/Image/${card.name}`);
-        newImagePaths.push(`Player/Up/Strength/${card.name} ${(card as PlayerCard).effectiveStrength}`);
-      }
-    }
-    
-    setImagePaths(newImagePaths);
-  }, [card, down, effectiveStrength, health])
-
 
   function handleClick() {
     if (isClickable) {
@@ -186,6 +125,47 @@ function Card({ card, className, disabled, above }: CardProps) {
         </div>
       </div>
   );
+}
+
+
+// Update image paths whenever card changes
+function getImagePaths(card: CardData): string[] {
+  const newImagePaths = [];
+  
+  if (card.type === CardType.ENEMY) {
+    // Enemy
+
+    //Image
+    if (card.name === "Infantry") {
+      newImagePaths.push(`Enemy/Image/Infantry ${card.strength}`);
+    } else {
+      newImagePaths.push(`Enemy/Image/${card.name}`);
+    }
+    
+    // Health
+    if (card.strength > 0) {
+      // If health is different from strength, need to indicate that via change in colour
+      const modified = card.strength === (card as EnemyCard).health ? "" : " Modified"
+      
+      newImagePaths.push(`Enemy/Strength/${card.name} ${(card as EnemyCard).health}${modified}`);
+    } else {
+      newImagePaths.push(`Enemy/Strength/${card.name}`);
+    }
+    
+    // Position
+    newImagePaths.push(`Enemy/Position/${(card as EnemyCard).position}`);
+  } else {
+    // Player
+
+    if ((card as PlayerCard).down) {
+      newImagePaths.push(`Player/Down/${card.name}`);
+    } else {
+      newImagePaths.push(`Player/Up/Image/${card.name}`);
+      newImagePaths.push(`Player/Up/Strength/${card.name} ${(card as PlayerCard).effectiveStrength}`);
+    }
+  }
+  
+  return newImagePaths;
 }
 
 export default Card;
