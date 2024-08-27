@@ -1,5 +1,11 @@
 ## Code
-- [ ] Make immutable arguments more explicit
+- [ ] Make gameState, board, card, deck, and history Readonly\<T\> or ReadonlyArray\<T\>
+    - Copying it will make it mutable, and adding back will make it immutable
+    - board is 2D array, so need to be careful
+    - ~~Look into how keeping a mutable reference to something in a readonly
+      property works, because placeCard() should return mutable reference.~~
+      It works fine
+- [ ] Fix mutating board. I need to copy 2 layers, not just first layer
 
 
 ## Board
