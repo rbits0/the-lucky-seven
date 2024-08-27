@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { GameContext, Phase, SharedContexts } from "./Contexts";
-import { AttackAction, GameActionType } from "./Game";
+import { GameContext, Phase } from "./Contexts";
+import { GameActionType, SelectAction } from "./Game";
 
 
 interface CardProps {
@@ -15,10 +15,11 @@ interface CardProps {
 
 
 function Card({ card, className, disabled, above }: CardProps) {
-  const [ , gameDispatch] = useContext(GameContext)!;
+  const [gameState, gameDispatch] = useContext(GameContext)!;
   
-  const { phase, selected, setSelected } = useContext(SharedContexts)!;
+  // TODO: Doesn't need useEffect
   const [rotation, setRotation] = useState("0");
+  // TODO: Use useMemo instead
   const [imagePaths, setImagePaths] = useState<string[]>([]);
 
   // Variables to check in useEffects
@@ -28,11 +29,12 @@ function Card({ card, className, disabled, above }: CardProps) {
   const effectiveStrength = (card as PlayerCard).effectiveStrength;
   const health = (card as EnemyCard).health;
 
-  const isSelected = selected === card.id;
+  const isSelected = (gameState.selected === card.id);
 
-  const enabled = (
+  // TODO: Move to seperate function
+  const isMoveable = (
     !disabled &&
-    phase === Phase.MANEUVER &&
+    gameState.phase === Phase.MANEUVER &&
     card.type === CardType.PLAYER &&
     (
       !(card as PlayerCard).down ||
@@ -41,10 +43,11 @@ function Card({ card, className, disabled, above }: CardProps) {
     !(card as PlayerCard).rotated
   )
 
+  // TODO: Move to seperate functions
   const isClickable = (
     (
 
-      phase === Phase.MANEUVER && 
+      gameState.phase === Phase.MANEUVER && 
       card.type === CardType.PLAYER &&
       (
         // The mouse can flip *DOWN* even if rotated
@@ -57,7 +60,7 @@ function Card({ card, className, disabled, above }: CardProps) {
 
     ) || (
 
-      phase === Phase.ATTACK &&
+      gameState.phase === Phase.ATTACK &&
       (
         (
           card.type === CardType.PLAYER &&
@@ -66,7 +69,7 @@ function Card({ card, className, disabled, above }: CardProps) {
             card.strength > 0
         ) || (
           card.type === CardType.ENEMY &&
-            selected &&
+            gameState.selected &&
             (card as EnemyCard).strength >= 0
         )
       )
@@ -79,7 +82,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     data: {
       card: card,
     },
-    disabled: !enabled,
+    disabled: !isMoveable,
   })
   
   const style: React.CSSProperties | undefined = transform ? {
@@ -142,25 +145,15 @@ function Card({ card, className, disabled, above }: CardProps) {
   }, [card, down, effectiveStrength, health])
 
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function handleClick() {
     if (isClickable) {
-      if (card.type === CardType.PLAYER) {
-        setSelected(card.id);
-      } else {
-        attack(card as EnemyCard);
-      }
+      gameDispatch({
+        type: GameActionType.SELECT,
+        card: card,
+      } as SelectAction);
     }
   }
   
-
-  function attack(enemy: EnemyCard) {
-    gameDispatch({
-      type: GameActionType.ATTACK,
-      enemy: enemy,
-    } as AttackAction);
-  }
-
-
 
   return (
       <div

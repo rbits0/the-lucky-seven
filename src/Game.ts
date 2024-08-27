@@ -33,7 +33,7 @@ export enum GameActionType {
   NEXT_PHASE,
   FLIP_SELECTED,
   MOVE,
-  ATTACK,
+  SELECT,
 }
 
 export interface GameAction {
@@ -46,9 +46,9 @@ export interface MoveAction extends GameAction {
   to: [number, number],
 }
 
-export interface AttackAction extends GameAction {
-  type: GameActionType.ATTACK,
-  enemy: EnemyCard,
+export interface SelectAction extends GameAction {
+  type: GameActionType.SELECT,
+  card: CardData | null,
 }
 
 
@@ -72,13 +72,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       flipSelected(newState);
       break;
     case GameActionType.MOVE:
-      // TODO:
       const moveAction = action as MoveAction;
       doMoveAction(newState, moveAction.from, moveAction.to);
       break;
-    case GameActionType.ATTACK:
-      const attackAction = action as AttackAction;
-      doAttackAction(newState, attackAction.enemy);
+    case GameActionType.SELECT:
+      const selectAction = action as SelectAction;
+      doSelectAction(newState, selectAction.card);
       break;
   }
   
@@ -748,6 +747,15 @@ function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
   
   state.selected = null;
   state.board = newBoard
+}
+
+
+function doSelectAction(state: GameState, card: CardData | null) {
+  if (card?.type === CardType.ENEMY) {
+    doAttackAction(state, card as EnemyCard);
+  } else {
+    state.selected = card ? card.id : null;
+  }
 }
 
 
