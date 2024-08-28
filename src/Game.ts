@@ -4,17 +4,20 @@ export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
 export const NUM_UNDOS = 3;
 
-type Board = (CardData | null)[][][];
+type Board = (Readonly<CardData> | null)[][][];
+type ReadonlyBoard = ReadonlyArray<ReadonlyArray<
+  (Readonly<CardData> | null)[]
+>>;
 
 
 export interface GameState {
-  board: Board,
-  deck: EnemyCard[],
+  board: ReadonlyBoard,
+  deck: readonly Readonly<EnemyCard>[],
   phase: Phase,
   selected: string | null,
   winState: WinState,
   canFlip: boolean,
-  history: GameState[] | null,
+  history: readonly Readonly<GameState>[] | null,
 }
 
 export enum WinState {
@@ -58,7 +61,7 @@ export interface SelectAction extends GameAction {
 
 
 
-export function gameReducer(state: GameState, action: GameAction): GameState {
+export function gameReducer(state: Readonly<GameState>, action: GameAction): GameState {
   const newState = {...state};
 
   switch (action.type) {
@@ -200,14 +203,16 @@ function addStateToHistory(state: GameState) {
 }
 
 // Pure function
-function undo(history: GameState[]): GameState {
+function undo(history: readonly GameState[]): GameState {
   if (history.length === 0) {
     throw new Error("Tried to undo with empty history");
   }
 
   let newState = history.at(-1)!;
-  newState.history = [...history];
-  newState.history.pop();
+  const newHistory = [...history];
+  // newState.history = [...history];
+  newHistory.pop();
+  newState.history = newHistory;
   
   // Reset deck enemy health and index
   newState.deck = newState.deck.map((card) => ({
@@ -286,7 +291,7 @@ function encounterPhase(state: GameState) {
 
 
 function maneuverPhase(state: GameState) {
-  const newBoard = [...state.board];
+  const newBoard = copy2DArray(state.board);
   handleMortars(newBoard);
   state.board = newBoard;
 }
@@ -300,7 +305,7 @@ function attackPhase(state: GameState) {
 
 
 function counterAttackPhase(state: GameState) {
-  const newBoard = [...state.board];
+  const newBoard = copy2DArray(state.board);
 
   unrotateCards(newBoard);
   counterAttack(newBoard);
@@ -451,7 +456,7 @@ function unrotateCards(board: Board) {
 
 
 // Pure function
-function removeFlares(board: Board): Board {
+function removeFlares(board: ReadonlyBoard): Board {
   return board.map(row => row.map(cards => cards.map(
     card => card?.name === "Flare" ? null : card
   )));
@@ -502,7 +507,7 @@ function flipSelected(state: GameState) {
 
   addStateToHistory(state);
 
-  const newBoard = [...state.board];
+  const newBoard = copy2DArray(state.board);
 
   // Find selected card
   const selectedCard = newBoard.flat().find((card) => card[0]?.id === state.selected)![0] as PlayerCard;
@@ -532,7 +537,7 @@ function doMoveAction(state: GameState, from: [number, number], to: [number, num
   if (canMoveTo(state.board, from, to)) {
     addStateToHistory(state);
   
-    const newBoard = [...state.board];
+    const newBoard = copy2DArray(state.board);
     const shouldUnselect = moveCard(newBoard, from, to, state.selected);
     if (shouldUnselect) {
       state.selected = null;
@@ -541,7 +546,7 @@ function doMoveAction(state: GameState, from: [number, number], to: [number, num
   }
 }
 
-function canMoveTo(board: Board, from: [number, number], to: [number, number]): boolean {
+function canMoveTo(board: ReadonlyBoard, from: [number, number], to: [number, number]): boolean {
   // Check if destIndex == sourceIndex
   if (to[0] === from[0] && to[1] === from[1]) {
     // Dragging back to the same spot means cancel the drag
@@ -643,7 +648,8 @@ function moveCard(
     if (board[index[0]][index[1]][0]?.name === "The Joker" && !(board[index[0]][index[1]][0]! as PlayerCard).down) {
       const adjacentEnemies = findAdjacentEnemies(index, board);
       for (const enemy of adjacentEnemies) {
-        enemy.health = enemy.strength;
+        const newEnemy = placeCard(board, enemy, enemy.index!, 0);
+        newEnemy.health = enemy.strength;
       }
     }
   }
@@ -651,12 +657,17 @@ function moveCard(
   // Swap cards
   const card1 = board[from[0]][from[1]][0];
   const card2 = board[to[0]][to[1]][0];
-  const newCard1 = placeCard(board, card1, to, 0);
-  const newCard2 = placeCard(board, card2, from, 0);
+  const newCard1 = placeCard<CardData | null>(board, card1, to, 0);
+  const newCard2 = placeCard<CardData | null>(board, card2, from, 0);
+  
 
   // Rotate cards
-  rotatePlayer(newCard1);
-  rotatePlayer(newCard2);
+  if (newCard1?.type === CardType.PLAYER) {
+    rotatePlayer(newCard1 as PlayerCard);
+  }
+  if (newCard2?.type === CardType.PLAYER) {
+    rotatePlayer(newCard2 as PlayerCard);
+  }
   
   updateHammerAnvilStrength(board);
 
@@ -679,11 +690,11 @@ function moveCard(
     }
   }
   
-  return shouldUnselect
+  return shouldUnselect;
 }
 
 
-function doAttackAction(state: GameState, enemy: EnemyCard) {
+function doAttackAction(state: GameState, enemy: Readonly<EnemyCard>) {
   const selectedCard = state.board.flatMap(row => row.find(
     cards => cards[0]?.id === state.selected
   )).find(
@@ -704,7 +715,10 @@ function doAttackAction(state: GameState, enemy: EnemyCard) {
 }
 
 
-export function canAttackEnemy(card: PlayerCard, enemy: EnemyCard): boolean {
+export function canAttackEnemy(
+  card: Readonly<PlayerCard>,
+  enemy: Readonly<EnemyCard>
+): boolean {
   if (!canPlayerAttack(card)) {
     return false;
   }
@@ -738,7 +752,7 @@ export function canAttackEnemy(card: PlayerCard, enemy: EnemyCard): boolean {
 }
 
 
-export function canPlayerAttack(card: PlayerCard): boolean {
+export function canPlayerAttack(card: Readonly<PlayerCard>): boolean {
   return (
     !(card as PlayerCard).rotated &&
     (!(card as PlayerCard).down || card.name === "The Mouse") &&
@@ -747,8 +761,8 @@ export function canPlayerAttack(card: PlayerCard): boolean {
 }
 
 
-function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
-  const newBoard = [...state.board];
+function attack(state: GameState, selectedCard: Readonly<PlayerCard>, enemy: Readonly<EnemyCard>) {
+  const newBoard = copy2DArray(state.board);
 
   const damage = selectedCard.effectiveStrength;
   
@@ -762,7 +776,7 @@ function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
   }
   
   // Rotate selected card
-  const newSelected = placeCard(state.board, selectedCard, selectedCard.index!, 0);
+  const newSelected = placeCard(newBoard, selectedCard, selectedCard.index!, 0);
   newSelected.rotated = true;
   
   state.selected = null;
@@ -770,7 +784,7 @@ function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
 }
 
 
-function doSelectAction(state: GameState, card: CardData | null) {
+function doSelectAction(state: GameState, card: Readonly<CardData> | null) {
   if (card?.type === CardType.ENEMY) {
     doAttackAction(state, card as EnemyCard);
   } else {
@@ -779,7 +793,7 @@ function doSelectAction(state: GameState, card: CardData | null) {
 }
 
 
-function canFlip(state: GameState): boolean {
+function canFlip(state: Readonly<GameState>): boolean {
   // Find selected card
   const selectedCard = state.board.flat().find(
     (card) => card[0]?.id === state.selected
@@ -794,7 +808,7 @@ function canFlip(state: GameState): boolean {
 }
 
 
-export function canCardFlip(state: GameState, card: PlayerCard): boolean {
+export function canCardFlip(state: GameState, card: Readonly<PlayerCard>): boolean {
   if (state.phase !== Phase.MANEUVER) {
     return false;
   }
@@ -833,13 +847,7 @@ export function canCardFlip(state: GameState, card: PlayerCard): boolean {
 }
 
 
-function rotatePlayer(card: CardData | null) {
-  if (!card || card.type !== CardType.PLAYER) {
-    return;
-  }
-
-  card = card as PlayerCard;
-
+function rotatePlayer(card: PlayerCard) {
   if (card.name === "The Athlete") {
     // Special case for athlete
     if (!(card as AthleteCard).halfRotated) {
@@ -860,7 +868,7 @@ function rotatePlayer(card: CardData | null) {
   
 
 // Is pacifist adjacent AND UP
-function isPacifistAdjacent(index: [number, number], board: Board): boolean {
+function isPacifistAdjacent(index: [number, number], board: ReadonlyBoard): boolean {
   return hasAdjacent(index, board, card => card?.name === "The Pacifist" && !(card! as PlayerCard).down);
 }
 
@@ -903,7 +911,7 @@ function updateJokerAdjacentHealth(board: Board) {
 
   for (const enemy of adjacentEnemies) {
     // Check if on top or bottom
-    const onTop = board[enemy.index![0]][enemy.index![1]][0]!.type == CardType.PLAYER;
+    const onTop = board[enemy.index![0]][enemy.index![1]][0]!.type === CardType.PLAYER;
 
     const newCard = placeCard(board, enemy, enemy.index!, onTop ? 1 : 0);
 
@@ -928,9 +936,9 @@ function resetEnemyHealth(board: Board) {
 
 function findAdjacent(
   index: [number, number],
-  board: Board,
-  predicate: (card: CardData | null) => boolean
-): CardData[] {
+  board: ReadonlyBoard,
+  predicate: (card: Readonly<CardData> | null) => boolean
+): Readonly<CardData>[] {
   const adjacent = [
     [index[0] - 1, index[1]],
     [index[0], index[1] - 1],
@@ -948,12 +956,23 @@ function findAdjacent(
 }
 
 
-function findAdjacentEnemies(index: [number, number], board: Board): EnemyCard[] {
-  return findAdjacent(index, board, card => card?.type === CardType.ENEMY) as EnemyCard[];
+function findAdjacentEnemies(
+  index: [number, number],
+  board: ReadonlyBoard
+): Readonly<EnemyCard>[] {
+  return findAdjacent(
+    index,
+    board,
+    card => card?.type === CardType.ENEMY
+  ) as Readonly<EnemyCard>[];
 }
 
 
-function findAdjacentPlayers(index: [number, number], board: Board, up?: boolean): PlayerCard[] {
+function findAdjacentPlayers(
+  index: [number, number],
+  board: ReadonlyBoard,
+  up?: boolean
+): Readonly<PlayerCard>[] {
   if (up === undefined) {
     up = false;
   }
@@ -962,13 +981,15 @@ function findAdjacentPlayers(index: [number, number], board: Board, up?: boolean
     index,
     board,
     card => card?.type === CardType.PLAYER && (!up || !(card! as PlayerCard).down)
-  ).map(card => card as PlayerCard);
+  ) as Readonly<PlayerCard>[];
 }
 
 
 // Creates copy of card with updated index and places it on board
 // Returns updated card
-function placeCard<T extends CardData | null>(board: Board, card: T, index: [number, number], stackIndex: number): T {
+function placeCard<T extends CardData | null>(
+  board: Board, card: Readonly<T>, index: [number, number], stackIndex: number
+): T {
   const newCard = (card ? {
     ...card,
     index: index,
@@ -983,7 +1004,7 @@ function placeCard<T extends CardData | null>(board: Board, card: T, index: [num
 }
 
 
-export function isMoveable(state: GameState, card: CardData): boolean {
+export function isMoveable(state: Readonly<GameState>, card: Readonly<CardData>): boolean {
   return (
     state.phase === Phase.MANEUVER &&
     card.type === CardType.PLAYER &&
@@ -1009,8 +1030,8 @@ function shuffleArray<T>(array: T[]): T[] {
 
 function hasAdjacent(
   index: [number, number],
-  board: Board,
-  predicate: (card: CardData | null) => boolean
+  board: ReadonlyBoard,
+  predicate: (card: Readonly<CardData> | null) => boolean
 ): boolean {
 
   const adjacent = [
@@ -1027,7 +1048,14 @@ function hasAdjacent(
   
   return cardIsAdjacent;
 }
-// TODO: Remove
-const isAdjacent = hasAdjacent;
-const is_Adjacent = hasAdjacent;
 
+
+// Copies array 2 levels deep
+// Returns a mutable copy
+// Note: When copying Board, won't copy third layer. It will reference the same
+// object
+function copy2DArray<T>(
+  array: ReadonlyArray<ReadonlyArray<T>>
+): T[][] {
+  return array.map((row) => [...row]);
+}
