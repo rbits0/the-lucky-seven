@@ -1,6 +1,6 @@
-import React, { createContext } from "react";
+import { createContext, Dispatch } from "react";
 import { GameAction, GameState } from "./Game";
 
 export const GameContext = createContext<
-  [GameState, React.Dispatch<GameAction>] | undefined
+  [Readonly<GameState>, Dispatch<GameAction>] | undefined
 >(undefined);

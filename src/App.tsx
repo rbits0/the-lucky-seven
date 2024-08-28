@@ -1,17 +1,19 @@
-import { useReducer } from "react";
+import { Dispatch, useReducer } from "react";
 import './App.css';
 import Grid from './Grid';
 import { GameContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 import GameEndPopup from "./GameEndPopup";
-import { createGame, GameActionType, gameReducer, Phase, WinState } from "./Game";
+import { createGame, GameAction, GameActionType, gameReducer, GameState, Phase, WinState } from "./Game";
 
 
 export const BUTTON_STYLE = "mt-4 h-min p-2 w-40 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";
 
 
 function App() {
-  const [gameState, gameDispatch] = useReducer(gameReducer, null, createGame);
+  const [gameState, gameDispatch]: [
+    Readonly<GameState>, Dispatch<GameAction>
+  ] = useReducer(gameReducer, null, createGame);
   
   return (
     <GameContext.Provider value={[gameState, gameDispatch]}>

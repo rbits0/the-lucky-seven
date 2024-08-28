@@ -7,7 +7,7 @@ import { canCardFlip, canPlayerAttack, GameActionType, GameState, isMoveable, Ph
 
 
 interface CardProps {
-  card: CardData,
+  card: Readonly<CardData>,
   className?: string,
   disabled: boolean,
   above?: boolean,
