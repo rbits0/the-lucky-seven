@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { BUTTON_STYLE } from "./App";
-import { GameContext, Phase } from "./Contexts";
+import { GameContext } from "./Contexts";
 import { GameActionType } from "./Game";
 
 interface GameEndPopupProps {

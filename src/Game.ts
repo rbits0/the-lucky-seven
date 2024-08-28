@@ -1,4 +1,3 @@
-import { Phase } from "./Contexts";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 
 export const NUM_ROWS = 4
@@ -32,6 +31,14 @@ export enum GameActionType {
   FLIP_SELECTED,
   MOVE,
   SELECT,
+}
+
+export enum Phase {
+  GAME_START,
+  ENCOUNTER,
+  MANEUVER,
+  ATTACK,
+  COUNTER_ATTACK,
 }
 
 export interface GameAction {

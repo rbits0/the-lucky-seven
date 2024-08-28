@@ -1,10 +1,10 @@
 import { useReducer } from "react";
 import './App.css';
 import Grid from './Grid';
-import { GameContext, Phase } from "./Contexts";
+import { GameContext } from "./Contexts";
 import { Active } from "@dnd-kit/core";
 import GameEndPopup from "./GameEndPopup";
-import { createGame, GameActionType, gameReducer, WinState } from "./Game";
+import { createGame, GameActionType, gameReducer, Phase, WinState } from "./Game";
 
 
 export const BUTTON_STYLE = "mt-4 h-min p-2 w-40 rounded-md bg-gray-400 hover:bg-gray-500 active:bg-gray-600 disabled:bg-gray-300 disabled:text-gray-700";

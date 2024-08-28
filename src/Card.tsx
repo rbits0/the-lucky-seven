@@ -2,8 +2,8 @@ import React, { useContext, useMemo } from "react";
 import { AthleteCard, CardData, CardType, EnemyCard, PlayerCard } from "./CardData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { GameContext, Phase } from "./Contexts";
-import { canCardFlip, canPlayerAttack, GameActionType, GameState, isMoveable, SelectAction } from "./Game";
+import { GameContext } from "./Contexts";
+import { canCardFlip, canPlayerAttack, GameActionType, GameState, isMoveable, Phase, SelectAction } from "./Game";
 
 
 interface CardProps {
