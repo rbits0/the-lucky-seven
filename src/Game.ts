@@ -435,10 +435,10 @@ function handleMortars(board: Board) {
 
 
 function unrotateCards(board: Board) {
-  for (const [rowIndex, row] of board.entries()) {
-    for (const [columnIndex, cards] of row.entries()) {
+  for (let [rowIndex, row] of board.entries()) {
+    for (let [columnIndex, cards] of row.entries()) {
       if (cards[0]?.type !== CardType.PLAYER) {
-        return;
+        continue;
       }
       
       const newCard = placeCard(
