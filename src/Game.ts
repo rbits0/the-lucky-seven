@@ -89,7 +89,7 @@ export function gameReducer(state: Readonly<GameState>, action: GameAction): Gam
       break;
   }
   
-  newState.canFlip = canFlip(state);
+  newState.canFlip = canFlip(newState);
   
   return newState;
 }
@@ -788,18 +788,24 @@ function doSelectAction(state: GameState, card: Readonly<CardData> | null) {
   if (card?.type === CardType.ENEMY) {
     doAttackAction(state, card as EnemyCard);
   } else {
+    console.log("doSelectAction card = %o", card);
     state.selected = card ? card.id : null;
+    console.log(state.selected);
   }
 }
 
 
 function canFlip(state: Readonly<GameState>): boolean {
+  console.log("canFlip");
+  console.log("selected: %s", state.selected);
+
   // Find selected card
   const selectedCard = state.board.flat().find(
     (card) => card[0]?.id === state.selected
   );
   
   if (selectedCard === undefined) {
+    console.log("No selected");
     return false;
   }
 
@@ -808,7 +814,7 @@ function canFlip(state: Readonly<GameState>): boolean {
 }
 
 
-export function canCardFlip(state: GameState, card: Readonly<PlayerCard>): boolean {
+export function canCardFlip(state: Readonly<GameState>, card: Readonly<PlayerCard>): boolean {
   if (state.phase !== Phase.MANEUVER) {
     return false;
   }
