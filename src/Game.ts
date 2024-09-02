@@ -4,20 +4,20 @@ export const NUM_ROWS = 4
 export const NUM_COLUMNS = 7
 export const NUM_UNDOS = 3;
 
-type Board = (Readonly<CardData> | null)[][][];
+type Board = (CardData | null)[][][];
 type ReadonlyBoard = ReadonlyArray<ReadonlyArray<
   (Readonly<CardData> | null)[]
 >>;
 
 
 export interface GameState {
-  board: ReadonlyBoard,
-  deck: readonly Readonly<EnemyCard>[],
+  board: Board,
+  deck: EnemyCard[],
   phase: Phase,
   selected: string | null,
   winState: WinState,
   canFlip: boolean,
-  history: readonly Readonly<GameState>[] | null,
+  history: Readonly<GameState>[] | null,
 }
 
 export enum WinState {
@@ -61,9 +61,7 @@ export interface SelectAction extends GameAction {
 
 
 
-export function gameReducer(state: Readonly<GameState>, action: GameAction): GameState {
-  const newState = {...state};
-
+export function gameReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case GameActionType.RESET:
       return createGame();
@@ -74,24 +72,22 @@ export function gameReducer(state: Readonly<GameState>, action: GameAction): Gam
 
       return undo(state.history);
     case GameActionType.NEXT_PHASE:
-      nextPhase(newState);
+      nextPhase(state);
       break;
     case GameActionType.FLIP_SELECTED:
-      flipSelected(newState);
+      flipSelected(state);
       break;
     case GameActionType.MOVE:
       const moveAction = action as MoveAction;
-      doMoveAction(newState, moveAction.from, moveAction.to);
+      doMoveAction(state, moveAction.from, moveAction.to);
       break;
     case GameActionType.SELECT:
       const selectAction = action as SelectAction;
-      doSelectAction(newState, selectAction.card);
+      doSelectAction(state, selectAction.card);
       break;
   }
   
-  newState.canFlip = canFlip(newState);
-  
-  return newState;
+  state.canFlip = canFlip(state);
 }
 
 
@@ -188,18 +184,20 @@ function createRandomBoard(): [Board, EnemyCard[]] {
 
 
 function addStateToHistory(state: GameState) {
-  const newHistory = state.history ? [...state.history] : [];
-  if (newHistory.length >= NUM_UNDOS) {
-    newHistory.shift();
+  if (!state.history) {
+    state.history = [];
+  }
+  if (state.history.length >= NUM_UNDOS) {
+    state.history.shift();
   }
 
+  // TODO: Deep copy, since state is draft so will be mutated
   const newState: GameState = {
     ...state,
     history: null,
   };
 
-  newHistory.push(newState);
-  state.history = newHistory;
+  state.history.push(newState);
 }
 
 // Pure function
@@ -208,13 +206,12 @@ function undo(history: readonly GameState[]): GameState {
     throw new Error("Tried to undo with empty history");
   }
 
-  let newState = history.at(-1)!;
   const newHistory = [...history];
-  // newState.history = [...history];
-  newHistory.pop();
+  const newState = newHistory.pop()!;
   newState.history = newHistory;
   
   // Reset deck enemy health and index
+  // TODO: Remove, not needed since state should be deep copied
   newState.deck = newState.deck.map((card) => ({
     ...card,
     health: card.strength,
@@ -276,42 +273,28 @@ function encounterPhase(state: GameState) {
     return;
   }
 
-  const newDeck = [...state.deck];
-  const newBoard = state.board.map(row => [...row]);
-  dealEnemies(newDeck, newBoard)
+  dealEnemies(state.deck, state.board);
 
 
-  updateJokerAdjacentHealth(newBoard);
-
-
-  // Save new deck and board
-  state.board = newBoard;
-  state.deck = newDeck;
+  updateJokerAdjacentHealth(state.board);
 }
 
 
 function maneuverPhase(state: GameState) {
-  const newBoard = copy2DArray(state.board);
-  handleMortars(newBoard);
-  state.board = newBoard;
+  handleMortars(state.board);
 }
 
 
 function attackPhase(state: GameState) {
-  const newBoard = removeFlares(state.board);
-  unrotateCards(newBoard);
-  state.board = newBoard;
+  removeFlares(state.board);
+  unrotateCards(state.board);
 }
 
 
 function counterAttackPhase(state: GameState) {
-  const newBoard = copy2DArray(state.board);
-
-  unrotateCards(newBoard);
-  counterAttack(newBoard);
-  removeTanks(newBoard);
-  
-  state.board = newBoard;
+  unrotateCards(state.board);
+  counterAttack(state.board);
+  removeTanks(state.board);
 }
 
 
@@ -320,8 +303,6 @@ function dealEnemies(deck: EnemyCard[], board: Board) {
     // Deal top card
     const card = deck.pop()!;
 
-
-    // Work out position of card
     let position = card.position;
     
     // If it can't overlap, need to find position where it doesn't overlap
@@ -369,9 +350,9 @@ function dealEnemies(deck: EnemyCard[], board: Board) {
     if (position >= 0) {
       if (card.canOverlap && board[row][position][0]) {
         // Put card on top instead of replacing
-        placeCard(board, card, [row, position], 1);
+        board[row][position][1] = card;
       } else {
-        placeCard(board, card, [row, position], 0);
+        board[row][position][0] = card;
       }
     }
   }
@@ -387,17 +368,12 @@ function handleMortars(board: Board) {
       
       // Flip and rotate card under mortar
       if (board[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.PLAYER) {
-        const card = placeCard(
-          board,
-          board[mortarIndex[0]][mortarIndex[1]][0]!,
-          mortarIndex,
-          0
-        ) as PlayerCard;
-
+        const card = board[mortarIndex[0]][mortarIndex[1]][0]! as PlayerCard;
         card.down = true;
         card.rotated = true;
       }
       
+      // TODO: Use findAdjacent
       // Flip all adjacent cards
       const indexes: [number, number][] = [
         [mortarIndex[0] + 1, mortarIndex[1]],
@@ -414,8 +390,7 @@ function handleMortars(board: Board) {
         const card = board[index[0]][index[1]][0]
         if (card?.type === CardType.PLAYER) {
           // Flip card
-          const newCard = placeCard(board, card, index, 0) as PlayerCard;
-          newCard.down = true;
+          (card as PlayerCard).down = true;
         }
         
       }
@@ -435,31 +410,30 @@ function handleMortars(board: Board) {
 
 
 function unrotateCards(board: Board) {
-  for (let [rowIndex, row] of board.entries()) {
-    for (let [columnIndex, cards] of row.entries()) {
+  for (const row of board) {
+    for (const cards of row) {
       if (cards[0]?.type !== CardType.PLAYER) {
         continue;
       }
       
-      const newCard = placeCard(
-        board, cards[0], [rowIndex, columnIndex], 0
-      ) as PlayerCard;
+      (cards[0] as PlayerCard).rotated = false;
 
-      newCard.rotated = false;
-
-      if (newCard.name === "The Athlete") {
-        (newCard as AthleteCard).halfRotated = false;
+      if (cards[0].name === "The Athlete") {
+        (cards[0] as AthleteCard).halfRotated = false;
       }
     }
   }
 }
 
 
-// Pure function
-function removeFlares(board: ReadonlyBoard): Board {
-  return board.map(row => row.map(cards => cards.map(
-    card => card?.name === "Flare" ? null : card
-  )));
+function removeFlares(board: Board) {
+  for (const cards of board.flat()) {
+    for (const [cardIndex, card] of cards.entries()) {
+      if (card?.name === "Flare") {
+        cards[cardIndex] = null;
+      }
+    }
+  }
 }
 
 
@@ -495,7 +469,7 @@ function counterAttack(board: Board) {
 
 function removeTanks(board: Board) {
   for (let row = 0; row < board.length; row++) {
-    placeCard(board, null, [row, 0], 0);
+    board[row][0][0] = null;
   }
 }
 
@@ -507,29 +481,24 @@ function flipSelected(state: GameState) {
 
   addStateToHistory(state);
 
-  const newBoard = copy2DArray(state.board);
-
   // Find selected card
-  const selectedCard = newBoard.flat().find((card) => card[0]?.id === state.selected)![0] as PlayerCard;
-  const newCard = placeCard(newBoard, selectedCard, selectedCard.index!, 0);
+  const selectedCard = state.board.flat().find((card) => card[0]?.id === state.selected)![0] as PlayerCard;
 
-  newCard.down = !selectedCard.down;
-  newCard.rotated = true;
+  selectedCard.down = !selectedCard.down;
+  selectedCard.rotated = true;
 
   // If joker, update enemy health
   if (selectedCard.name === "The Joker") {
-    updateJokerAdjacentHealth(newBoard);
+    updateJokerAdjacentHealth(state.board);
   }
   
   // If pacifist, update hammer/anvil strength
   if (selectedCard.name === "The Pacifist") {
-    updateHammerAnvilStrength(newBoard);
+    updateHammerAnvilStrength(state.board);
   }
   
   // Deselect card
   state.selected = null;
-
-  state.board = newBoard
 }
 
 
@@ -537,12 +506,10 @@ function doMoveAction(state: GameState, from: [number, number], to: [number, num
   if (canMoveTo(state.board, from, to)) {
     addStateToHistory(state);
   
-    const newBoard = copy2DArray(state.board);
-    const shouldUnselect = moveCard(newBoard, from, to, state.selected);
+    const shouldUnselect = moveCard(state.board, from, to, state.selected);
     if (shouldUnselect) {
       state.selected = null;
     }
-    state.board = newBoard;
   }
 }
 
@@ -648,8 +615,7 @@ function moveCard(
     if (board[index[0]][index[1]][0]?.name === "The Joker" && !(board[index[0]][index[1]][0]! as PlayerCard).down) {
       const adjacentEnemies = findAdjacentEnemies(index, board);
       for (const enemy of adjacentEnemies) {
-        const newEnemy = placeCard(board, enemy, enemy.index!, 0);
-        newEnemy.health = enemy.strength;
+        enemy.health = enemy.strength;
       }
     }
   }
@@ -657,29 +623,30 @@ function moveCard(
   // Swap cards
   const card1 = board[from[0]][from[1]][0];
   const card2 = board[to[0]][to[1]][0];
-  const newCard1 = placeCard<CardData | null>(board, card1, to, 0);
-  const newCard2 = placeCard<CardData | null>(board, card2, from, 0);
+  [
+    board[from[0]][from[1]][0],
+    board[to[0]][to[1]][0]
+  ] = [card2, card1];
   
 
   // Rotate cards
-  if (newCard1?.type === CardType.PLAYER) {
-    rotatePlayer(newCard1 as PlayerCard);
+  if (card1?.type === CardType.PLAYER) {
+    rotatePlayer(card1 as PlayerCard);
   }
-  if (newCard2?.type === CardType.PLAYER) {
-    rotatePlayer(newCard2 as PlayerCard);
+  if (card2?.type === CardType.PLAYER) {
+    rotatePlayer(card2 as PlayerCard);
   }
   
   updateHammerAnvilStrength(board);
 
   let shouldUnselect = false;
 
-  for (const card of [newCard1, newCard2]) {
+  for (const card of [card1, card2]) {
     // If one of the cards is the joker (up), reduce enemy strength
     if (card?.name === "The Joker" && !(card as PlayerCard).down) {
       const adjacentEnemies = findAdjacentEnemies(card.index!, board);        
       for (const enemy of adjacentEnemies) {
-        const newEnemy = placeCard(board, enemy, enemy.index!, 0)
-        newEnemy.health = newEnemy.strength - 1;
+        enemy.health = enemy.strength - 1;
       }
     }
     
@@ -761,44 +728,34 @@ export function canPlayerAttack(card: Readonly<PlayerCard>): boolean {
 }
 
 
-function attack(state: GameState, selectedCard: Readonly<PlayerCard>, enemy: Readonly<EnemyCard>) {
-  const newBoard = copy2DArray(state.board);
-
+function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
   const damage = selectedCard.effectiveStrength;
   
-  const newEnemy = placeCard(newBoard, enemy, enemy.index!, 0);
-  newEnemy.health -= damage;
+  enemy.health -= damage;
 
-  if (newEnemy.health <= 0) {
+  if (enemy.health <= 0) {
     // Remove enemy
-    const index = newEnemy.index!;
-    placeCard(newBoard, null, index, 0);
+    const index = enemy.index!;
+    state.board[index[0]][index[1]][0] = null;
   }
   
   // Rotate selected card
-  const newSelected = placeCard(newBoard, selectedCard, selectedCard.index!, 0);
-  newSelected.rotated = true;
+  selectedCard.rotated = true;
   
   state.selected = null;
-  state.board = newBoard
 }
 
 
-function doSelectAction(state: GameState, card: Readonly<CardData> | null) {
+function doSelectAction(state: GameState, card: CardData | null) {
   if (card?.type === CardType.ENEMY) {
     doAttackAction(state, card as EnemyCard);
   } else {
-    console.log("doSelectAction card = %o", card);
     state.selected = card ? card.id : null;
-    console.log(state.selected);
   }
 }
 
 
 function canFlip(state: Readonly<GameState>): boolean {
-  console.log("canFlip");
-  console.log("selected: %s", state.selected);
-
   // Find selected card
   const selectedCard = state.board.flat().find(
     (card) => card[0]?.id === state.selected
@@ -887,16 +844,14 @@ export function updateHammerAnvilStrength(board: Board) {
         cards => cards[0]?.name === "The Hammer" ||
         cards[0]?.name === "The Anvil"
     )) {
-      const newCard = placeCard(
-        board, cards[0]!, cards[0]!.index!, 0
-      ) as PlayerCard;
+      const card = cards[0]! as PlayerCard;
 
-      if (isPacifistAdjacent(cards[0]!.index!, board)) {
+      if (isPacifistAdjacent(card.index!, board)) {
         // Increase strength
-        newCard.effectiveStrength = newCard.strength + 1;
+        card.effectiveStrength = card.strength + 1;
       } else {
         // Reset strength
-        newCard.effectiveStrength = newCard.strength;
+        card.effectiveStrength = card.strength;
       }
     }
   }
@@ -919,12 +874,10 @@ function updateJokerAdjacentHealth(board: Board) {
     // Check if on top or bottom
     const onTop = board[enemy.index![0]][enemy.index![1]][0]!.type === CardType.PLAYER;
 
-    const newCard = placeCard(board, enemy, enemy.index!, onTop ? 1 : 0);
-
     if (isDown) {
-      newCard.health = newCard.strength;
+      enemy.health = enemy.strength;
     } else {
-      newCard.health = newCard.strength - 1;
+      enemy.health = enemy.strength - 1;
     }
   }
 }
@@ -932,8 +885,7 @@ function updateJokerAdjacentHealth(board: Board) {
 
 function resetEnemyHealth(board: Board) {
   for (const [enemy] of board.flat().filter(cards => cards[0]?.type === CardType.ENEMY)) {
-    const newCard = placeCard(board, enemy!, enemy!.index!, 0) as EnemyCard;
-    newCard.health = newCard.strength;
+    (enemy! as EnemyCard).health = enemy!.strength;
   }
   
   updateJokerAdjacentHealth(board);
@@ -942,16 +894,21 @@ function resetEnemyHealth(board: Board) {
 
 function findAdjacent(
   index: [number, number],
-  board: ReadonlyBoard,
+  board: Board,
   predicate: (card: Readonly<CardData> | null) => boolean
-): Readonly<CardData>[] {
+): CardData[] {
   const adjacent = [
     [index[0] - 1, index[1]],
     [index[0], index[1] - 1],
     [index[0], index[1] + 1],
     [index[0] + 1, index[1]],
   // No out of bounds indexes
-  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < board.length && adjIndex[1] < board[0].length);
+  ].filter(adjIndex => (
+    (adjIndex[0] >= 0) &&
+    (adjIndex[1] >= 1) &&
+    (adjIndex[0] < board.length) &&
+    (adjIndex[1] < board[0].length)
+  ));
   
   const adjacentCards = adjacent
     .map(adjIndex => board[adjIndex[0]][adjIndex[1]][0])
@@ -964,21 +921,21 @@ function findAdjacent(
 
 function findAdjacentEnemies(
   index: [number, number],
-  board: ReadonlyBoard
-): Readonly<EnemyCard>[] {
+  board: Board
+): EnemyCard[] {
   return findAdjacent(
     index,
     board,
     card => card?.type === CardType.ENEMY
-  ) as Readonly<EnemyCard>[];
+  ) as EnemyCard[];
 }
 
 
 function findAdjacentPlayers(
   index: [number, number],
-  board: ReadonlyBoard,
+  board: Board,
   up?: boolean
-): Readonly<PlayerCard>[] {
+): PlayerCard[] {
   if (up === undefined) {
     up = false;
   }
@@ -987,27 +944,27 @@ function findAdjacentPlayers(
     index,
     board,
     card => card?.type === CardType.PLAYER && (!up || !(card! as PlayerCard).down)
-  ) as Readonly<PlayerCard>[];
+  ) as PlayerCard[];
 }
 
 
 // Creates copy of card with updated index and places it on board
 // Returns updated card
-function placeCard<T extends CardData | null>(
-  board: Board, card: Readonly<T>, index: [number, number], stackIndex: number
-): T {
-  const newCard = (card ? {
-    ...card,
-    index: index,
-  } : null) as T;
+// function placeCard<T extends CardData | null>(
+//   board: Board, card: Readonly<T>, index: [number, number], stackIndex: number
+// ): T {
+//   const newCard = (card ? {
+//     ...card,
+//     index: index,
+//   } : null) as T;
   
-  const newCards = [...board[index[0]][index[1]]]
-  newCards[stackIndex] = newCard;
+//   const newCards = [...board[index[0]][index[1]]]
+//   newCards[stackIndex] = newCard;
 
-  board[index[0]][index[1]] = newCards;
+//   board[index[0]][index[1]] = newCards;
   
-  return newCard;
-}
+//   return newCard;
+// }
 
 
 export function isMoveable(state: Readonly<GameState>, card: Readonly<CardData>): boolean {
@@ -1039,29 +996,16 @@ function hasAdjacent(
   board: ReadonlyBoard,
   predicate: (card: Readonly<CardData> | null) => boolean
 ): boolean {
-
-  const adjacent = [
-    [index[0] - 1, index[1]],
-    [index[0], index[1] - 1],
-    [index[0], index[1] + 1],
-    [index[0] + 1, index[1]],
-  // No out of bounds indexes
-  ].filter(adjIndex => adjIndex[0] >= 0 && adjIndex[1] >= 1 && adjIndex[0] < board.length && adjIndex[1] < board[0].length);
-  
-  const cardIsAdjacent = adjacent
-    .map(adjIndex => board[adjIndex[0]][adjIndex[1]][0])
-    .find(predicate) !== undefined;
-  
-  return cardIsAdjacent;
+  return findAdjacent(index, board as Board, predicate).length > 0;
 }
 
 
-// Copies array 2 levels deep
-// Returns a mutable copy
-// Note: When copying Board, won't copy third layer. It will reference the same
-// object
-function copy2DArray<T>(
-  array: ReadonlyArray<ReadonlyArray<T>>
-): T[][] {
-  return array.map((row) => [...row]);
-}
+// // Copies array 2 levels deep
+// // Returns a mutable copy
+// // Note: When copying Board, won't copy third layer. It will reference the same
+// // object
+// function copy2DArray<T>(
+//   array: ReadonlyArray<ReadonlyArray<T>>
+// ): T[][] {
+//   return array.map((row) => [...row]);
+// }

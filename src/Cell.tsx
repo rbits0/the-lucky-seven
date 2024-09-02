@@ -6,7 +6,7 @@ interface CellProps {
   id: string,
   rowIndex: number,
   columnIndex: number,
-  cards: (Readonly<CardData> | null)[],
+  cards: readonly (Readonly<CardData> | null)[],
 }
 
 
