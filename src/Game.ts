@@ -191,7 +191,15 @@ function addStateToHistory(state: GameState) {
     state.history.shift();
   }
 
-  const newState = structuredClone(state);
+  const newState: GameState = {
+    board: deepCopyBoard(state.board),
+    canFlip: state.canFlip,
+    deck: state.deck.map((card) => ({...card})),
+    phase: state.phase,
+    selected: state.selected,
+    winState: state.winState,
+    history: null,
+  }
   newState.history = null;
 
   state.history.push(newState);
@@ -989,12 +997,14 @@ function hasAdjacent(
 }
 
 
-// // Copies array 2 levels deep
-// // Returns a mutable copy
-// // Note: When copying Board, won't copy third layer. It will reference the same
-// // object
-// function copy2DArray<T>(
-//   array: ReadonlyArray<ReadonlyArray<T>>
-// ): T[][] {
-//   return array.map((row) => [...row]);
-// }
+function deepCopyBoard(
+  board: ReadonlyBoard
+): Board {
+  return board.map(
+    (row) => row.map(
+      (cards) => cards.map(
+        (card) => card ? {...card} : null
+      )
+    )
+  );
+}
