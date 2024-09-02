@@ -191,11 +191,8 @@ function addStateToHistory(state: GameState) {
     state.history.shift();
   }
 
-  // TODO: Deep copy, since state is draft so will be mutated
-  const newState: GameState = {
-    ...state,
-    history: null,
-  };
+  const newState = structuredClone(state);
+  newState.history = null;
 
   state.history.push(newState);
 }
@@ -209,14 +206,6 @@ function undo(history: readonly GameState[]): GameState {
   const newHistory = [...history];
   const newState = newHistory.pop()!;
   newState.history = newHistory;
-  
-  // Reset deck enemy health and index
-  // TODO: Remove, not needed since state should be deep copied
-  newState.deck = newState.deck.map((card) => ({
-    ...card,
-    health: card.strength,
-    index: undefined,
-  }))
   
   return newState;
 }
