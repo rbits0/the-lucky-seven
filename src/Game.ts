@@ -361,6 +361,7 @@ function handleMortars(board: Board) {
   for (const cards of board.flat().filter(
     cards => cards[0]?.name === "Mortar" || cards[1]?.name === "Mortar"
   )) {
+      // TODO: Need to get top card sometimes
       const mortarIndex = cards[0]!.index!;
       
       // Flip and rotate card under mortar
@@ -868,9 +869,6 @@ function updateJokerAdjacentHealth(board: Board) {
   
 
   for (const enemy of adjacentEnemies) {
-    // Check if on top or bottom
-    const onTop = board[enemy.index![0]][enemy.index![1]][0]!.type === CardType.PLAYER;
-
     if (isDown) {
       enemy.health = enemy.strength;
     } else {
