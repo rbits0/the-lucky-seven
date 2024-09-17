@@ -190,18 +190,8 @@ function addStateToHistory(state: GameState) {
   if (state.history.length >= NUM_UNDOS) {
     state.history.shift();
   }
-
-  const newState: GameState = {
-    board: deepCopyBoard(state.board),
-    canFlip: state.canFlip,
-    deck: state.deck.map((card) => ({...card})),
-    phase: state.phase,
-    selected: state.selected,
-    winState: state.winState,
-    history: null,
-  }
-  newState.history = null;
-
+  
+  const newState = deepCopyState(state);
   state.history.push(newState);
 }
 
@@ -212,7 +202,7 @@ function undo(history: readonly GameState[]): GameState {
   }
 
   const newHistory = [...history];
-  const newState = newHistory.pop()!;
+  const newState = deepCopyState(newHistory.pop()!);
   newState.history = newHistory;
   
   return newState;
@@ -1005,4 +995,17 @@ function deepCopyBoard(
       )
     )
   );
+}
+
+// Returns deep copy of state (apart from history)
+function deepCopyState(state: Readonly<GameState>): GameState {
+  return {
+    board: deepCopyBoard(state.board),
+    canFlip: state.canFlip,
+    deck: state.deck.map((card) => ({...card})),
+    phase: state.phase,
+    selected: state.selected,
+    winState: state.winState,
+    history: null,
+  }
 }
