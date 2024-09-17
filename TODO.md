@@ -59,6 +59,7 @@ Maneuver
 - [x] Don't highlight cells of first column, since player can't move to it
 - [x] The mouse can flip after moving
 - [x] Fix mouse movement
+- [ ] Fix flipping of diagonally adjacent to leader
 
 Attack
 - [x] Click on player card to select it
