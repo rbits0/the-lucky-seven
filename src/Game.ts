@@ -308,13 +308,13 @@ function dealEnemies(deck: EnemyCard[], board: Board) {
       // Determine whether to prioritise left or right
       const prioritisedDirection = position > (NUM_COLUMNS - 1) / 2 ? -1 : 1;
       
-      let index = 1;
+      let distance_from_default = 1;
       let prioritisedExhausted = false;
       let unprioritisedExhausted = false;
 
       while (!(prioritisedExhausted && unprioritisedExhausted)) {
         // Try prioritised direction first
-        let attemptPosition = position + index * prioritisedDirection;
+        let attemptPosition = position + distance_from_default * prioritisedDirection;
         if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
           prioritisedExhausted = true;
         } else {
@@ -326,7 +326,7 @@ function dealEnemies(deck: EnemyCard[], board: Board) {
         }
         
         // Try other direction
-        attemptPosition = position + index * (prioritisedDirection * -1);
+        attemptPosition = position + distance_from_default * (prioritisedDirection * -1);
         if (attemptPosition < 1 || attemptPosition >= NUM_COLUMNS) {
           unprioritisedExhausted = true;
         } else {
@@ -338,12 +338,13 @@ function dealEnemies(deck: EnemyCard[], board: Board) {
         }
         
         // Increment index
-        index += 1;
+        distance_from_default += 1;
       }
     }
 
 
     // Place card
+    card.index = [row, position];
     if (position >= 0) {
       if (card.canOverlap && board[row][position][0]) {
         // Put card on top instead of replacing
@@ -760,7 +761,6 @@ function canFlip(state: Readonly<GameState>): boolean {
   );
   
   if (selectedCard === undefined) {
-    console.log("No selected");
     return false;
   }
 
