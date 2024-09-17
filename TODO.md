@@ -28,6 +28,7 @@
 - [x] Make win/loss overlay generic (don't have duplicate code)
 - [ ] Fix layout on vertical screens
 - [ ] Pre-load images
+- [ ] Add keyboard support
 
 ## Phases
 
