@@ -55,10 +55,13 @@
 - The history does not include the current state.
 - The history is empty by default.
 
+
+
 ## Phases
 - When entering a phase, certain actions are carried out.
 - The user can do certain actions depending on the current phase.
 - The initial phase is Game Start
+
 
 ### Game Start
 - When the game starts, player cards are dealt to the board according to these steps:
@@ -91,6 +94,7 @@
 - (Low Priority) All randomness should be able to be set by a seed.
     - Given the same seed, the state after the game has started should be exactly the same.
 
+
 ### Encounter
 - Exactly one enemy card is dealt for each row, from the top of the deck.
     - NOTE: Top of the deck may correspond to the end of the JavaScript list.
@@ -118,3 +122,44 @@
         - The player card is then discarded, and the enemy card is placed there.
     - If there is no empty cell in the row, and there is no player card in the row (ie. the row is full of enemies):
         - The card is discarded - no new card is placed in that row.
+
+### Maneuver
+- This phase involves user interaction.
+- Each player card that is not rotated *may* take one of the following actions (performed by the player):
+    - Move to adjacent or diagonally adjacent empty cell, if the card  is flipped up.
+        - A player card may not move diagonally between two enemy cards adjacent to the player.
+            - This includes flares that are on another card, even if it is on a player card.
+            - This restriction does not apply to only adjacent player cards, or one player card and one enemy card.
+        - Two player cards may be moved at the same time to swap their positions.
+            - This rotates *both* cards.
+        - Cells in the tank column do not count as valid empty cells for non-tank cards.
+    - Flip down, if flipped up.
+    - Flip up, if flipped down but adjacent to a player card that is flipped up.
+        - This does not count as taking an action for the other card.
+- After a player card takes an action, the card is rotated so that it cannot take another action this turn.
+
+- There are a number of exceptions to the above rules/additional behaviour, according to the specific behaviour of each card:
+
+#### The Athlete
+- Can move twice when moving
+    - In the application, this can be represented as a "half-rotate" after the first move
+    - This does not include flipping up or flipping down. It may not, for example, move and then flip down, or flip up and then move.
+    - The Athlete may be used to flip up adjacent player cards each time it moves.
+    - The Athlete may swap with a player card each time it moves.
+
+#### The Leader
+- Allows diagonally adjacent player cards to flip up (in addition to the regular behaviour of allowing adjacent player cards to flip up).
+    - It still applies that this card must be flipped up.
+- Can flip up without an adjacent player card.
+
+#### The Mouse
+- Can flip down after moving.
+    - It is unclear whether this can only be done immediately after moving, or if it can be done at any point after moving. For the purpose of this application, we will assume that it can be done at any point after moving, as long as the game is still in the Maneuver phase.
+    - NOTE: It can only flip down after *moving*, it is not about whether it is flipped down. For example, it can't flip up and then flip down. This may not be important, since this shouldn't allow any 
+- Can move even if flipped down.
+
+#### Flare
+- The player card that the flare is on may not move.
+    - This includes swapping.
+    - It still applies that other player cards may not move here.
+- This card is discarded at the end of the phase.
