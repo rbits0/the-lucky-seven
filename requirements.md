@@ -85,3 +85,28 @@
     - All player cards surrounding the removed card are flipped down.
 - When the game starts, all the enemy cards are put into the deck.
 - The deck is then shuffled.
+- (Low Priority) All randomness should be able to be set by a seed.
+    - Given the same seed, the state after the game has started should be exactly the same.
+
+### Encounter
+- Exactly one enemy card is dealt for each row, from the top of the deck.
+    - NOTE: Top of the deck may correspond to the end of the JavaScript list.
+    - The enemy on the first row should be the top card, the second row the card below the top card, etc.
+    - The enemy can only be placed in that row - it cannot be placed in any other row.
+- If the card is a tank:
+    - The card is placed in the tank column.
+- If the card is a mortar or flare:
+    - The card is placed in its associated column.
+    - If there is already a card there, it is placed on top of the existing card.
+- If the card is an infantry or machine gun:
+    - If there is no card in the associated column, it is placed there.
+    - If there is a card there, it places in the closest empty cell to the associated column.
+        - If there are multiple empty cells with the same distance to the cell, the cell closest to the center should be chosen.
+        - eg. If the closest cells are column 1 and 3, the card should be placed in column 3.
+        - The cells in the tank column are not valid empty cells for non-tank cards
+    - If there is no empty cell in the row, but there is a player card in the row:
+        - One of the player cards is chosen according to the same rules as for an empty cell (above).
+        - If there is a player card in the associated column, that one is be chosen.
+        - The player card is then discarded, and the enemy card is placed there.
+    - If there is no empty cell in the row, and there is no player card in the row (ie. the row is full of enemies):
+        - The card is discarded - no new card is placed in that row.
