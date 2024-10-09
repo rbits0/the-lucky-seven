@@ -1,5 +1,8 @@
 # Requirements
 
+## Terminology
+- Adjacent refers only to adjacent in one axis, not diagonals, unless otherwise specified.
+
 ## Description of a Game State
 - Cards can be player card or enemy card.
 - Each card has a different type.
@@ -98,6 +101,11 @@
 - If the card is a mortar or flare:
     - The card is placed in its associated column.
     - If there is already a card there, it is placed on top of the existing card.
+    - If the card is a mortar, once the card is placed:
+        - If the mortar is on a player card, the player card is flipped down AND rotated.
+        - All adjacent player cards are flipped down.
+        - The mortar is then discarded
+        - NOTE: While this differs from the official rules, this action can be taken in the transition from Encounter to Maneuver phase instead, since the end result should be the same. This can be done to make it more clear to the player what is happening.
 - If the card is an infantry or machine gun:
     - If there is no card in the associated column, it is placed there.
     - If there is a card there, it places in the closest empty cell to the associated column.
