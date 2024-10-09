@@ -162,4 +162,5 @@
 - The player card that the flare is on may not move.
     - This includes swapping.
     - It still applies that other player cards may not move here.
+    - The player card may still flip up or down.
 - This card is discarded at the end of the phase.
