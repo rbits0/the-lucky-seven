@@ -168,10 +168,11 @@
 
 
 ### Attack
+- This phase involves user interaction.
 - All enemy cards' health is reset to their strength at the start of this phase.
 - All player cards are unrotated at the start of this phase.
 - If a player card is flipped down, its effective strength is 0.
-- Each player card that is up and unrotated may attack ONE adjacent enemy.
+- Each player card that is up and unrotated *may* attack ONE adjacent enemy (performed by the player).
     - Attacking an enemy subtracts the effective strength of the player card from the enemy card's health.
     - If *after attacking an enemy* the enemy's health is 0, the enemy card is discarded.
     - After attacking, the player card is rotated to indicate that it has already attacked.
