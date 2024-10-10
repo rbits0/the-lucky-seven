@@ -115,20 +115,33 @@ function createRandomBoard(): [Board, EnemyCard[]] {
   // Shuffle row and column numbers
   let row_numbers: number[][] = shuffleArray(cards.rows);
   let column_numbers: number[][] = shuffleArray(cards.columns);
-  // let row_numbers: number[][] = cards.rows;
-  // let column_numbers: number[][] = cards.columns;
   
+  // Place player cards
+  let players = parsePlayerCards(cards.players);
+  shuffleArray(players);
+  placePlayerCards(players, row_numbers, column_numbers, board);
 
-  // Shuffle player cards
-  let players = shuffleArray(
-    (cards.players as any[]).map((card, i) => (
-      {...card, id: card.name, type: CardType.PLAYER, down: false, rotated: false, effectiveStrength: card.strength}
-    ))
-  ) as PlayerCard[];
-  // let players = (cards.players as any[]).map(card => (
-  //   {...card, id: card.name, type: CardType.Player, down: false}
-  // ))as PlayerCard[];
+  updateHammerAnvilStrength(board);
   
+  // Shuffle enemy cards
+  let enemies = parseEnemyCards(cards.enemies);
+  shuffleArray(enemies);
+  
+  return [board, enemies];
+}
+
+function parsePlayerCards(players: any): PlayerCard[] {
+  return (players as any[]).map(card => (
+    {...card, id: card.name, type: CardType.PLAYER, down: false, rotated: false, effectiveStrength: card.strength}
+  )) as PlayerCard[];
+}
+
+function placePlayerCards(
+  players: readonly PlayerCard[],
+  row_numbers: readonly number[][],
+  column_numbers: readonly number[][],
+  board: Board
+) {
   // Place player cards
   players.forEach((player, i) => {
     // Find row and column
@@ -142,7 +155,6 @@ function createRandomBoard(): [Board, EnemyCard[]] {
     board[rowIndex][columnIndex][0] = player;
   });
   
-
   // Remove last player card
   const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
   const columnIndex = column_numbers.findIndex(value => value.includes(players.length)) + 1;
@@ -160,26 +172,19 @@ function createRandomBoard(): [Board, EnemyCard[]] {
       (board[index[0]][index[1]][0] as PlayerCard).down = true;
     }
   }
+}
 
-
-  updateHammerAnvilStrength(board);
-  
-
-  // Parse enemy cards
-  let enemies: EnemyCard[] = [];
-  for (const [i, enemy] of cards.enemies.entries()) {
+function parseEnemyCards(enemies: any): EnemyCard[] {
+  let parsedEnemies: EnemyCard[] = [];
+  for (const [i, enemy] of enemies.entries()) {
     for (const [j, position] of enemy.positions.entries()) {
       const newEnemy = { ...enemy, position: position, id: `enemy${i}:${j}`, type: CardType.ENEMY, health: enemy.strength};
       delete newEnemy.positions;
-      enemies.push(newEnemy);
+      parsedEnemies.push(newEnemy);
     }
   }
   
-  // Shuffle enemy cards
-  shuffleArray(enemies);
-
-  
-  return [board, enemies];
+  return parsedEnemies;
 }
 
 
