@@ -1,7 +1,11 @@
 # Requirements
 
+
+
 ## Terminology
 - Adjacent refers only to adjacent in one axis, not diagonals, unless otherwise specified.
+
+
 
 ## Description of a Game State
 - Cards can be player card or enemy card.
@@ -101,6 +105,7 @@
     - NOTE: Top of the deck may correspond to the end of the JavaScript list.
     - The enemy on the first row should be the top card, the second row the card below the top card, etc.
     - The enemy can only be placed in that row - it cannot be placed in any other row.
+    - If the deck is empty, don't deal any enemies.
 - If the card is a tank:
     - The card is placed in the tank column.
 - If the card is a mortar or flare:
@@ -205,3 +210,38 @@
 #### The Mouse
 - Can attack even if flipped down.
     - Its effective strength is still 1, even if flipped down.
+
+
+### Counter-Attack
+- Do actions for enemy cards still remaining on the board.
+- If there are no player cards on the board at the end of the phase, the game is lost.
+- After this phase, return to the encounter phase.
+- After this phase, if it is the last turn, determine whether the game is won or lost
+    - Display a message telling the player whether they won or lost.
+    - Have a button to start a new game.
+        - Completely reset everything.
+    - Have a button to view the board state.
+
+#### Infantry
+- Discard all adjacent player cards.
+
+#### Machine Gun
+- Discard all adjacent player cards that are flipped up.
+
+#### Tank
+- Discard all player cards in this row that are up.
+- Then discard this card.
+
+
+
+## Undo
+- Pressing the undo button returns the game to the state before the user took their latest action.
+    - Pressing it a second time returns to the state before the previous action, etc.
+- Undo can only go 3 actions back.
+- Changing phase counts as an action.
+
+
+
+## Other
+- The current phase is displayed at all times
+- The number of turns left before the game ends is displayed at all times.
