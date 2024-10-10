@@ -126,17 +126,23 @@
 
 ### Maneuver
 - This phase involves user interaction.
+- The user may click on a card that has an available action to select it.
 - Each player card that is not rotated *may* take one of the following actions (performed by the player):
-    - Move to adjacent or diagonally adjacent empty cell, if the card  is flipped up.
+    - Move to adjacent or diagonally adjacent empty cell, if the card is flipped up.
+        - This is performed by dragging the card to the empty cell.
         - A player card may not move diagonally between two enemy cards adjacent to the player.
             - This includes flares that are on another card, even if it is on a player card.
             - This restriction does not apply to only adjacent player cards, or one player card and one enemy card.
         - Two player cards may be moved at the same time to swap their positions.
             - This rotates *both* cards.
         - Cells in the tank column do not count as valid empty cells for non-tank cards.
-    - Flip down, if flipped up.
-    - Flip up, if flipped down but adjacent to a player card that is flipped up.
-        - This does not count as taking an action for the other card.
+    - Flip.
+        - This is performed on the selected player by pressing the flip button, if the selected card can flip.
+        - If the selected player is flipped up, it will flip down.
+        - If the player is flipped down but adjacent to a player that is flipped up.
+            - This does not count as taking an action for the other player.
+        - If no player is selected, or the player is flipped down but not adjacent to a player that is flipped up, this action cannot be performed.
+            - The flip button is disabled.
 - After a player card takes an action, the card is rotated so that it cannot take another action this turn.
 
 - There are a number of exceptions to the above rules/additional behaviour, according to the specific behaviour of each card:
