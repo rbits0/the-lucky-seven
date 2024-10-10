@@ -127,6 +127,7 @@
 ### Maneuver
 - This phase involves user interaction.
 - The user may click on a card that has an available action to select it.
+    - If the card has no available action, the card cannot be clicked, and the card is unselected.
 - Each player card that is not rotated *may* take one of the following actions (performed by the player):
     - Move to adjacent or diagonally adjacent empty cell, if the card is flipped up.
         - This is performed by dragging the card to the empty cell.
@@ -179,9 +180,12 @@
 - All player cards are unrotated at the start of this phase.
 - If a player card is flipped down, its effective strength is 0.
 - Each player card that is up and unrotated *may* attack ONE adjacent enemy (performed by the player).
+    - This is performed by clicking (selecting) the player card, then clicking the enemy card.
+        - The card cannot be clicked if it cannot attack.
     - Attacking an enemy subtracts the effective strength of the player card from the enemy card's health.
     - If *after attacking an enemy* the enemy's health is 0, the enemy card is discarded.
     - After attacking, the player card is rotated to indicate that it has already attacked.
+    - After attacking, the player card is unselected.
     - A card with an effective strength of 0 cannot attack.
 - Enemies without a strength (such as tanks) cannot be attacked.
 
@@ -196,7 +200,7 @@
 
 #### The Natural
 - Can attack diagonally adjacent enemies.
-    - The rule for diagonal movement does not apply here - it can still attack an enemy even if it is diagonally between to enemies that are adjacent to the natural.
+    - The rule for diagonal movement does not apply here - it can still attack an enemy even if the enemy is diagonally between two enemies that are adjacent to the natural.
 
 #### The Mouse
 - Can attack even if flipped down.
