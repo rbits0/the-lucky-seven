@@ -12,9 +12,10 @@
 - Each card has a strength.
     - Player strength is its default attack power.
     - Enemy strength is its default health.
+    - Tanks, mortars, and flares do not have a strength (this can be represented as a strength of -1 in the application).
 - Each player card has an effective strength.
     - Only used for hammer and anvil cards.
-    - Defaults to the card's strength
+    - Defaults to the card's strength.
 - Player cards can be up or down.
 - Player cards can be unrotated or rotated.
 - Athlete card can be half-rotated instead.
@@ -164,3 +165,32 @@
     - It still applies that other player cards may not move here.
     - The player card may still flip up or down.
 - This card is discarded at the end of the phase.
+
+
+### Attack
+- All enemy cards' health is reset to their strength at the start of this phase.
+- All player cards are unrotated at the start of this phase.
+- If a player card is flipped down, its effective strength is 0.
+- Each player card that is up and unrotated may attack ONE adjacent enemy.
+    - Attacking an enemy subtracts the effective strength of the player card from the enemy card's health.
+    - If *after attacking an enemy* the enemy's health is 0, the enemy card is discarded.
+    - After attacking, the player card is rotated to indicate that it has already attacked.
+    - A card with an effective strength of 0 cannot attack.
+- Enemies without a strength (such as tanks) cannot be attacked.
+
+#### The Anvil AND The Hammer
+- Has strength 2 instead of 1 when the pacifist is adjacent and up.
+    - If the pacifist is adjacent to both the anvil and the hammer, they both will have a strength of 2.
+
+#### The Joker
+- Reduces the health of each adjacent enemy by 1.
+    - This does not count as an attack.
+    - Even if the joker reduces an enemy's health to 0, it cannot discard it, since an enemy card needs to be attacked to be discarded.
+
+#### The Natural
+- Can attack diagonally adjacent enemies.
+    - The rule for diagonal movement does not apply here - it can still attack an enemy even if it is diagonally between to enemies that are adjacent to the natural.
+
+#### The Mouse
+- Can attack even if flipped down.
+    - Its effective strength is still 1, even if flipped down.
