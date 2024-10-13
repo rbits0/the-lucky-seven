@@ -29,6 +29,7 @@
 - [ ] Fix layout on vertical screens
 - [ ] Pre-load images
 - [ ] Add keyboard support
+- [ ] Display which player card was 8th
 
 ## Phases
 
