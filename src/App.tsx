@@ -2,7 +2,6 @@ import { Dispatch } from "react";
 import './App.css';
 import Grid from './Grid';
 import { GameContext } from "./Contexts";
-import { Active } from "@dnd-kit/core";
 import GameEndPopup from "./GameEndPopup";
 import { createGame, GameAction, GameActionType, gameReducer, GameState, Phase, WinState } from "./Game";
 import { useImmerReducer } from "use-immer";
@@ -23,10 +22,10 @@ function App() {
       : (gameState.winState === WinState.LOSS) ?
         <GameEndPopup win={false}/>
       : null}
-      <div className="flex flex-wrap h-full justify-start items-center">
+      <div className="main">
         <Grid/>
 
-        <div className="flex flex-col h-min self-start flex-grow justify-center items-center p-4 text-xl">
+        <div className="sidebar">
           <div className="w-44">
             <p className="text-balance text-center">Phase: {phaseToString(gameState.phase)}</p>
 
