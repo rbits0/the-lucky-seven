@@ -2,7 +2,7 @@ html, body, #root {
   height: 100%
 }
 
-.grid-aspect {
+.grid-aspect, .grid-flex {
     /* From StackOverflow: https://stackoverflow.com/a/20593342/13956165 */
 
     --width-ratio: 7;
@@ -35,7 +35,7 @@ html, body, #root {
   height: 100%;
 
   display: flex;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
   justify-content: flex-start;
   align-items: center;
 }
@@ -53,4 +53,16 @@ html, body, #root {
   align-items: center;
 
   font-size: 1.25rem;
+}
+
+@media (max-aspect-ratio: 22/12) {
+  .main {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    justify-content: flex-start;
+  }
 }
