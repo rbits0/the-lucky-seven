@@ -56,7 +56,7 @@ export interface MoveAction extends GameAction {
 
 export interface SelectAction extends GameAction {
   type: GameActionType.SELECT,
-  card: CardData | null,
+  index: [number, number] | null;
 }
 
 
@@ -83,7 +83,7 @@ export function gameReducer(state: GameState, action: GameAction) {
       break;
     case GameActionType.SELECT:
       const selectAction = action as SelectAction;
-      doSelectAction(state, selectAction.card);
+      doSelectAction(state, selectAction.index);
       break;
   }
   
@@ -740,7 +740,9 @@ function attack(state: GameState, selectedCard: PlayerCard, enemy: EnemyCard) {
 }
 
 
-function doSelectAction(state: GameState, card: CardData | null) {
+function doSelectAction(state: GameState, index: [number, number] | null) {
+  const card = index ? state.board[index[0]][index[1]][0] : null;
+
   if (card?.type === CardType.ENEMY) {
     doAttackAction(state, card as EnemyCard);
   } else {

@@ -44,7 +44,7 @@ function Card({ card, className, disabled, above }: CardProps) {
     if (cardIsClickable) {
       gameDispatch({
         type: GameActionType.SELECT,
-        card: card,
+        index: card.index,
       } as SelectAction);
     }
   }
