@@ -603,7 +603,7 @@ function moveCard(
   from: [number, number],
   to: [number, number],
   selected: string | null,
-) {
+): boolean {
   // If one of the cards is the joker (up), reset enemy strength
   for (const index of [from, to]) {
     if (board[index[0]][index[1]][0]?.name === "The Joker" && !(board[index[0]][index[1]][0]! as PlayerCard).down) {
@@ -621,6 +621,13 @@ function moveCard(
     board[from[0]][from[1]][0],
     board[to[0]][to[1]][0]
   ] = [card2, card1];
+
+  if (card1) {
+    card1.index = to;
+  }
+  if (card2) {
+    card2.index = from;
+  }
   
 
   // Rotate cards
