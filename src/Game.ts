@@ -367,28 +367,16 @@ function handleMortars(board: Board) {
         card.rotated = true;
       }
       
-      // TODO: Use findAdjacent
-      // Flip all adjacent cards
-      const indexes: [number, number][] = [
-        [mortarIndex[0] + 1, mortarIndex[1]],
-        [mortarIndex[0] - 1, mortarIndex[1]],
-        [mortarIndex[0], mortarIndex[1] + 1],
-        [mortarIndex[0], mortarIndex[1] - 1],
-      ];
-      for (const index of indexes) {
-        // Check index is in bounds
-        if (index[0] < 0 || index[1] < 1 || index[0] >= board.length || index[1] >= board[0].length) {
-          continue;
-        }
-        
-        const card = board[index[0]][index[1]][0]
-        if (card?.type === CardType.PLAYER) {
-          // Flip card
-          (card as PlayerCard).down = true;
-        }
-        
+      // Flip all adjacent players
+      const adjacentPlayers = findAdjacent(
+        mortarIndex,
+        board,
+        card => card?.type === CardType.PLAYER
+      ) as PlayerCard[];
+      for (const card of adjacentPlayers) {
+        card.down = true;
       }
-      
+
       // Remove mortar
       if (cards[1]?.name === "Mortar") {
         cards[1] = null;
