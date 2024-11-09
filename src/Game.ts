@@ -673,7 +673,7 @@ function doAttackAction(state: GameState, enemy: Readonly<EnemyCard>) {
     return;
   }
   
-  if (!canAttackEnemy(selectedCard, enemy)) {
+  if (!canAttackEnemy(selectedCard, enemy, state.board)) {
     return;
   }
 
@@ -685,7 +685,8 @@ function doAttackAction(state: GameState, enemy: Readonly<EnemyCard>) {
 
 export function canAttackEnemy(
   card: Readonly<PlayerCard>,
-  enemy: Readonly<EnemyCard>
+  enemy: Readonly<EnemyCard>,
+  board: ReadonlyBoard,
 ): boolean {
   if (!canPlayerAttack(card)) {
     return false;
@@ -696,27 +697,13 @@ export function canAttackEnemy(
   }
   
   // Check that selected is adjacent
-  // TODO: Use hasAdjacent. Need to add diagonal version
-  let adjacentIndexes = [
-    [enemy.index![0] - 1, enemy.index![1]],
-    [enemy.index![0], enemy.index![1] - 1],
-    [enemy.index![0], enemy.index![1] + 1],
-    [enemy.index![0] + 1, enemy.index![1]],
-  ];
-  
-  // Special case for the natural, can attack diagonally
-  if (card.name === "The Natural") {
-    adjacentIndexes = adjacentIndexes.concat([
-      [enemy.index![0] - 1, enemy.index![1] - 1],
-      [enemy.index![0] - 1, enemy.index![1] + 1],
-      [enemy.index![0] + 1, enemy.index![1] - 1],
-      [enemy.index![0] + 1, enemy.index![1] + 1],
-    ]);
-  }
-
-  return (adjacentIndexes.find(
-    index => index[0] === card.index![0] && index[1] === card.index![1]
-  ) !== null);
+  const allowDiagonal = card.name === "The Natural";
+  return hasAdjacent(
+    card.index!,
+    board,
+    c => c === enemy,
+    allowDiagonal,
+  );
 }
 
 
@@ -800,13 +787,13 @@ export function canCardFlip(state: Readonly<GameState>, card: Readonly<PlayerCar
   if (!card.down || card.name === "The Leader") {
     return true;
   } else {
-    // Card is down
+  // Card is down
 
-    // Check if adjacent up card exists
+  // Check if adjacent up card exists
     return hasAdjacent(card.index!, state.board, (card) => (
-      (card !== null) &&
-      (card.type === CardType.PLAYER) && 
-      (!(card as PlayerCard).down)
+    (card !== null) &&
+    (card.type === CardType.PLAYER) && 
+    (!(card as PlayerCard).down)
     ));
   }
 }
@@ -894,25 +881,36 @@ function resetEnemyHealth(board: Board) {
 function findAdjacent(
   index: [number, number],
   board: Board,
-  predicate: (card: Readonly<CardData> | null) => boolean
+  predicate: (card: Readonly<CardData> | null) => boolean,
+  allowDiagonal?: boolean,
 ): CardData[] {
-  const adjacent = [
+  let adjacentIndices = [
     [index[0] - 1, index[1]],
     [index[0], index[1] - 1],
     [index[0], index[1] + 1],
     [index[0] + 1, index[1]],
+  ];
+  
+  if (allowDiagonal) {
+    adjacentIndices.push(
+      [index[0] - 1, index[1] - 1],
+      [index[0] - 1, index[1] + 1],
+      [index[0] + 1, index[1] - 1],
+      [index[0] + 1, index[1] + 1],
+    );
+  }
+
   // No out of bounds indexes
-  ].filter(adjIndex => (
+  adjacentIndices = adjacentIndices.filter(adjIndex => (
     (adjIndex[0] >= 0) &&
     (adjIndex[1] >= 1) &&
     (adjIndex[0] < board.length) &&
     (adjIndex[1] < board[0].length)
   ));
   
-  const adjacentCards = adjacent
+  const adjacentCards = adjacentIndices
     .map(adjIndex => board[adjIndex[0]][adjIndex[1]][0])
-    .filter(predicate)
-    .map(card => card!);
+    .filter(predicate) as CardData[];
   
   return adjacentCards;
 }
@@ -920,12 +918,14 @@ function findAdjacent(
 
 function findAdjacentEnemies(
   index: [number, number],
-  board: Board
+  board: Board,
+  allowDiagonal?: boolean,
 ): EnemyCard[] {
   return findAdjacent(
     index,
     board,
-    card => card?.type === CardType.ENEMY
+    card => card?.type === CardType.ENEMY,
+    allowDiagonal,
   ) as EnemyCard[];
 }
 
@@ -933,7 +933,8 @@ function findAdjacentEnemies(
 function findAdjacentPlayers(
   index: [number, number],
   board: Board,
-  up?: boolean
+  up?: boolean,
+  allowDiagonal?: boolean,
 ): PlayerCard[] {
   if (up === undefined) {
     up = false;
@@ -942,7 +943,8 @@ function findAdjacentPlayers(
   return findAdjacent(
     index,
     board,
-    card => card?.type === CardType.PLAYER && (!up || !(card! as PlayerCard).down)
+    card => card?.type === CardType.PLAYER && (!up || !(card! as PlayerCard).down),
+    allowDiagonal,
   ) as PlayerCard[];
 }
 
@@ -993,9 +995,10 @@ function shuffleArray<T>(array: T[]): T[] {
 function hasAdjacent(
   index: [number, number],
   board: ReadonlyBoard,
-  predicate: (card: Readonly<CardData> | null) => boolean
+  predicate: (card: Readonly<CardData> | null) => boolean,
+  allowDiagonal?: boolean,
 ): boolean {
-  return findAdjacent(index, board as Board, predicate).length > 0;
+  return findAdjacent(index, board as Board, predicate, allowDiagonal).length > 0;
 }
 
 
