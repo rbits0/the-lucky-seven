@@ -6,7 +6,6 @@
       property works, because placeCard() should return mutable reference.~~
       It works fine
 - [x] Fix mutating board. I need to copy 2 layers, not just first layer
-- [ ] Cell cards prop isn't readonly, but still works? Why?
 
 
 ## Board
@@ -61,7 +60,7 @@ Maneuver
 - [x] Don't highlight cells of first column, since player can't move to it
 - [x] The mouse can flip after moving
 - [x] Fix mouse movement
-- [ ] Fix flipping of diagonally adjacent to leader
+- [x] Fix flipping of diagonally adjacent to leader
 
 Attack
 - [x] Click on player card to select it

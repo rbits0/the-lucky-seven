@@ -541,7 +541,6 @@ function canMoveTo(board: ReadonlyBoard, from: [number, number], to: [number, nu
   }
   
   // If diagonally adjacent, check that movement is not blocked by diagonal enemies
-  // TODO: Replace with findAdjacent
   let blocked = [[-1, -1], [-1, 1], [1, -1], [1, 1]].filter((value) => {
     if (to[0] === from[0] + value[0] && to[1] === from[1] + value[1]) {
       const card0 = board[from[0]][from[1] + value[1]];
@@ -753,7 +752,7 @@ export function canCardFlip(state: Readonly<GameState>, card: Readonly<PlayerCar
     return false;
   }
 
-  // Mouse can always flip DOWN
+  // Mouse can always flip DOWN, even if rotated
   if (card.name === "The Mouse" && !card.down) {
     return true;
   }
@@ -771,19 +770,34 @@ export function canCardFlip(state: Readonly<GameState>, card: Readonly<PlayerCar
   }
   
 
-  // Leader can always flip, even if down
+  // Card can flip DOWN
+  // Leader can flip down or up
   if (!card.down || card.name === "The Leader") {
     return true;
-  } else {
+  }  
+
   // Card is down
 
   // Check if adjacent up card exists
-    return hasAdjacent(card.index!, state.board, (card) => (
+  if (hasAdjacent(card.index!, state.board, (card) => (
     (card !== null) &&
     (card.type === CardType.PLAYER) && 
     (!(card as PlayerCard).down)
-    ));
+  ))) {
+    return true;
+  };
+  
+  // Check if diagonally adjacent leader exists
+  if (findAdjacent(
+    card.index!,
+    state.board,
+    c => c?.name === "The Leader",
+    true,
+  ).length > 0) {
+    return true;
   }
+  
+  return false;
 }
 
 
