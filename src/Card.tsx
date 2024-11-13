@@ -26,6 +26,7 @@ function Card({ card, className, disabled, above }: CardProps) {
   const isSelected = (gameState.selected === card.id);
   const cardIsMoveable = (!disabled && isMoveable(gameState, card));
   const cardIsClickable = isClickable(gameState, card);
+  const cardIsUnlucky = card.id === gameState.unluckyCard.id;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -72,13 +73,16 @@ function Card({ card, className, disabled, above }: CardProps) {
         <div className={`w-full h-full absolute rounded-lg
           ${isSelected && !isDragging ? "outline outline-4 outline-offset-2 outline-sky-600" : ""}
         `}></div>
-        <div className={`w-full h-full text-center flex flex-col select-none rounded-lg card
+        <div className={`w-full h-full absolute text-center flex flex-col select-none rounded-lg card
           ${card.type === CardType.ENEMY ? "bg-rose-700" : "bg-green-700"}
         `}>
           {imagePaths.map(imagePath => (
             <img key={imagePath} src={`${process.env.PUBLIC_URL}/cards/${imagePath}.png`} alt={card.name}/>
           ))}
         </div>
+        {cardIsUnlucky ? (
+          <div className="w-full h-full absolute select-none rounded-lg card bg-red-600 opacity-50 z-10"></div>
+        ) : null}
       </div>
   );
 }

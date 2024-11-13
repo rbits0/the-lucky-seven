@@ -29,9 +29,6 @@ function App() {
 
         <div className="sidebar">
           <div className="w-44">
-            {gameState.phase === Phase.GAME_START ? (
-              <p>Card removed: {gameState.unluckyCard.name}</p>
-            ) : null}
             <p className="text-balance text-center">Rounds left: {roundsLeft}</p>
             <p className="text-balance text-center">Phase: {phaseToString(gameState.phase)}</p>
 

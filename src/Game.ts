@@ -158,11 +158,10 @@ function placePlayerCards(
     board[rowIndex][columnIndex][0] = player;
   });
   
-  // Remove last player card
+  // Remove last player card (don't actually remove it yet)
   const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
   const columnIndex = column_numbers.findIndex(value => value.includes(players.length)) + 1;
   const unluckyCard = board[rowIndex][columnIndex][0]! as PlayerCard;
-  board[rowIndex][columnIndex][0] = null;
   
   // Down adjacent players
   const adjacent = [[rowIndex - 1, columnIndex], [rowIndex + 1, columnIndex], [rowIndex, columnIndex - 1], [rowIndex, columnIndex + 1]];
@@ -241,6 +240,10 @@ function nextPhase(state: GameState) {
       state.phase = Phase.ENCOUNTER;
       break;
     case Phase.GAME_START:
+      removeUnlucky(state);
+      encounterPhase(state);
+      state.phase = Phase.ENCOUNTER;
+      break;
     default:
       encounterPhase(state);
       state.phase = Phase.ENCOUNTER;
@@ -250,6 +253,12 @@ function nextPhase(state: GameState) {
 
   // Unselect card
   state.selected = null;
+}
+
+
+function removeUnlucky(state: GameState) {
+  const index = state.unluckyCard.index!;
+  state.board[index[0]][index[1]][0] = null;
 }
 
   
