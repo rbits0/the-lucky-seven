@@ -15,6 +15,8 @@ function App() {
     Readonly<GameState>, Dispatch<GameAction>
   ] = useImmerReducer(gameReducer, null, createGame);
   
+  const roundsLeft = Math.floor(gameState.deck.length / 4) + 1;
+  
   return (
     <GameContext.Provider value={[gameState, gameDispatch]}>
       {(gameState.winState === WinState.WIN) ? 
@@ -27,6 +29,7 @@ function App() {
 
         <div className="sidebar">
           <div className="w-44">
+            <p className="text-balance text-center">Rounds left: {roundsLeft}</p>
             <p className="text-balance text-center">Phase: {phaseToString(gameState.phase)}</p>
 
             <div className="mx-auto w-min">
