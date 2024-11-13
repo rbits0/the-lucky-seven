@@ -58,6 +58,9 @@ function Card({ card, className, disabled, above }: CardProps) {
           ${// Card should be above everything when it's being dragged
             isDragging ? "z-30" : above ? "z-20" : "z-10"
           }
+          ${
+            cardIsUnlucky ? "opacity-80" : ""
+          }
           ${className}
         `}
         {...listeners}
