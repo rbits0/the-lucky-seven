@@ -13,6 +13,7 @@ type ReadonlyBoard = ReadonlyArray<ReadonlyArray<
 export interface GameState {
   board: Board,
   deck: EnemyCard[],
+  unluckyCard: Readonly<PlayerCard>,
   phase: Phase,
   selected: string | null,
   winState: WinState,
@@ -93,11 +94,12 @@ export function gameReducer(state: GameState, action: GameAction) {
 
 
 export function createGame(): GameState {
-  const [initialBoard, initialDeck] = createRandomBoard();
+  const [initialBoard, initialDeck, unluckyCard] = createRandomBoard();
 
   return {
     board: initialBoard,
     deck: initialDeck,
+    unluckyCard,
     phase: Phase.GAME_START,
     selected: null,
     winState: WinState.NONE,
@@ -107,7 +109,7 @@ export function createGame(): GameState {
 }
 
 
-function createRandomBoard(): [Board, EnemyCard[]] {
+function createRandomBoard(): [Board, EnemyCard[], PlayerCard] {
   const cards = require("./cards.json");
   // Create 3D array with null for board
   const board: Board = [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(2).fill(null)));
@@ -119,7 +121,7 @@ function createRandomBoard(): [Board, EnemyCard[]] {
   // Place player cards
   let players = parsePlayerCards(cards.players);
   shuffleArray(players);
-  placePlayerCards(players, row_numbers, column_numbers, board);
+  const unluckyCard = placePlayerCards(players, row_numbers, column_numbers, board);
 
   updateHammerAnvilStrength(board);
   
@@ -127,7 +129,7 @@ function createRandomBoard(): [Board, EnemyCard[]] {
   let enemies = parseEnemyCards(cards.enemies);
   shuffleArray(enemies);
   
-  return [board, enemies];
+  return [board, enemies, unluckyCard];
 }
 
 function parsePlayerCards(players: any): PlayerCard[] {
@@ -136,12 +138,13 @@ function parsePlayerCards(players: any): PlayerCard[] {
   )) as PlayerCard[];
 }
 
+// Returns the unlucky card
 function placePlayerCards(
   players: readonly PlayerCard[],
   row_numbers: readonly number[][],
   column_numbers: readonly number[][],
   board: Board
-) {
+): PlayerCard {
   // Place player cards
   players.forEach((player, i) => {
     // Find row and column
@@ -158,6 +161,7 @@ function placePlayerCards(
   // Remove last player card
   const rowIndex = row_numbers.findIndex(value => value.includes(players.length));
   const columnIndex = column_numbers.findIndex(value => value.includes(players.length)) + 1;
+  const unluckyCard = board[rowIndex][columnIndex][0]! as PlayerCard;
   board[rowIndex][columnIndex][0] = null;
   
   // Down adjacent players
@@ -172,6 +176,8 @@ function placePlayerCards(
       (board[index[0]][index[1]][0] as PlayerCard).down = true;
     }
   }
+  
+  return unluckyCard
 }
 
 function parseEnemyCards(enemies: any): EnemyCard[] {
@@ -1027,6 +1033,7 @@ function deepCopyState(state: Readonly<GameState>): GameState {
     board: deepCopyBoard(state.board),
     canFlip: state.canFlip,
     deck: state.deck.map((card) => ({...card})),
+    unluckyCard: state.unluckyCard,
     phase: state.phase,
     selected: state.selected,
     winState: state.winState,

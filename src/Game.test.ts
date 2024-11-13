@@ -1,5 +1,5 @@
 import { GameState, NUM_ROWS, NUM_COLUMNS, Phase, WinState, createGame, gameReducer, GameActionType } from "./Game";
-import { CardType, EnemyCard } from "./CardData";
+import { CardType, EnemyCard, PlayerCard } from "./CardData";
 
 let gameState = mockGameState();
 
@@ -8,6 +8,7 @@ function mockGameState(): GameState {
   return {
     board: [...Array(NUM_ROWS)].map(() => [...Array(NUM_COLUMNS)].map(() => Array(2).fill(null))),
     deck: [],
+    unluckyCard: mockPlayer(),
     phase: Phase.GAME_START,
     selected: null,
     winState: WinState.NONE,
@@ -28,6 +29,19 @@ function mockEnemy(): EnemyCard {
         canOverlap: false,
         discardAfterRound: false,
         health: 1
+    };
+}
+
+
+function mockPlayer(): PlayerCard {
+    return {
+        id: 'player0',
+        name: 'The Athlete',
+        type: CardType.PLAYER,
+        strength: 1,
+        effectiveStrength: 1,
+        down: false,
+        rotated: false,
     };
 }
 
