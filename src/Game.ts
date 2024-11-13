@@ -357,14 +357,19 @@ function handleMortars(board: Board) {
   for (const cards of board.flat().filter(
     cards => cards[0]?.name === "Mortar" || cards[1]?.name === "Mortar"
   )) {
-      // TODO: Need to get top card sometimes
-      const mortarIndex = cards[0]!.index!;
-      
-      // Flip and rotate card under mortar
-      if (board[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.PLAYER) {
-        const card = board[mortarIndex[0]][mortarIndex[1]][0]! as PlayerCard;
-        card.down = true;
-        card.rotated = true;
+      let mortarIndex: [number, number];
+      if (cards[0]?.name === "Mortar") {
+        mortarIndex = cards[0]!.index!;
+      } else {
+        // Mortar is on top
+        mortarIndex = cards[1]!.index!;
+
+        // Flip and rotate card under mortar
+        if (board[mortarIndex[0]][mortarIndex[1]][0]?.type === CardType.PLAYER) {
+          const card = board[mortarIndex[0]][mortarIndex[1]][0]! as PlayerCard;
+          card.down = true;
+          card.rotated = true;
+        }
       }
       
       // Flip all adjacent players
