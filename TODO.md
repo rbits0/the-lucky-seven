@@ -1,3 +1,13 @@
+## Code
+- [x] Make gameState, board, card, deck, and history Readonly\<T\> or ReadonlyArray\<T\>
+    - Copying it will make it mutable, and adding back will make it immutable
+    - board is 2D array, so need to be careful
+    - ~~Look into how keeping a mutable reference to something in a readonly
+      property works, because placeCard() should return mutable reference.~~
+      It works fine
+- [x] Fix mutating board. I need to copy 2 layers, not just first layer
+
+
 ## Board
 
 - [x] Disable dragging of cards when not necessary
@@ -17,6 +27,8 @@
 - [x] Make win/loss overlay generic (don't have duplicate code)
 - [ ] Fix layout on vertical screens
 - [ ] Pre-load images
+- [ ] Add keyboard support
+- [ ] Display which player card was 8th
 
 ## Phases
 
@@ -48,6 +60,7 @@ Maneuver
 - [x] Don't highlight cells of first column, since player can't move to it
 - [x] The mouse can flip after moving
 - [x] Fix mouse movement
+- [x] Fix flipping of diagonally adjacent to leader
 
 Attack
 - [x] Click on player card to select it

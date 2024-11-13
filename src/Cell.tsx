@@ -1,20 +1,16 @@
-import React from "react";
 import Card from "./Card";
-import { CardData, EnemyCard } from "./CardData";
+import { CardData } from "./CardData";
 import { useDroppable } from "@dnd-kit/core";
-import { NUM_ROWS } from "./App";
-
 
 interface CellProps {
   id: string,
   rowIndex: number,
   columnIndex: number,
-  cards: (CardData | null)[],
-  attackCallback: (enemy: EnemyCard) => void,
+  cards: readonly (Readonly<CardData> | null)[],
 }
 
 
-function Cell({ id, rowIndex, columnIndex, cards, attackCallback }: CellProps) {
+function Cell({ id, rowIndex, columnIndex, cards }: CellProps) {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
     data: {
@@ -32,10 +28,10 @@ function Cell({ id, rowIndex, columnIndex, cards, attackCallback }: CellProps) {
     >
       <div className="flex justify-center items-center relative h-full">
         {cards[0] ? 
-          <Card card={cards[0]} disabled={cards[1] !== null} attackCallback={attackCallback}/>
+          <Card card={cards[0]} disabled={cards[1] !== null}/>
         : null}
         {cards[1] ? 
-          <Card card={cards[1]} disabled={true} className="absolute mt-[30%]" attackCallback={attackCallback} above={true} /> 
+          <Card card={cards[1]} disabled={true} className="absolute mt-[30%]" above={true} /> 
         : null}
       </div>
     </td>
