@@ -1,6 +1,8 @@
 # The Lucky Seven
 A react version of The Lucky Seven by [Coincidence Games](https://coincidence.games/)
 
+![Screenshot of game board with 7 green player card and 4 red enemy cards](preview.png)
+
 
 ## Available Scripts
 
